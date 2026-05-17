@@ -1,9 +1,10 @@
-const CACHE = 'russian-tools-v3';
+const CACHE = 'russian-tools-v5';
 const FILES = [
   '/russian-tools/',
   '/russian-tools/index.html',
   '/russian-tools/ch123_quiz.html',
   '/russian-tools/russian_verb_conjugator.html',
+  '/russian-tools/stats.html',
   '/russian-tools/manifest.json',
   '/russian-tools/icon.png',
   '/russian-tools/icon-512.png'

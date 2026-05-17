@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Русский — Stats</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Русский">
+<meta name="theme-color" content="#f5f3ee">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #f5f3ee; color: #1a1a1a; min-height: 100vh; padding: 1.5rem 1rem; }
+  .container { width: 100%; max-width: 620px; margin: 0 auto; }
+  .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
+  .back-btn:hover { color: #444; }
+  h1 { font-size: 1.4rem; font-weight: bold; margin-bottom: 1.5rem; }
+
+  /* Tool tabs */
+  .tool-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .tool-tab { padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-family: Georgia, serif; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #666; transition: all 0.15s; }
+  .tool-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .tool-tab.disabled { opacity: 0.4; cursor: default; }
+
+  /* Summary buckets */
+  .buckets { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .bucket { flex: 1; border-radius: 8px; padding: 0.6rem 0.5rem; text-align: center; }
+  .bucket-count { font-size: 1.3rem; font-weight: bold; }
+  .bucket-label { font-size: 0.68rem; margin-top: 2px; opacity: 0.85; }
+  .bucket.mastered { background: #2d7a3a; color: #fff; }
+  .bucket.getting-there { background: #c17f00; color: #fff; }
+  .bucket.need-work { background: #b02020; color: #fff; }
+
+  /* Sort controls */
+  .sort-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; }
+  .sort-label { font-size: 0.75rem; color: #888; }
+  .sort-btn { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.78rem; font-family: Georgia, serif; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #666; transition: all 0.15s; }
+  .sort-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  /* Word list */
+  .word-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .word-pill {
+    display: inline-block;
+    padding: 0.45rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    color: #fff;
+    font-family: Georgia, serif;
+    line-height: 1.3;
+    width: 100%;
+  }
+  .word-pill.unseen {
+    background: transparent;
+    border: 1px dashed #bbb;
+    color: #bbb;
+    filter: none;
+  }
+
+  .unseen-section-label { font-size: 0.72rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin: 1rem 0 0.5rem; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .coming-soon { color: #aaa; font-size: 0.9rem; padding: 2rem 0; text-align: center; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back-btn" href="index.html">← Home</a>
+  <h1>Stats</h1>
+
+  <div class="tool-tabs">
+    <button class="tool-tab active" onclick="showTab('quiz')">Vocabulary Quiz</button>
+    <button class="tool-tab disabled" onclick="">Verb Conjugator</button>
+  </div>
+
+  <div class="tab-content active" id="tab-quiz">
+    <div class="buckets">
+      <div class="bucket mastered"><div class="bucket-count" id="count-mastered">0</div><div class="bucket-label">Mastered</div></div>
+      <div class="bucket getting-there"><div class="bucket-count" id="count-getting">0</div><div class="bucket-label">Getting there</div></div>
+      <div class="bucket need-work"><div class="bucket-count" id="count-work">0</div><div class="bucket-label">Need work</div></div>
+    </div>
+
+    <div class="sort-row">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" id="sort-desc" onclick="setSort('desc')">Best → Worst</button>
+      <button class="sort-btn" id="sort-asc" onclick="setSort('asc')">Worst → Best</button>
+    </div>
+
+    <div class="word-list" id="word-list"></div>
+  </div>
+
+  <div class="tab-content" id="tab-conj">
+    <p class="coming-soon">Coming soon</p>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'quiz_scores_v1';
+
+// All 153 quiz items with their storage key and display label
+const ALL_WORDS = [{"key":"да","display":"да (yes)"},{"key":"нет","display":"нет (no)"},{"key":"спасибо","display":"спасибо (thank you)"},{"key":"пожалуйста","display":"пожалуйста (please / you're welcome)"},{"key":"простите","display":"простите (excuse me / I'm sorry)"},{"key":"привет","display":"привет (hello — informal)"},{"key":"до свидания","display":"до свидания (goodbye)"},{"key":"доброе утро","display":"доброе утро (good morning)"},{"key":"добрый день","display":"добрый день (good day)"},{"key":"это","display":"это (this / that / it)"},{"key":"вот","display":"вот (here / there — pointing)"},{"key":"где?","display":"где? (where?)"},{"key":"что?","display":"что? (what?)"},{"key":"без проблем","display":"без проблем (no problem)"},{"key":"здравствуйте","display":"здравствуйте (hello — formal)"},{"key":"а","display":"а (and / but — contrast)"},{"key":"водка","display":"водка (vodka)"},{"key":"вино","display":"вино (wine)"},{"key":"пиво","display":"пиво (beer)"},{"key":"чай","display":"чай (tea)"},{"key":"борщ","display":"борщ (beetroot soup)"},{"key":"сметана","display":"сметана (sour cream)"},{"key":"шоколад","display":"шоколад (chocolate)"},{"key":"сахар","display":"сахар (sugar)"},{"key":"газета","display":"газета (newspaper)"},{"key":"журнал","display":"журнал (magazine / journal)"},{"key":"дом","display":"дом (house)"},{"key":"окно","display":"окно (window)"},{"key":"дверь","display":"дверь (door)"},{"key":"брат","display":"брат (brother)"},{"key":"сестра","display":"сестра (sister)"},{"key":"мать","display":"мать (mother)"},{"key":"папа","display":"папа (dad)"},{"key":"дядя","display":"дядя (uncle)"},{"key":"такси","display":"такси (taxi)"},{"key":"рубль","display":"рубль (rouble)"},{"key":"утро","display":"утро (morning)"},{"key":"день","display":"день (day)"},{"key":"Москва","display":"Москва (Moscow)"},{"key":"англичанин","display":"англичанин (Englishman)"},{"key":"англичанка","display":"англичанка (Englishwoman)"},{"key":"правда","display":"правда (truth)"},{"key":"кофе","display":"кофе (coffee)"},{"key":"меню","display":"меню (menu)"},{"key":"пепси-кола","display":"пепси-кола (Pepsi-Cola)"},{"key":"1","display":"один (1)"},{"key":"2","display":"два (2)"},{"key":"3","display":"три (3)"},{"key":"4","display":"четыре (4)"},{"key":"5","display":"пять (5)"},{"key":"6","display":"шесть (6)"},{"key":"7","display":"семь (7)"},{"key":"8","display":"восемь (8)"},{"key":"9","display":"девять (9)"},{"key":"10","display":"десять (10)"},{"key":"ЗАКРЫТО","display":"ЗАКРЫТО (closed)"},{"key":"КАССА","display":"КАССА (cash / ticket desk)"},{"key":"ТУАЛЕТ","display":"ТУАЛЕТ (toilet)"},{"key":"ЗАПРЕЩЕНО","display":"ЗАПРЕЩЕНО (forbidden)"},{"key":"АЭРОПОРТ","display":"АЭРОПОРТ (airport)"},{"key":"ГОСТИНИЦА","display":"ГОСТИНИЦА (hotel)"},{"key":"ПОЧТА","display":"ПОЧТА (post office)"},{"key":"РЕСТОРАН","display":"РЕСТОРАН (restaurant)"},{"key":"БУФЕТ","display":"БУФЕТ (buffet / snack bar)"},{"key":"НЕ КУРИТЬ","display":"НЕ КУРИТЬ (no smoking)"},{"key":"ОТ СЕБЯ","display":"ОТ СЕБЯ (push)"},{"key":"К СЕБЕ","display":"К СЕБЕ (pull)"},{"key":"РЕМОНТ","display":"РЕМОНТ (closed for repairs)"},{"key":"ДИРЕКТОР","display":"ДИРЕКТОР (manager / director)"},{"key":"ПАРИКМАХЕРСКАЯ","display":"ПАРИКМАХЕРСКАЯ (hairdresser / barber)"},{"key":"ИНТУРИСТ","display":"ИНТУРИСТ (Intourist)"},{"key":"Which is correct for спасибо?","display":"Pronunciation: спасибо → spa-see-ba"},{"key":"Which is correct for пожалуйста?","display":"Pronunciation: пожалуйста → pa-zhal-sta"},{"key":"Which is correct for до свидания?","display":"Pronunciation: до свидания → da svee-da-nee-ya"},{"key":"Which is correct for Москва?","display":"Pronunciation: Москва → mask-va"},{"key":"Which is correct for она?","display":"Pronunciation: она → a-na"},{"key":"Which is correct for оно?","display":"Pronunciation: оно → a-no"},{"key":"Which is correct for сахар?","display":"Pronunciation: сахар → sa-khar"},{"key":"Which is correct for здравствуйте?","display":"Pronunciation: здравствуйте → zdra-stvooy-tye"},{"key":"Which is correct for что?","display":"Pronunciation: что → shto"},{"key":"Which is correct for хорошо?","display":"Pronunciation: хорошо → kha-ra-sho"},{"key":"Which is correct for привет?","display":"Pronunciation: привет → pree-vet"},{"key":"Which is correct for добрый день?","display":"Pronunciation: добрый день → do-bri dyen"},{"key":"Where is the vodka?","display":"Где водка? (Where is the vodka?)"},{"key":"There it is! (neuter)","display":"Вот оно! (There it is! — neuter)"},{"key":"It's tea.","display":"Это чай. (It's tea.)"},{"key":"Excuse me, what is this?","display":"Простите, что это? (Excuse me, what is this?)"},{"key":"No, it's wine.","display":"Нет, это вино. (No, it's wine.)"},{"key":"Thank you!","display":"Спасибо! (Thank you!)"},{"key":"You're welcome.","display":"Пожалуйста. (You're welcome.)"},{"key":"Here he is!","display":"Вот он! (Here he is!)"},{"key":"Here she is!","display":"Вот она! (Here she is!)"},{"key":"Goodbye.","display":"До свидания. (Goodbye.)"},{"key":"I don't know.","display":"Я не знаю. (I don't know.)"},{"key":"It's here!","display":"Вот оно! (It's here!)"},{"key":"What sound does Ж make?","display":"Ж → zh (like 'measure')"},{"key":"What sound does Х make?","display":"Х → kh (like Scottish 'loch')"},{"key":"What sound does Щ make?","display":"Щ → shsh"},{"key":"What sound does Ц make?","display":"Ц → ts"},{"key":"What sound does Ю make?","display":"Ю → yoo"},{"key":"What sound does Я make?","display":"Я → ya"},{"key":"What sound does Ё make?","display":"Ё → yo"},{"key":"What sound does Е make?","display":"Е → ye"},{"key":"What sound does Ш make?","display":"Ш → sh"},{"key":"What sound does Ч make?","display":"Ч → ch (like 'church')"},{"key":"What sound does Й make?","display":"Й → y (like 'boy')"},{"key":"What is the hard sign Ъ used for?","display":"Ъ → brief pause (separates sounds)"},{"key":"What is the soft sign Ь used for?","display":"Ь → softens the preceding consonant"},{"key":"What sound does Э make?","display":"Э → e (like 'fed')"},{"key":"What sound does Ы make?","display":"Ы → i (back of mouth)"},{"key":"Сибирь","display":"Сибирь (Siberia)"},{"key":"интервью","display":"интервью (interview)"},{"key":"шоу","display":"шоу (show)"},{"key":"Неаполь","display":"Неаполь (Naples)"},{"key":"Лондон","display":"Лондон (London)"},{"key":"Нью Йорк","display":"Нью Йорк (New York)"},{"key":"Good morning!","display":"Доброе утро! (Good morning!)"},{"key":"Good day!","display":"Добрый день! (Good day!)"},{"key":"What is this?","display":"Что это? (What is this?)"},{"key":"Where is the menu?","display":"Где меню? (Where is the menu?)"},{"key":"Which is correct for борщ?","display":"Pronunciation: борщ → borshch"},{"key":"Which is correct for журнал?","display":"Pronunciation: журнал → zhoor-nal"},{"key":"Which is correct for чай?","display":"Pronunciation: чай → chay"},{"key":"Россия","display":"Россия (Russia)"},{"key":"где","display":"где (where — handwriting)"},{"key":"что","display":"что (what — handwriting)"},{"key":"да, это чай","display":"да, это чай (yes, it's tea — handwriting)"},{"key":"нет, это водка","display":"нет, это водка (no, it's vodka — handwriting)"},{"key":"гостиница","display":"гостиница (hotel — handwriting)"},{"key":"до свидания, спасибо","display":"до свидания, спасибо (goodbye, thank you — handwriting)"},{"key":"Париж","display":"Париж (Paris)"},{"key":"Берлин","display":"Берлин (Berlin)"},{"key":"Рим","display":"Рим (Rome)"},{"key":"Англия","display":"Англия (England)"},{"key":"Франция","display":"Франция (France)"},{"key":"Германия","display":"Германия (Germany)"},{"key":"Италия","display":"Италия (Italy)"},{"key":"Америка","display":"Америка (America)"},{"key":"Владимир Ленин","display":"Владимир Ленин (Vladimir Lenin)"},{"key":"Лев Толстой","display":"Лев Толстой (Leo Tolstoy)"},{"key":"Антон Чехов","display":"Антон Чехов (Anton Chekhov)"},{"key":"Александр Пушкин","display":"Александр Пушкин (Alexander Pushkin)"},{"key":"Фёдор Достоевский","display":"Фёдор Достоевский (Fyodor Dostoevsky)"},{"key":"Борис Пастернак","display":"Борис Пастернак (Boris Pasternak)"},{"key":"Санкт-Петербург","display":"Санкт-Петербург (St Petersburg)"},{"key":"Невский Проспект","display":"Невский Проспект (Nevsky Prospect)"},{"key":"Владивосток","display":"Владивосток (Vladivostok)"},{"key":"Екатеринбург","display":"Екатеринбург (Yekaterinburg)"},{"key":"Иркутск","display":"Иркутск (Irkutsk)"},{"key":"Михаил Булгаков","display":"Михаил Булгаков (Mikhail Bulgakov)"},{"key":"Владимир Набоков","display":"Владимир Набоков (Vladimir Nabokov)"},{"key":"Иван Тургенев","display":"Иван Тургенев (Ivan Turgenev)"},{"key":"Николай Гоголь","display":"Николай Гоголь (Nikolai Gogol)"}];
+
+let sortDir = 'desc';
+
+function scoreToColor(s) {
+  // 0 = dark red, 5 = amber, 10 = green
+  if (s <= 5) {
+    // dark red (#8b0000) to amber (#c17f00)
+    const t = s / 5;
+    const r = Math.round(139 + (193 - 139) * t);
+    const g = Math.round(0 + (127 - 0) * t);
+    const b = 0;
+    return `rgb(${r},${g},${b})`;
+  } else {
+    // amber (#c17f00) to green (#2d7a3a)
+    const t = (s - 5) / 5;
+    const r = Math.round(193 + (45 - 193) * t);
+    const g = Math.round(127 + (122 - 127) * t);
+    const b = Math.round(0 + (58 - 0) * t);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function loadScores() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function render() {
+  const scores = loadScores();
+  let mastered = 0, getting = 0, work = 0;
+
+  const seen = [], unseen = [];
+  ALL_WORDS.forEach(w => {
+    if (w.key in scores) {
+      const s = scores[w.key];
+      if (s === 10) mastered++;
+      else if (s >= 5) getting++;
+      else work++;
+      seen.push({ ...w, score: s });
+    } else {
+      unseen.push(w);
+    }
+  });
+
+  document.getElementById('count-mastered').textContent = mastered;
+  document.getElementById('count-getting').textContent = getting;
+  document.getElementById('count-work').textContent = work;
+
+  seen.sort((a, b) => sortDir === 'desc' ? b.score - a.score : a.score - b.score);
+
+  const list = document.getElementById('word-list');
+  list.innerHTML = '';
+
+  seen.forEach(w => {
+    const pill = document.createElement('div');
+    pill.className = 'word-pill';
+    pill.style.background = scoreToColor(w.score);
+    pill.textContent = w.display + '  —  ' + w.score + ' / 10';
+    list.appendChild(pill);
+  });
+
+  if (unseen.length > 0) {
+    const label = document.createElement('div');
+    label.className = 'unseen-section-label';
+    label.textContent = `Not yet seen (${unseen.length})`;
+    list.appendChild(label);
+
+    unseen.forEach(w => {
+      const pill = document.createElement('div');
+      pill.className = 'word-pill unseen';
+      pill.textContent = w.display;
+      list.appendChild(pill);
+    });
+  }
+}
+
+function setSort(dir) {
+  sortDir = dir;
+  document.getElementById('sort-desc').className = 'sort-btn' + (dir === 'desc' ? ' active' : '');
+  document.getElementById('sort-asc').className = 'sort-btn' + (dir === 'asc' ? ' active' : '');
+  render();
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tool-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'quiz') || (i === 1 && tab === 'conj'));
+  });
+  document.getElementById('tab-quiz').className = 'tab-content' + (tab === 'quiz' ? ' active' : '');
+  document.getElementById('tab-conj').className = 'tab-content' + (tab === 'conj' ? ' active' : '');
+}
+
+render();
+</script>
+</body>
+</html>

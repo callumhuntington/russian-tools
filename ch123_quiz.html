@@ -52,6 +52,10 @@
   .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
   .back-btn:hover { color: #444; }
   input[type="text"] { font-size: 16px !important; }
+
+  /* ── Stats overlay ─────────────────────────────── */
+  .stats-link { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; float: right; }
+  .stats-link:hover { color: #444; }
 </style>
 </head>
 <body>
@@ -298,11 +302,59 @@ const ALL_QUESTIONS = [
   {type:"Translate to English",q:"Николай Гоголь",a:"Nikolai Gogol",opts:["Nikolai Gogol","Nikolai Nekrasov","Nikolai Leskov","Nikolai Ostrovsky"],pron:"nee-ka-lie go-gol",tr:"Nikolai Gogol",ex:["Гоголь написал «Мёртвые души». (Gogol wrote Dead Souls.)","Гоголь — украинско-русский писатель. (Gogol was a Ukrainian-Russian writer.)","Гоголь — на нашей книжной полке! (Gogol is on our bookshelf!)"]},
 ];
 
+
+// ── Persistent scoring ──────────────────────────────────────────────────────
+const STORE_KEY = 'quiz_scores_v1';
+
+function loadScores() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function saveScores(scores) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(scores)); } catch(e) {}
+}
+function getScore(q, scores) {
+  return q in scores ? scores[q] : null; // null = unseen
+}
+function updateScore(q, correct) {
+  const scores = loadScores();
+  const cur = q in scores ? scores[q] : 0;
+  scores[q] = Math.max(0, Math.min(10, cur + (correct ? 1 : -1)));
+  saveScores(scores);
+}
+
+// Weighted selection: score 0 → weight 6, score 10 → weight 1
+function weightedShuffle(questions) {
+  const scores = loadScores();
+  const weighted = [];
+  questions.forEach(q => {
+    const s = q.q in scores ? scores[q.q] : 0;
+    const w = Math.round(6 - (s / 10) * 5); // 6 down to 1
+    for (let i = 0; i < w; i++) weighted.push(q);
+  });
+  // Shuffle weighted pool, then pick 20 unique questions
+  const shuffled = [...weighted].sort(() => Math.random() - 0.5);
+  const seen = new Set();
+  const result = [];
+  for (const q of shuffled) {
+    const key = q.type + '|' + q.q;
+    if (!seen.has(key)) { seen.add(key); result.push(q); }
+    if (result.length >= 20) break;
+  }
+  // If not enough (shouldn't happen with 153+ questions), top up randomly
+  if (result.length < 20) {
+    const remaining = questions.filter(q => !result.includes(q));
+    const extra = [...remaining].sort(() => Math.random() - 0.5);
+    result.push(...extra.slice(0, 20 - result.length));
+  }
+  return result;
+}
+
 let current = 0, score = 0, answered = false, selected20 = [];
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function startQuiz() {
-  selected20 = shuffle(ALL_QUESTIONS).slice(0, 20);
+  selected20 = weightedShuffle(ALL_QUESTIONS);
   current = 0; score = 0; answered = false;
   document.getElementById('results').style.display = 'none';
   document.getElementById('quiz-header').style.display = 'block';
@@ -353,9 +405,11 @@ function checkAnswer(selected, correct) {
   fb.style.display = 'block';
   if (selected === correct) {
     score++;
+    updateScore(q.q, true);
     fb.className = 'feedback correct';
     fb.textContent = '✓ Correct!';
   } else {
+    updateScore(q.q, false);
     fb.className = 'feedback wrong';
     fb.textContent = `✗ The answer is: ${correct}`;
   }
