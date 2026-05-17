@@ -146,7 +146,7 @@
 <div class="container">
   <a class="back-btn" href="index.html">← Home</a>
   <h1>Russian Verb Conjugator</h1>
-  <p class="subtitle">5 random verbs per session — 30 forms total</p>
+  <p class="subtitle">3 random verbs per session — 18 forms total</p>
 
   <div id="quiz-area">
     <div class="header-row">
@@ -245,9 +245,9 @@ const ALL_VERBS = [
 ];
 
 const PRONOUNS = ["я","ты","он/она/оно","мы","вы","они"];
-const SESSION_SIZE = 5;
+const SESSION_SIZE = 3;
 
-let session = [], idx = 0, correct = 0, rowState = [], revealed = false;
+let session = [], idx = 0, correct = 0, rowState = [], revealed = false, scoreAtVerbStart = 0;
 
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
@@ -264,6 +264,7 @@ function loadVerb() {
   const v = session[idx];
   rowState = Array(6).fill(null);
   revealed = false;
+  scoreAtVerbStart = correct;
 
   document.getElementById('infinitive-display').textContent = v.inf;
   document.getElementById('translation-display').textContent = v.tr;
@@ -411,8 +412,8 @@ function checkComplete() {
 function showResults() {
   document.getElementById('quiz-area').style.display = 'none';
   document.getElementById('results').style.display = 'block';
-  const pct = Math.round((correct / 30) * 100);
-  document.getElementById('final-score').textContent = correct + ' / 30 (' + pct + '%)';
+  const pct = Math.round((correct / 18) * 100);
+  document.getElementById('final-score').textContent = correct + ' / 18 (' + pct + '%)';
   const msgs = [
     'Keep at it — review and try again. Каждый день!',
     'Getting there — keep practising!',
@@ -457,9 +458,9 @@ function revealStem() {
 }
 
 function nextVerb() { idx++; loadVerb(); }
-function resetVerb() { loadVerb(); }
+function resetVerb() { correct = scoreAtVerbStart; loadVerb(); }
 function updateScore() {
-  document.getElementById('score-display').textContent = correct + ' / 30';
+  document.getElementById('score-display').textContent = correct + ' / 18';
 }
 
 startSession();
