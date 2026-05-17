@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Russian">
+<meta name="apple-mobile-web-app-title" content="Русский">
 <meta name="theme-color" content="#f5f3ee">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,7 +74,7 @@
 
   input[type="text"] {
     flex: 1;
-    font-size: 0.95rem;
+    font-size: 16px;
     font-family: Georgia, serif;
     padding: 6px 10px;
     border: 1px solid #ccc;
@@ -83,6 +83,8 @@
     outline: none;
     transition: border-color 0.15s, color 0.15s;
   }
+  .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
+  .back-btn:hover { color: #444; }
 
   input[type="text"]:focus { border-color: #999; }
   input.correct { border-color: #81c784; color: #2e7d32; }
@@ -142,6 +144,7 @@
 </head>
 <body>
 <div class="container">
+  <a class="back-btn" href="index.html">← Home</a>
   <h1>Russian Verb Conjugator</h1>
   <p class="subtitle">5 random verbs per session — 30 forms total</p>
 

@@ -1,6 +1,6 @@
 {
-  "name": "Russian Tools",
-  "short_name": "Russian",
+  "name": "Русский",
+  "short_name": "Русский",
   "description": "Russian quiz and verb conjugator",
   "start_url": "/russian-tools/",
   "display": "standalone",
