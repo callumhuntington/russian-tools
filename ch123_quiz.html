@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Russian Quiz — Sections 1–3</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Russian">
+<meta name="theme-color" content="#f5f3ee">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, serif;
+    background: #f5f3ee;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .container { width: 100%; max-width: 620px; }
+  h1 { font-size: 1.4rem; font-weight: normal; margin-bottom: 0.25rem; color: #1a1a1a; }
+  .subtitle { font-size: 0.85rem; color: #888; margin-bottom: 2rem; }
+  .progress-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: #888; margin-bottom: 0.4rem; }
+  .progress-track { height: 4px; background: #ddd; border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: #3a6ea8; border-radius: 2px; transition: width 0.3s; width: 0%; }
+  .question-card { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
+  .category-badge { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: #e8e4db; color: #666; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .question-text { font-size: 1.5rem; font-weight: normal; line-height: 1.3; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .option-btn { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.9rem; font-family: Georgia, serif; text-align: left; cursor: pointer; transition: background 0.15s, border-color 0.15s; line-height: 1.3; }
+  .option-btn:hover:not(:disabled) { background: #f0ede6; border-color: #bbb; }
+  .option-btn.correct { background: #e8f5e9; border-color: #81c784; color: #2e7d32; }
+  .option-btn.wrong { background: #ffebee; border-color: #e57373; color: #c62828; }
+  .feedback { display: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; margin-bottom: 0.6rem; }
+  .feedback.correct { background: #e8f5e9; border: 1px solid #81c784; color: #2e7d32; }
+  .feedback.wrong { background: #ffebee; border: 1px solid #e57373; color: #c62828; }
+  .info-box { display: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; background: #f0ede6; border: 1px solid #d5cfc5; color: #444; line-height: 1.6; }
+  .info-box .info-row { margin-bottom: 0.2rem; }
+  .info-box .info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 0.1rem; }
+  .next-row { display: flex; justify-content: flex-end; }
+  .next-btn { display: none; background: #fff; border: 1px solid #bbb; border-radius: 8px; padding: 0.5rem 1.25rem; font-size: 0.9rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
+  .next-btn:hover { background: #f0ede6; }
+  .results { display: none; text-align: center; padding: 3rem 0 2rem; }
+  .results-score { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .results-msg { font-size: 1rem; color: #666; margin-bottom: 2rem; }
+  .restart-btn { background: #3a6ea8; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.75rem; font-size: 0.95rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
+  .restart-btn:hover { background: #2d5a8a; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Russian Quiz</h1>
+  <p class="subtitle">Sections 1–3 — 20 random questions from a bank of 200</p>
+  <div id="quiz-header">
+    <div class="progress-row">
+      <span id="progress-label">Question 1 of 20</span>
+      <span id="score-label">0 / 20</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div>
+  </div>
+  <div class="question-card" id="question-card">
+    <div class="category-badge" id="question-type"></div>
+    <div class="question-text" id="question-text"></div>
+  </div>
+  <div class="options-grid" id="options-grid"></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="info-box" id="info-box"></div>
+  <div class="next-row"><button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button></div>
+  <div class="results" id="results">
+    <div class="results-score" id="final-score"></div>
+    <div class="results-msg" id="final-message"></div>
+    <button class="restart-btn" onclick="restartQuiz()">New set of 20</button>
+  </div>
+</div>
+<script>
+// Each question has: type, q, a, opts, pron (pronunciation, if Cyrillic), tr (translation if not already given), ex (3 example sentences)
+const ALL_QUESTIONS = [
+  // ── TRANSLATE TO ENGLISH ─────────────────────────────────────────────────
+  {type:"Translate to English",q:"да",a:"yes",opts:["yes","no","hello","goodbye"],pron:"da",ex:["— Вы говорите по-русски? — Да! (Do you speak Russian? — Yes!)","— Это чай? — Да, это чай. (Is this tea? — Yes, it's tea.)","Да, я знаю. (Yes, I know.)"]},
+  {type:"Translate to English",q:"нет",a:"no",opts:["yes","no","thank you","excuse me"],pron:"nyet",ex:["— Это водка? — Нет, это вино. (Is this vodka? — No, it's wine.)","Нет, я не понимаю. (No, I don't understand.)","— Вы едете в Москву? — Нет. (Are you going to Moscow? — No.)"]},
+  {type:"Translate to English",q:"спасибо",a:"thank you",opts:["hello","goodbye","thank you","please"],pron:"spa-see-ba",ex:["— Три, пожалуйста. — Пожалуйста. — Спасибо! (Three, please. — Here you are. — Thank you!)","Спасибо за чай. (Thank you for the tea.)","Большое спасибо! (Thank you very much!)"]},
+  {type:"Translate to English",q:"пожалуйста",a:"please / you're welcome",opts:["please / you're welcome","excuse me","goodbye","good morning"],pron:"pa-zhal-sta",ex:["Три, пожалуйста. (Three, please.)","— Спасибо! — Пожалуйста. (Thank you! — You're welcome.)","Простите, пожалуйста, где туалет? (Excuse me please, where is the toilet?)"]},
+  {type:"Translate to English",q:"простите",a:"excuse me / I'm sorry",opts:["hello","excuse me / I'm sorry","thank you","where?"],pron:"pra-stee-tye",ex:["Простите, что это? (Excuse me, what is this?)","Простите, как вас зовут? (Excuse me, what is your name?)","Простите, пожалуйста, где касса? (Excuse me please, where is the ticket desk?)"]},
+  {type:"Translate to English",q:"привет",a:"hello (informal)",opts:["goodbye","hello (informal)","good morning","hello (formal)"],pron:"pree-vet",ex:["Привет, Ваня! (Hello, Vanya!)","— Привет! — Привет! (Hello! — Hello!)","Привет, как дела? (Hi, how are you?)"]},
+  {type:"Translate to English",q:"до свидания",a:"goodbye",opts:["good morning","good day","goodbye","you're welcome"],pron:"da svee-da-nee-ya",ex:["Спасибо. До свидания! (Thank you. Goodbye!)","— До свидания! — До свидания! (Goodbye! — Goodbye!)","До свидания, Мэри. (Goodbye, Mary.)"]},
+  {type:"Translate to English",q:"доброе утро",a:"good morning",opts:["good morning","good day","good evening","goodbye"],pron:"do-bra-ye oo-tra",ex:["Доброе утро, Наташа! (Good morning, Natasha!)","— Доброе утро! — Доброе утро! (Good morning! — Good morning!)","Доброе утро. Чай? (Good morning. Tea?)"]},
+  {type:"Translate to English",q:"добрый день",a:"good day",opts:["good morning","good day","goodbye","good evening"],pron:"do-bri dyen",ex:["Добрый день, меня зовут Борис. (Good day, my name is Boris.)","— Добрый день! — Добрый день! (Good day! — Good day!)","Добрый день. Простите, где ресторан? (Good day. Excuse me, where is the restaurant?)"]},
+  {type:"Translate to English",q:"это",a:"this / that / it",opts:["he","she","this / that / it","where"],pron:"e-ta",ex:["Что это? Это чай. (What is this? It's tea.)","Это борщ. (This is beetroot soup.)","Простите, это вино? (Excuse me, is this wine?)"]},
+  {type:"Translate to English",q:"вот",a:"here / there (pointing)",opts:["what?","where?","here / there (pointing)","and / but"],pron:"vot",ex:["Где Ваня? Вот он! (Where is Vanya? Here he is!)","Где водка? Вот она. (Where is the vodka? There it is.)","Вот меню. (Here is the menu.)"]},
+  {type:"Translate to English",q:"где?",a:"where?",opts:["what?","where?","who?","when?"],pron:"(g)dye",ex:["Где туалет? (Where is the toilet?)","Где вы живёте? (Where do you live?)","Где Мэри? Вот она. (Where is Mary? There she is.)"]},
+  {type:"Translate to English",q:"что?",a:"what?",opts:["what?","where?","who?","how?"],pron:"shto",ex:["Что это? (What is this?)","Простите, что это? (Excuse me, what is this?)","Что вы говорите? (What are you saying?)"]},
+  {type:"Translate to English",q:"без проблем",a:"no problem",opts:["no problem","excuse me","you're welcome","goodbye"],pron:"bez pro-blem",ex:["— Простите! — Без проблем. (Excuse me! — No problem.)","Без проблем, я понимаю. (No problem, I understand.)","— Спасибо! — Без проблем! (Thank you! — No problem!)"]},
+  {type:"Translate to English",q:"здравствуйте",a:"hello (formal)",opts:["hello (formal)","hello (informal)","goodbye","good morning"],pron:"zdra-stvooy-tye",ex:["Здравствуйте, меня зовут Мэри. (Hello, my name is Mary.)","Здравствуйте! Вы говорите по-английски? (Hello! Do you speak English?)","Здравствуйте, простите, где гостиница? (Hello, excuse me, where is the hotel?)"]},
+  {type:"Translate to English",q:"а",a:"and / but (contrast)",opts:["and / but (contrast)","yes","no","this"],pron:"a",ex:["Я еду на автобусе, а Мэри едет на метро. (I go by bus, but Mary goes by metro.)","Он говорит по-русски, а она — нет. (He speaks Russian, but she doesn't.)","Вы говорите по-английски? А по-французски? (Do you speak English? And French?)"]},
+  {type:"Translate to English",q:"водка",a:"vodka",opts:["vodka","wine","beer","tea"],pron:"vod-ka",tr:"vodka (f)",ex:["Где водка? Вот она. (Where is the vodka? There it is.)","Это водка? Нет, это вино. (Is this vodka? No, it's wine.)","Три водки, пожалуйста. (Three vodkas, please.)"]},
+  {type:"Translate to English",q:"вино",a:"wine",opts:["vodka","wine","beer","juice"],pron:"vee-no",tr:"wine (n)",ex:["Это вино? Да, это вино. (Is this wine? Yes, it's wine.)","Нет, это водка, а не вино. (No, this is vodka, not wine.)","Вино, пожалуйста. (Wine, please.)"]},
+  {type:"Translate to English",q:"пиво",a:"beer",opts:["vodka","wine","beer","tea"],pron:"pee-va",tr:"beer (n)",ex:["Где пиво? Вот оно! (Where is the beer? There it is!)","Пиво, пожалуйста. (Beer, please.)","Это пиво? Да. (Is this beer? Yes.)"]},
+  {type:"Translate to English",q:"чай",a:"tea",opts:["coffee","wine","beer","tea"],pron:"chay",tr:"tea (m)",ex:["Что это? Это чай. (What is this? It's tea.)","Чай, пожалуйста. (Tea, please.)","Три чая. (Three teas.)"]},
+  {type:"Translate to English",q:"борщ",a:"beetroot soup",opts:["sour cream","beetroot soup","chocolate","bread"],pron:"borshch",tr:"beetroot soup (m)",ex:["Это борщ? Да. (Is this beetroot soup? Yes.)","Борщ со сметаной. (Beetroot soup with sour cream.)","Нет, это борщ, а не вино! (No, this is beetroot soup, not wine!)"]},
+  {type:"Translate to English",q:"сметана",a:"sour cream",opts:["sour cream","beetroot soup","chocolate","butter"],pron:"smye-ta-na",tr:"sour cream (f)",ex:["Борщ со сметаной. (Beetroot soup with sour cream.)","Где сметана? (Where is the sour cream?)","Это сметана. (This is sour cream.)"]},
+  {type:"Translate to English",q:"шоколад",a:"chocolate",opts:["chocolate","sugar","cheese","bread"],pron:"sha-ka-lad",tr:"chocolate (m)",ex:["Что это? Это шоколад. (What is this? It's chocolate.)","Шоколад, пожалуйста. (Chocolate, please.)","Это шоколад? Да, это шоколад. (Is this chocolate? Yes, it's chocolate.)"]},
+  {type:"Translate to English",q:"сахар",a:"sugar",opts:["sugar","salt","cheese","butter"],pron:"sa-khar",tr:"sugar (m)",ex:["Сахар, пожалуйста. (Sugar, please.)","Где сахар? (Where is the sugar?)","Чай с сахаром. (Tea with sugar.)"]},
+  {type:"Translate to English",q:"газета",a:"newspaper",opts:["newspaper","magazine","book","letter"],pron:"ga-zye-ta",tr:"newspaper (f)",ex:["Что это? Это газета Правда. (What is this? It's the Pravda newspaper.)","Где газета? (Where is the newspaper?)","Это газета? Да. (Is this a newspaper? Yes.)"]},
+  {type:"Translate to English",q:"журнал",a:"magazine / journal",opts:["newspaper","magazine / journal","book","letter"],pron:"zhoor-nal",tr:"magazine (m)",ex:["Это журнал? Да. (Is this a magazine? Yes.)","Где журнал? (Where is the magazine?)","Журнал, пожалуйста. (The magazine, please.)"]},
+  {type:"Translate to English",q:"дом",a:"house",opts:["house","flat","window","door"],pron:"dom",tr:"house (m)",ex:["Это дом. (This is a house.)","Где дом? (Where is the house?)","Он живёт в этом доме. (He lives in this house.)"]},
+  {type:"Translate to English",q:"окно",a:"window",opts:["house","flat","window","door"],pron:"ak-na",tr:"window (n)",ex:["Где окно? Вот оно. (Where is the window? There it is.)","Это окно. (This is a window.)","Окно открыто. (The window is open.)"]},
+  {type:"Translate to English",q:"дверь",a:"door",opts:["house","flat","window","door"],pron:"dvyer",tr:"door (f)",ex:["Где дверь? Вот она. (Where is the door? There it is.)","ОТ СЕБЯ — push; К СЕБЕ — pull. (These signs are on doors.)","Это дверь. (This is a door.)"]},
+  {type:"Translate to English",q:"брат",a:"brother",opts:["brother","sister","uncle","dad"],pron:"brat",tr:"brother (m)",ex:["Где брат? Вот он! (Where is the brother? Here he is!)","Это мой брат. (This is my brother.)","Брат говорит по-русски. (My brother speaks Russian.)"]},
+  {type:"Translate to English",q:"сестра",a:"sister",opts:["brother","sister","uncle","mum"],pron:"sys-tra",tr:"sister (f)",ex:["Где сестра? Вот она! (Where is the sister? There she is!)","Это моя сестра. (This is my sister.)","Сестра живёт в Лондоне. (My sister lives in London.)"]},
+  {type:"Translate to English",q:"мать",a:"mother",opts:["mother","father","sister","brother"],pron:"mat",tr:"mother (f)",ex:["Где мать? Вот она. (Where is mother? There she is.)","Это мать. (This is mother.)","Мать живёт в Москве. (Mother lives in Moscow.)"]},
+  {type:"Translate to English",q:"папа",a:"dad",opts:["mum","dad","uncle","brother"],pron:"pa-pa",tr:"dad (m)",ex:["Где папа? Вот он! (Where is dad? Here he is!)","Это папа. (This is dad.)","Папа говорит по-английски. (Dad speaks English.)"]},
+  {type:"Translate to English",q:"дядя",a:"uncle",opts:["uncle","aunt","brother","sister"],pron:"dya-dya",tr:"uncle (m)",ex:["Где дядя Ваня? Вот он! (Where is Uncle Vanya? Here he is!)","Это дядя. (This is my uncle.)","Дядя живёт в Москве. (Uncle lives in Moscow.)"]},
+  {type:"Translate to English",q:"такси",a:"taxi",opts:["taxi","bus","train","metro"],pron:"tak-see",tr:"taxi (n, indeclinable)",ex:["Где такси? Вот оно! (Where is the taxi? There it is!)","Такси, пожалуйста. (A taxi, please.)","Это такси? Да. (Is this a taxi? Yes.)"]},
+  {type:"Translate to English",q:"рубль",a:"rouble",opts:["rouble","euro","dollar","pound"],pron:"roob-ly",tr:"rouble (m)",ex:["Что это? Это рубль. (What is this? It's a rouble.)","Три рубля. (Three roubles.)","Рубль — это русская валюта. (The rouble is Russian currency.)"]},
+  {type:"Translate to English",q:"утро",a:"morning",opts:["morning","evening","night","afternoon"],pron:"oo-tra",tr:"morning (n)",ex:["Доброе утро! (Good morning!)","Утро — это хорошо. (Morning is good.)","Доброе утро, Наташа! (Good morning, Natasha!)"]},
+  {type:"Translate to English",q:"день",a:"day",opts:["day","night","morning","week"],pron:"dyen",tr:"day (m)",ex:["Добрый день! (Good day!)","Один день. (One day.)","Добрый день, меня зовут Борис. (Good day, my name is Boris.)"]},
+  {type:"Translate to English",q:"Москва",a:"Moscow",opts:["Moscow","St Petersburg","Kiev","Minsk"],pron:"mask-va",tr:"Moscow (f)",ex:["Она живёт в Москве. (She lives in Moscow.)","Где Москва? В России. (Where is Moscow? In Russia.)","Я еду в Москву. (I am going to Moscow.)"]},
+  {type:"Translate to English",q:"англичанин",a:"Englishman",opts:["Englishman","Englishwoman","Russian man","Russian woman"],pron:"an-glee-chan-in",tr:"Englishman (m)",ex:["Он англичанин. (He is an Englishman.)","Это англичанин? Да. (Is this an Englishman? Yes.)","Он англичанин и говорит по-английски. (He is an Englishman and speaks English.)"]},
+  {type:"Translate to English",q:"англичанка",a:"Englishwoman",opts:["Englishwoman","Englishman","Russian woman","Russian man"],pron:"an-glee-chan-ka",tr:"Englishwoman (f)",ex:["Мэри — англичанка. (Mary is an Englishwoman.)","Она англичанка и говорит по-английски. (She is an Englishwoman and speaks English.)","Это англичанка? Да. (Is this an Englishwoman? Yes.)"]},
+  {type:"Translate to English",q:"правда",a:"truth",opts:["truth","lie","news","word"],pron:"prav-da",tr:"truth (f) / also: a famous newspaper",ex:["Это правда? (Is that true?)","Правда — газета. (Pravda is a newspaper.)","Да, это правда. (Yes, that's true.)"]},
+  {type:"Translate to English",q:"кофе",a:"coffee",opts:["coffee","tea","water","juice"],pron:"ko-fye",tr:"coffee (m — exception!)",ex:["Кофе, пожалуйста. (Coffee, please.)","Что это? Это кофе. (What is this? It's coffee.)","Кофе — мужского рода, хотя оканчивается на -е. (Coffee is masculine, even though it ends in -е.)"]},
+  {type:"Translate to English",q:"меню",a:"menu",opts:["menu","taxi","show","jury"],pron:"mye-nyoo",tr:"menu (n, indeclinable)",ex:["Где меню? Вот оно. (Where is the menu? There it is.)","Меню, пожалуйста. (The menu, please.)","Это меню. (This is the menu.)"]},
+  {type:"Translate to English",q:"пепси-кола",a:"Pepsi-Cola",opts:["Pepsi-Cola","Coca-Cola","lemonade","juice"],pron:"pep-see ko-la",tr:"Pepsi-Cola",ex:["А это? Пепси-Кола. (And this? Pepsi-Cola.)","Пепси-Кола, пожалуйста. (Pepsi-Cola, please.)","Это пепси-кола. (This is Pepsi-Cola.)"]},
+  // ── WHAT GENDER? ────────────────────────────────────────────────────────
+  {type:"What gender?",q:"водка",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"vod-ka",tr:"vodka",ex:["Где водка? Вот она! (Where is the vodka? There it is!)","Водка — женского рода: она заканчивается на -а. (Vodka is feminine: it ends in -а.)","Это водка. Вот она. (This is vodka. Here it is.)"]},
+  {type:"What gender?",q:"вино",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"vee-no",tr:"wine",ex:["Где вино? Вот оно! (Where is the wine? There it is!)","Вино — среднего рода: заканчивается на -о. (Wine is neuter: ends in -о.)","Это вино? Да. Вот оно. (Is this wine? Yes. Here it is.)"]},
+  {type:"What gender?",q:"чай",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"chay",tr:"tea",ex:["Где чай? Вот он! (Where is the tea? There it is!)","Чай — мужского рода: заканчивается на согласный й. (Tea is masculine: ends in the consonant й.)","Чай, пожалуйста. Вот он. (Tea, please. Here it is.)"]},
+  {type:"What gender?",q:"пиво",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"pee-va",tr:"beer",ex:["Где пиво? Вот оно! (Where is the beer? There it is!)","Пиво — среднего рода: заканчивается на -о. (Beer is neuter: ends in -о.)","Это пиво? Да. Вот оно. (Is this beer? Yes. Here it is.)"]},
+  {type:"What gender?",q:"борщ",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"borshch",tr:"beetroot soup",ex:["Борщ — мужского рода: заканчивается на согласный. (Borsch is masculine: ends in a consonant.)","Где борщ? Вот он! (Where is the borsch? There it is!)","Это борщ. Он вкусный. (This is borsch. It's delicious.)"]},
+  {type:"What gender?",q:"сметана",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"smye-ta-na",tr:"sour cream",ex:["Сметана — женского рода: заканчивается на -а. (Sour cream is feminine: ends in -а.)","Где сметана? Вот она. (Where is the sour cream? There it is.)","Борщ со сметаной. Вот она, сметана. (Borsch with sour cream. There it is, the sour cream.)"]},
+  {type:"What gender?",q:"окно",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"ak-na",tr:"window",ex:["Окно — среднего рода: заканчивается на -о. (Window is neuter: ends in -о.)","Где окно? Вот оно. (Where is the window? There it is.)","Это окно. Вот оно. (This is the window. Here it is.)"]},
+  {type:"What gender?",q:"такси",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"tak-see",tr:"taxi",ex:["Где такси? Вот оно! (Where is the taxi? There it is!)","Такси — среднего рода: иностранное слово на -и. (Taxi is neuter: foreign word ending in -и.)","Такси здесь. Вот оно. (The taxi is here. There it is.)"]},
+  {type:"What gender?",q:"газета",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"ga-zye-ta",tr:"newspaper",ex:["Где газета? Вот она. (Where is the newspaper? There it is.)","Газета — женского рода: заканчивается на -а. (Newspaper is feminine: ends in -а.)","Это газета Правда. Вот она. (This is the Pravda newspaper. There it is.)"]},
+  {type:"What gender?",q:"день",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"dyen",tr:"day",ex:["День — мужского рода, хотя заканчивается на мягкий знак. (Day is masculine, despite ending in a soft sign.)","Добрый день! (Good day!)","Один день — он. (One day — it's masculine: он.)"]},
+  {type:"What gender?",q:"рубль",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"roob-ly",tr:"rouble",ex:["Рубль — мужского рода, хотя заканчивается на мягкий знак. (Rouble is masculine despite soft sign.)","Что это? Это рубль. Вот он. (What is this? It's a rouble. Here it is.)","Один рубль. (One rouble.)"]},
+  {type:"What gender?",q:"мать",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"mat",tr:"mother",ex:["Мать — женского рода, заканчивается на мягкий знак. (Mother is feminine, ends in soft sign.)","Где мать? Вот она. (Where is mother? There she is.)","Это мать. Вот она. (This is mother. There she is.)"]},
+  {type:"What gender?",q:"дверь",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"dvyer",tr:"door",ex:["Дверь — женского рода, заканчивается на мягкий знак. (Door is feminine, ends in soft sign.)","Где дверь? Вот она. (Where is the door? There it is.)","К СЕБЕ — тяни дверь к себе. (K SEBE — pull the door toward you.)"]},
+  {type:"What gender?",q:"дом",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"dom",tr:"house",ex:["Дом — мужского рода: заканчивается на согласный. (House is masculine: ends in a consonant.)","Где дом? Вот он. (Where is the house? There it is.)","Это дом. Вот он. (This is the house. There it is.)"]},
+  {type:"What gender?",q:"Москва",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"mask-va",tr:"Moscow",ex:["Москва — женского рода: заканчивается на -а. (Moscow is feminine: ends in -а.)","Она живёт в Москве. Москва — она. (She lives in Moscow. Moscow — it's feminine.)","Где Москва? Вот она. (Where is Moscow? There it is.)"]},
+  {type:"What gender?",q:"утро",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"oo-tra",tr:"morning",ex:["Утро — среднего рода: заканчивается на -о. (Morning is neuter: ends in -о.)","Доброе утро! (Good morning! — note доброе, the neuter adjective.)","Утро. Вот оно. (Morning. Here it is.)"]},
+  {type:"What gender?",q:"меню",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"mye-nyoo",tr:"menu",ex:["Где меню? Вот оно. (Where is the menu? There it is.)","Меню — среднего рода: иностранное слово на -ю. (Menu is neuter: foreign word ending in -ю.)","Меню, пожалуйста. Вот оно. (The menu, please. Here it is.)"]},
+  {type:"What gender?",q:"шоколад",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"sha-ka-lad",tr:"chocolate",ex:["Шоколад — мужского рода: заканчивается на согласный. (Chocolate is masculine: ends in a consonant.)","Где шоколад? Вот он. (Where is the chocolate? There it is.)","Это шоколад. Он вкусный. (This is chocolate. It's delicious.)"]},
+  {type:"What gender?",q:"сестра",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"sys-tra",tr:"sister",ex:["Сестра — женского рода: заканчивается на -а. (Sister is feminine: ends in -а.)","Где сестра? Вот она. (Where is sister? There she is.)","Это сестра. Вот она. (This is my sister. There she is.)"]},
+  {type:"What gender?",q:"папа",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"pa-pa",tr:"dad",ex:["Папа — мужского рода, хотя заканчивается на -а: обозначает мужчину. (Dad is masculine despite -а ending: it denotes a male.)","Где папа? Вот он! (Where is dad? There he is!)","Папа говорит по-английски. (Dad speaks English.)"]},
+  {type:"What gender?",q:"кофе",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"ko-fye",tr:"coffee",ex:["Кофе — мужского рода по традиции, хотя оканчивается на -е. (Coffee is masculine by convention, despite ending in -е.)","Где кофе? Вот он. (Where is the coffee? There it is.)","Кофе, пожалуйста. Вот он. (Coffee, please. Here it is.)"]},
+  {type:"What gender?",q:"правда",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"prav-da",tr:"truth",ex:["Правда — женского рода: заканчивается на -а. (Truth is feminine: ends in -а.)","Это правда? Да, это правда. Вот она. (Is it the truth? Yes, it is. There it is.)","Правда — газета. Она знаменита. (Pravda is a newspaper. It's famous.)"]},
+  // ── NUMBERS ────────────────────────────────────────────────────────────
+  {type:"Numbers",q:"1",a:"один",opts:["один","два","три","четыре"],pron:"a-deen",ex:["Один рубль, пожалуйста. (One rouble, please.)","Один чай. (One tea.)","Я живу один. (I live alone.)"]},
+  {type:"Numbers",q:"2",a:"два",opts:["один","два","три","четыре"],pron:"dva",ex:["Два чая, пожалуйста. (Two teas, please.)","Два рубля. (Two roubles.)","Два и два — четыре. (Two and two is four.)"]},
+  {type:"Numbers",q:"3",a:"три",opts:["два","три","четыре","один"],pron:"tree",ex:["Три, пожалуйста. (Three, please.)","Три рубля. (Three roubles.)","Три чая и один кофе. (Three teas and one coffee.)"]},
+  {type:"Numbers",q:"4",a:"четыре",opts:["три","четыре","пять","два"],pron:"chye-ti-rye",ex:["Четыре, пожалуйста. (Four, please.)","Четыре рубля. (Four roubles.)","Один, два, три, четыре! (One, two, three, four!)"]},
+  {type:"Numbers",q:"5",a:"пять",opts:["три","четыре","пять","шесть"],pron:"pyat",ex:["Пять рублей. (Five roubles.)","Пять, пожалуйста. (Five, please.)","Пять минут. (Five minutes.)"]},
+  {type:"Numbers",q:"6",a:"шесть",opts:["пять","шесть","семь","четыре"],pron:"shyest",ex:["Шесть рублей. (Six roubles.)","Шесть часов. (Six o'clock.)","Шесть, пожалуйста. (Six, please.)"]},
+  {type:"Numbers",q:"7",a:"семь",opts:["шесть","семь","восемь","пять"],pron:"syem",ex:["Семь дней в неделе. (Seven days in a week.)","Семь рублей. (Seven roubles.)","Семь, пожалуйста. (Seven, please.)"]},
+  {type:"Numbers",q:"8",a:"восемь",opts:["семь","восемь","девять","шесть"],pron:"vo-syem",ex:["Восемь часов. (Eight o'clock.)","Восемь рублей. (Eight roubles.)","Восемь, пожалуйста. (Eight, please.)"]},
+  {type:"Numbers",q:"9",a:"девять",opts:["восемь","девять","десять","семь"],pron:"dye-vyat",ex:["Девять рублей. (Nine roubles.)","Девять часов. (Nine o'clock.)","Девять, пожалуйста. (Nine, please.)"]},
+  {type:"Numbers",q:"10",a:"десять",opts:["восемь","девять","десять","шесть"],pron:"dye-syat",ex:["Десять рублей. (Ten roubles.)","Десять пальцев. (Ten fingers.)","Десять, пожалуйста. (Ten, please.)"]},
+  // ── READ THE SIGN ────────────────────────────────────────────────────────
+  {type:"Read the sign",q:"ЗАКРЫТО",a:"closed",opts:["open","closed","forbidden","push"],pron:"za-kri-ta",ex:["Магазин закрыто. (The shop is closed.)","Закрыто — противоположность открыто. (Closed is the opposite of open.)","Ресторан закрыто. Ремонт. (The restaurant is closed. Repairs.)"]},
+  {type:"Read the sign",q:"КАССА",a:"cash / ticket desk",opts:["post office","hotel","cash / ticket desk","restaurant"],pron:"ka-sa",ex:["Где касса? (Where is the ticket desk?)","Касса — это где платят. (The касса is where you pay.)","Простите, где касса? Вот она. (Excuse me, where is the desk? There it is.)"]},
+  {type:"Read the sign",q:"ТУАЛЕТ",a:"toilet",opts:["toilet","exit","entrance","buffet"],pron:"too-a-lyet",ex:["Где туалет? (Where is the toilet?)","Простите, где туалет? (Excuse me, where is the toilet?)","Туалет — направо. (The toilet is to the right.)"]},
+  {type:"Read the sign",q:"ЗАПРЕЩЕНО",a:"forbidden",opts:["closed","forbidden","push","pull"],pron:"za-prye-shche-no",ex:["Курить запрещено. (Smoking is forbidden.)","НЕ КУРИТЬ — Запрещено! (No smoking — Forbidden!)","Здесь запрещено. (It is forbidden here.)"]},
+  {type:"Read the sign",q:"АЭРОПОРТ",a:"airport",opts:["airport","hotel","post office","restaurant"],pron:"a-e-ra-port",ex:["Где аэропорт? (Where is the airport?)","Я еду в аэропорт. (I am going to the airport.)","Простите, где аэропорт? (Excuse me, where is the airport?)"]},
+  {type:"Read the sign",q:"ГОСТИНИЦА",a:"hotel",opts:["airport","hotel","post office","restaurant"],pron:"ga-stee-nee-tsa",ex:["Где гостиница? (Where is the hotel?)","Они в гостинице «Россия». (They are at the Rossiya Hotel.)","Простите, где гостиница? (Excuse me, where is the hotel?)"]},
+  {type:"Read the sign",q:"ПОЧТА",a:"post office",opts:["airport","hotel","post office","restaurant"],pron:"poch-ta",ex:["Где почта? (Where is the post office?)","Простите, где почта? (Excuse me, where is the post office?)","Почта — направо. (The post office is to the right.)"]},
+  {type:"Read the sign",q:"РЕСТОРАН",a:"restaurant",opts:["airport","hotel","post office","restaurant"],pron:"rye-sta-ran",ex:["Где ресторан? (Where is the restaurant?)","Они знают этот ресторан! (They know this restaurant!)","Простите, где ресторан? (Excuse me, where is the restaurant?)"]},
+  {type:"Read the sign",q:"БУФЕТ",a:"buffet / snack bar",opts:["buffet / snack bar","toilet","hotel","exit"],pron:"boo-fyet",ex:["Где буфет? (Where is the buffet?)","Буфет — это небольшой бар. (A буфет is a small snack bar.)","Простите, где буфет? (Excuse me, where is the buffet?)"]},
+  {type:"Read the sign",q:"НЕ КУРИТЬ",a:"no smoking",opts:["no entry","no smoking","no parking","forbidden"],pron:"nye koo-reet",ex:["НЕ КУРИТЬ! — Это запрещено. (No smoking! — It is forbidden.)","Здесь не курить. (No smoking here.)","Не курить — инфинитив как команда. (Не курить — infinitive used as a command.)"]},
+  {type:"Read the sign",q:"ОТ СЕБЯ",a:"push",opts:["push","pull","open","closed"],pron:"at sye-bya",ex:["ОТ СЕБЯ — толкай от себя. (ОТ СЕБЯ — push away from yourself.)","ОТ СЕБЯ означает толкать. (ОТ СЕБЯ means to push.)","Дверь: ОТ СЕБЯ. (Door: push.)"]},
+  {type:"Read the sign",q:"К СЕБЕ",a:"pull",opts:["push","pull","open","closed"],pron:"k sye-bye",ex:["К СЕБЕ — тяни к себе. (К СЕБЕ — pull toward yourself.)","К СЕБЕ означает тянуть. (К СЕБЕ means to pull.)","Дверь: К СЕБЕ. (Door: pull.)"]},
+  {type:"Read the sign",q:"РЕМОНТ",a:"closed for repairs",opts:["closed for repairs","open","push","forbidden"],pron:"rye-mont",ex:["Магазин — ремонт. (The shop is closed for repairs.)","Ресторан закрыто. Ремонт. (The restaurant is closed. Repairs.)","РЕМОНТ — очень частый знак в России! (РЕМОНТ — a very common sign in Russia!)"]},
+  {type:"Read the sign",q:"ДИРЕКТОР",a:"manager / director",opts:["manager / director","cashier","doctor","driver"],pron:"dee-ryek-tor",ex:["Где директор? (Where is the director?)","ДИРЕКТОР — на двери кабинета. (ДИРЕКТОР — on the office door.)","Простите, где директор? (Excuse me, where is the director?)"]},
+  {type:"Read the sign",q:"ПАРИКМАХЕРСКАЯ",a:"hairdresser / barber",opts:["hairdresser / barber","pharmacy","post office","hotel"],pron:"pa-reek-ma-khyer-ska-ya",ex:["Где парикмахерская? (Where is the hairdresser?)","ПАРИКМАХЕРСКАЯ — одно из самых длинных слов! (ПАРИКМАХЕРСКАЯ — one of the longest common words!)","Простите, где парикмахерская? (Excuse me, where is the hairdresser?)"]},
+  {type:"Read the sign",q:"ИНТУРИСТ",a:"Intourist (Soviet travel agency)",opts:["Intourist (Soviet travel agency)","airport","hotel","buffet"],pron:"een-too-reest",ex:["ИНТУРИСТ — советское туристическое агентство. (INTOURIST — the Soviet tourist agency.)","Иностранцы ехали через ИНТУРИСТ. (Foreigners travelled through INTOURIST.)","Где ИНТУРИСТ? (Where is Intourist?)"]},
+  // ── PRONUNCIATION ──────────────────────────────────────────────────────
+  {type:"Pronunciation",q:"Which is correct for спасибо?",a:"spa-see-ba",opts:["spa-see-ba","spa-see-bo","spa-sea-ba","spu-see-ba"],ex:["Безударное -о в конце всегда звучит как /а/. (Unstressed -о at the end always sounds like /а/.)","Спасибо за чай! (Thank you for the tea!)","Большое спасибо! (Thank you very much!)"]},
+  {type:"Pronunciation",q:"Which is correct for пожалуйста?",a:"pa-zhal-sta",opts:["pa-zhal-sta","po-zhal-sta","pa-jal-sta","pa-zhal-sto"],ex:["Пожалуйста произносится как три слога: па-жал-ста. (Пожалуйста is pronounced in three syllables: pa-zhal-sta.)","Три чая, пожалуйста. (Three teas, please.)","— Спасибо! — Пожалуйста. (Thank you! — You're welcome.)"]},
+  {type:"Pronunciation",q:"Which is correct for до свидания?",a:"da svee-da-nee-ya",opts:["da svee-da-nee-ya","do svee-da-nee-ya","da svee-da-nya","da svee-dee-nya"],ex:["Безударное до звучит как /да/. (Unstressed до sounds like /да/.)","Спасибо. До свидания! (Thank you. Goodbye!)","До свидания, Мэри! (Goodbye, Mary!)"]},
+  {type:"Pronunciation",q:"Which is correct for Москва?",a:"mask-va",opts:["mask-va","mos-kva","mosk-va","mask-vo"],ex:["Безударное -о- в середине редуцируется до /а/. (Unstressed -о- in the middle reduces to /а/.)","Они в Москве. Произносится mask-va. (They are in Moscow. Pronounced mask-va.)","Москва — столица России. (Moscow is the capital of Russia.)"]},
+  {type:"Pronunciation",q:"Which is correct for она?",a:"a-na",opts:["a-na","o-na","on-a","an-a"],ex:["Безударное о редуцируется: она = а-на. (Unstressed о reduces: она = a-na.)","Где водка? Вот она. Произносится а-на. (Where's the vodka? There it is. Pronounced a-na.)","Она живёт в Москве. (She lives in Moscow.)"]},
+  {type:"Pronunciation",q:"Which is correct for оно?",a:"a-no",opts:["a-no","o-no","on-o","an-o"],ex:["Первое о безударное → /а/; второе о ударное → /о/. (First о unstressed → /а/; second о stressed → /о/.)","Где такси? Вот оно. Произносится а-но. (Where's the taxi? There it is. Pronounced a-no.)","Меню — оно. Вот оно. (The menu is neuter — it. There it is.)"]},
+  {type:"Pronunciation",q:"Which is correct for сахар?",a:"sa-khar",opts:["sa-khar","sa-har","sa-kar","sa-kha"],ex:["Буква х произносится как горловой звук, похожий на ch в шотландском 'loch'. (The letter х is a guttural sound like ch in Scottish 'loch'.)","Сахар, пожалуйста. Произносится са-хар. (Sugar, please. Pronounced sa-khar.)","Чай с сахаром. (Tea with sugar.)"]},
+  {type:"Pronunciation",q:"Which is correct for здравствуйте?",a:"zdra-stvooy-tye",opts:["zdra-stvooy-tye","zdra-vstvoo-ee-tye","zda-stvooy-tye","zdra-stvoo-tye"],ex:["Первая в почти никогда не произносится: здра-ствуй-те. (The first в is almost never pronounced: zdra-stvooy-tye.)","Здравствуйте, меня зовут Мэри. (Hello, my name is Mary.)","Здравствуйте! Вы говорите по-английски? (Hello! Do you speak English?)"]},
+  {type:"Pronunciation",q:"Which is correct for что?",a:"shto",opts:["shto","chto","shcho","kto"],ex:["Ч в слове что произносится как ш: shto, а не chto. (The ч in что is pronounced like ш: shto, not chto.)","Что это? Произносится: shto e-ta? (What is this? Pronounced: shto e-ta?)","Что вы говорите? Произносится shto. (What are you saying? Pronounced shto.)"]},
+  {type:"Pronunciation",q:"Which is correct for хорошо?",a:"kha-ra-sho",opts:["kha-ra-sho","ho-ro-sho","ha-ro-sho","kho-ro-sho"],ex:["Оба безударных о редуцируются до /а/: ха-ра-шо. (Both unstressed о reduce to /а/: kha-ra-sho.)","Вы хорошо говорите по-русски! (You speak Russian well!)","Хорошо, я понимаю. (Good / OK, I understand.)"]},
+  {type:"Pronunciation",q:"Which is correct for привет?",a:"pree-vet",opts:["pree-vet","pri-vyet","pree-vyet","pri-vet"],ex:["Ударение на втором слоге: при-ВЕТ. (Stress on the second syllable: pri-VET.)","Привет, Ваня! Произносится pree-vet. (Hello, Vanya! Pronounced pree-vet.)","Привет! Как дела? (Hi! How are you?)"]},
+  {type:"Pronunciation",q:"Which is correct for добрый день?",a:"do-bri dyen",opts:["do-bri dyen","do-bree dyen","do-bri dyen","dob-ry dyen"],ex:["В слове добрый ый → ый звучит как краткий и. (In добрый, ый sounds like a short и.)","Добрый день, меня зовут Борис. (Good day, my name is Boris.)","Добрый день! Произносится до-бри дьень. (Good day! Pronounced do-bri dyen.)"]},
+  // ── TRANSLATE TO RUSSIAN ─────────────────────────────────────────────────
+  {type:"Translate to Russian",q:"Where is the vodka?",a:"Где водка?",opts:["Что это?","Где водка?","Вот она!","Это водка?"],ex:["Где водка? — Вот она! (Where is the vodka? — There it is!)","Простите, где водка? (Excuse me, where is the vodka?)","Где водка? Я не знаю. (Where is the vodka? I don't know.)"]},
+  {type:"Translate to Russian",q:"There it is! (neuter)",a:"Вот оно!",opts:["Вот он!","Вот она!","Вот оно!","Где оно?"],ex:["Где меню? Вот оно! (Where is the menu? There it is!)","Где такси? Вот оно! (Where is the taxi? There it is!)","Где вино? Вот оно! (Where is the wine? There it is!)"]},
+  {type:"Translate to Russian",q:"It's tea.",a:"Это чай.",opts:["Это чай.","Это вино.","Это пиво.","Это кофе."],ex:["— Что это? — Это чай. (What is this? — It's tea.)","Это чай. Вот он. (It's tea. Here it is.)","Это чай, а не кофе. (It's tea, not coffee.)"]},
+  {type:"Translate to Russian",q:"Excuse me, what is this?",a:"Простите, что это?",opts:["Простите, что это?","Где это?","Что вот?","Это простите?"],ex:["Простите, что это? — Это борщ. (Excuse me, what is this? — It's borsch.)","Простите, что это? — Это рубль. (Excuse me, what is this? — It's a rouble.)","Простите, что это? — Это шоколад. (Excuse me, what is this? — It's chocolate.)"]},
+  {type:"Translate to Russian",q:"No, it's wine.",a:"Нет, это вино.",opts:["Да, это вино.","Нет, это вино.","Нет, это водка.","Где вино?"],ex:["— Это водка? — Нет, это вино. (Is this vodka? — No, it's wine.)","— Это чай? — Нет, это вино. (Is this tea? — No, it's wine.)","— Это пиво? — Нет, это вино. (Is this beer? — No, it's wine.)"]},
+  {type:"Translate to Russian",q:"Thank you!",a:"Спасибо!",opts:["Пожалуйста!","Спасибо!","Привет!","До свидания!"],ex:["— Три, пожалуйста. — Пожалуйста. — Спасибо! (Three, please. — Here you are. — Thank you!)","Спасибо за чай! (Thank you for the tea!)","Большое спасибо! (Thank you very much!)"]},
+  {type:"Translate to Russian",q:"You're welcome.",a:"Пожалуйста.",opts:["Спасибо.","Пожалуйста.","Привет.","Простите."],ex:["— Спасибо! — Пожалуйста. (Thank you! — You're welcome.)","Пожалуйста — и 'please' и 'you're welcome'. (Пожалуйста means both 'please' and 'you're welcome'.)","— Спасибо большое! — Пожалуйста! (Thank you very much! — You're welcome!)"]},
+  {type:"Translate to Russian",q:"Here he is!",a:"Вот он!",opts:["Вот он!","Вот она!","Вот оно!","Где он?"],ex:["— Где брат? — Вот он! (Where is the brother? — Here he is!)","— Где дядя Ваня? — Вот он! (Where is Uncle Vanya? — Here he is!)","— Где Владимир? — Вот он. (Where is Vladimir? — Here he is.)"]},
+  {type:"Translate to Russian",q:"Here she is!",a:"Вот она!",opts:["Вот он!","Вот она!","Вот оно!","Где она?"],ex:["— Где Анна? — Вот она! (Where is Anna? — There she is!)","— Где Мэри? — Вот она. (Where is Mary? — There she is.)","— Где водка? — Вот она! (Where is the vodka? — There it is!)"]},
+  {type:"Translate to Russian",q:"Goodbye.",a:"До свидания.",opts:["Привет.","До свидания.","Спасибо.","Пожалуйста."],ex:["Спасибо. До свидания! (Thank you. Goodbye!)","До свидания, Наташа! (Goodbye, Natasha!)","— До свидания! — До свидания! (Goodbye! — Goodbye!)"]},
+  {type:"Translate to Russian",q:"I don't know.",a:"Я не знаю.",opts:["Я знаю.","Я не знаю.","Я понимаю.","Я не понимаю."],ex:["— Где Ваня? — Я не знаю. (Where is Vanya? — I don't know.)","— Вы говорите по-русски? — Я не знаю. (Do you speak Russian? — I don't know.)","Я не знаю, где он. (I don't know where he is.)"]},
+  {type:"Translate to Russian",q:"It's here!",a:"Вот оно!",opts:["Вот он!","Вот она!","Вот оно!","Там оно."],ex:["— Где пиво? — Вот оно! (Where is the beer? — Here it is!)","— Где меню? — Вот оно! (Where is the menu? — Here it is!)","— Где такси? — Вот оно! (Where is the taxi? — Here it is!)"]},
+  // ── ALPHABET ────────────────────────────────────────────────────────────
+  {type:"Alphabet",q:"What sound does Ж make?",a:"zh (like 'measure')",opts:["zh (like 'measure')","sh","z","j"],ex:["Ж — как s в слове 'measure' или 'treasure'. (Ж — like the s in 'measure' or 'treasure'.)","журнал — zhoor-nal. (magazine — zhoor-nal.)","Ж всегда твёрдый в русском языке. (Ж is always hard in Russian.)"]},
+  {type:"Alphabet",q:"What sound does Х make?",a:"kh (like Scottish 'loch')",opts:["h (English)","kh (like Scottish 'loch')","k","x"],ex:["Х — горловой звук, как ch в шотландском 'loch'. (Х — a guttural sound like ch in Scottish 'loch'.)","сахар — sa-khar. (sugar — sa-khar.)","Хельсинки — khye-ly-seen-kee. (Helsinki.)"]},
+  {type:"Alphabet",q:"What sound does Щ make?",a:"shsh",opts:["sh","shsh","ch","zh"],ex:["Щ — долгий мягкий шипящий звук. (Щ — a long, soft hissing sound.)","борщ — borshch. (beetroot soup — borshch.)","щи — shshee (cabbage soup — a classic Russian dish)."]},
+  {type:"Alphabet",q:"What sound does Ц make?",a:"ts",opts:["ts","ch","s","tz"],ex:["Ц — как ts в слове 'bits'. (Ц — like ts in 'bits'.)","царь — tsar. (tsar — the Russian emperor.)","цирк — tsirk. (circus.)"]},
+  {type:"Alphabet",q:"What sound does Ю make?",a:"yoo",opts:["yoo","yo","ya","yu"],ex:["Ю — как английское слово 'you'. (Ю — like the English word 'you'.)","Юлия — Yoo-lee-ya. (Julia.)","юмор — yoo-mor. (humour — a loan word.)"]},
+  {type:"Alphabet",q:"What sound does Я make?",a:"ya",opts:["ya","ye","yo","yoo"],ex:["Я — как ya в 'yak'. (Я — like ya in 'yak'.)","Я знаю. — Ya zna-yoo. (I know.)","Наталья — Na-tal-ya. (Natalia.)"]},
+  {type:"Alphabet",q:"What sound does Ё make?",a:"yo",opts:["ya","ye","yo","yoo"],ex:["Ё — как yo в 'yonder'. (Ё — like yo in 'yonder'.)","Ё всегда ударная. (Ё is always stressed.)","живёт — zhi-vyet. (lives — note the ё.)"]},
+  {type:"Alphabet",q:"What sound does Е make?",a:"ye",opts:["ya","ye","yo","ee"],ex:["Е — как ye в 'yet'. (Е — like ye in 'yet'.)","нет — nyet. (no — nyet.)","день — dyen. (day.)"]},
+  {type:"Alphabet",q:"What sound does Ш make?",a:"sh",opts:["sh","shsh","zh","ch"],ex:["Ш — как sh в 'shut'. (Ш — like sh in 'shut'.)","шоколад — sha-ka-lad. (chocolate.)","Шекспир — shyek-speer. (Shakespeare.)"]},
+  {type:"Alphabet",q:"What sound does Ч make?",a:"ch (like 'church')",opts:["ch (like 'church')","sh","ts","zh"],ex:["Ч — как ch в 'church'. (Ч — like ch in 'church'.)","чай — chay. (tea.)","четыре — chye-ti-rye. (four.)"]},
+  {type:"Alphabet",q:"What sound does Й make?",a:"y (like 'boy')",opts:["y (like 'boy')","ee","j","yoo"],ex:["Й — краткое и, как y в 'boy'. (Й — short и, like y in 'boy'.)","чай — chay. Й на конце. (tea — chay. Й at the end.)","Нью Йорк — N-yoo York. (New York.)"]},
+  {type:"Alphabet",q:"What is the hard sign Ъ used for?",a:"brief pause (separates sounds)",opts:["brief pause (separates sounds)","makes the letter soft","silent letter","marks stress"],ex:["Ъ — твёрдый знак, разделяет звуки. (Ъ — the hard sign, separates sounds.)","объект — ab-yekt. (object — note the pause.)","Ъ встречается редко. (Ъ is rare in modern Russian.)"]},
+  {type:"Alphabet",q:"What is the soft sign Ь used for?",a:"softens the preceding consonant",opts:["softens the preceding consonant","makes the letter hard","brief pause","marks stress"],ex:["Ь смягчает предыдущий согласный. (Ь softens the preceding consonant.)","рубль — roob-ly. (rouble — the л is softened by ь.)","день — dyen. (day — the н is softened.)"]},
+  {type:"Alphabet",q:"What sound does Э make?",a:"e (like 'fed')",opts:["e (like 'fed')","ye","ee","a"],ex:["Э — как e в 'fed'. (Э — like e in 'fed'.)","Это — E-ta начинается с Э. (Это starts with Э.)","Эй! — Hey! (Э at the start.)"]},
+  {type:"Alphabet",q:"What sound does Ы make?",a:"i (back of mouth)",opts:["i (back of mouth)","ee","ye","oo"],ex:["Ы — как i в 'bit', но с языком дальше назад. (Ы — like i in 'bit' but with the tongue further back.)","вы — vi. (you plural/polite.)","мы — mi. (we.)"]},
+  // ── EXTRA TRANSLATE TO ENGLISH ──────────────────────────────────────────
+  {type:"Translate to English",q:"Сибирь",a:"Siberia",opts:["Siberia","Russia","Volga","Ukraine"],pron:"see-beer",tr:"Siberia (f)",ex:["Сибирь — в России. (Siberia is in Russia.)","Где Сибирь? В России. (Where is Siberia? In Russia.)","Сибирь большая. (Siberia is big.)"]},
+  {type:"Translate to English",q:"интервью",a:"interview",opts:["interview","menu","jury","show"],pron:"een-tyer-vyoo",tr:"interview (n, indeclinable)",ex:["Это интервью. (This is an interview.)","Интервью — иностранное слово на -ю. (Interview is a foreign word ending in -ю.)","Интервью в газете. (An interview in the newspaper.)"]},
+  {type:"Translate to English",q:"шоу",a:"show",opts:["show","jury","interview","menu"],pron:"sho-oo",tr:"show (n, indeclinable)",ex:["Это шоу. (This is a show.)","Шоу — иностранное слово. (Show is a foreign word.)","Где шоу? (Where is the show?)"]},
+  {type:"Translate to English",q:"Неаполь",a:"Naples",opts:["Naples","Milan","Rome","Venice"],pron:"nye-a-pol",tr:"Naples (m)",ex:["Я живу в Неаполе. (I live in Naples.)","Неаполь — в Италии. (Naples is in Italy.)","Где Неаполь? В Италии. (Where is Naples? In Italy.)"]},
+  {type:"Translate to English",q:"Лондон",a:"London",opts:["London","Paris","Berlin","Madrid"],pron:"lon-dan",tr:"London (m)",ex:["Она живёт в Лондоне. (She lives in London.)","Лондон — столица Англии. (London is the capital of England.)","Я еду в Лондон. (I am going to London.)"]},
+  {type:"Translate to English",q:"Нью Йорк",a:"New York",opts:["New York","London","Paris","Los Angeles"],pron:"nyoo york",tr:"New York",ex:["Она живёт в Нью Йорке. (She lives in New York.)","Нью Йорк — в Америке. (New York is in America.)","Я еду в Нью Йорк. (I am going to New York.)"]},
+  // ── EXTRA WHAT GENDER? ───────────────────────────────────────────────────
+  {type:"What gender?",q:"Сибирь",a:"feminine (она)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"see-beer",tr:"Siberia",ex:["Сибирь — женского рода: заканчивается на мягкий знак. (Siberia is feminine: ends in soft sign.)","Где Иркутск? В Сибири. (Where is Irkutsk? In Siberia.)","Сибирь большая. Она в России. (Siberia is big. It is in Russia.)"]},
+  {type:"What gender?",q:"Неаполь",a:"masculine (он)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"nye-a-pol",tr:"Naples",ex:["Неаполь — мужского рода: заканчивается на мягкий знак. (Naples is masculine: ends in soft sign.)","Я живу в Неаполе. (I live in Naples.)","Неаполь — он. Я живу в нём. (Naples is masculine. I live in it.)"]},
+  {type:"What gender?",q:"шоу",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"sho-oo",tr:"show",ex:["Шоу — среднего рода: иностранное слово на -у. (Show is neuter: foreign word ending in -у.)","Где шоу? Вот оно. (Where is the show? There it is.)","Это шоу. Вот оно. (This is the show. There it is.)"]},
+  {type:"What gender?",q:"интервью",a:"neuter (оно)",opts:["masculine (он)","feminine (она)","neuter (оно)"],pron:"een-tyer-vyoo",tr:"interview",ex:["Интервью — среднего рода: иностранное слово на -ю. (Interview is neuter: foreign word ending in -ю.)","Где интервью? Вот оно. (Where is the interview? There it is.)","Это интервью. Вот оно. (This is the interview. There it is.)"]},
+  // ── EXTRA TRANSLATE TO RUSSIAN ──────────────────────────────────────────
+  {type:"Translate to Russian",q:"Good morning!",a:"Доброе утро!",opts:["Добрый день!","Доброе утро!","До свидания!","Привет!"],ex:["Доброе утро, Наташа! (Good morning, Natasha!)","Доброе утро! Чай? (Good morning! Tea?)","— Доброе утро! — Доброе утро! (Good morning! — Good morning!)"]},
+  {type:"Translate to Russian",q:"Good day!",a:"Добрый день!",opts:["Добрый день!","Доброе утро!","Привет!","До свидания!"],ex:["Добрый день, меня зовут Борис. (Good day, my name is Boris.)","Добрый день! Простите, где ресторан? (Good day! Excuse me, where is the restaurant?)","— Добрый день! — Добрый день! (Good day! — Good day!)"]},
+  {type:"Translate to Russian",q:"What is this?",a:"Что это?",opts:["Что это?","Где это?","Вот это!","Это что?"],ex:["Что это? — Это чай. (What is this? — It's tea.)","Простите, что это? (Excuse me, what is this?)","Что это? — Это рубль. (What is this? — It's a rouble.)"]},
+  {type:"Translate to Russian",q:"Where is the menu?",a:"Где меню?",opts:["Где меню?","Что это?","Вот оно!","Это меню?"],ex:["Где меню? — Вот оно. (Where is the menu? — There it is.)","Простите, где меню? (Excuse me, where is the menu?)","Где меню? Я не знаю. (Where is the menu? I don't know.)"]},
+  // ── EXTRA PRONUNCIATION ──────────────────────────────────────────────────
+  {type:"Pronunciation",q:"Which is correct for борщ?",a:"borshch",opts:["borshch","borsh","borshtch","borsh-ch"],ex:["Щ произносится как shsh: борщ = borshch. (Щ is pronounced shsh: борщ = borshch.)","Борщ — традиционный русский суп. (Borsch is a traditional Russian soup.)","Борщ, пожалуйста! Произносится borshch. (Borsch, please! Pronounced borshch.)"]},
+  {type:"Pronunciation",q:"Which is correct for журнал?",a:"zhoor-nal",opts:["zhoor-nal","joor-nal","zhur-nal","zhoor-nahl"],ex:["Ж произносится как zh (как s в 'measure'). (Ж is pronounced zh like s in 'measure'.)","журнал — zhoor-nal. (magazine — zhoor-nal.)","Где журнал? Произносится zhoor-nal. (Where is the magazine? Pronounced zhoor-nal.)"]},
+  {type:"Pronunciation",q:"Which is correct for чай?",a:"chay",opts:["chay","shay","tsay","zhay"],ex:["Ч произносится как ch в 'church'. (Ч is pronounced like ch in 'church'.)","Чай — chay. (Tea — chay.)","Чай, пожалуйста! Произносится chay. (Tea, please! Pronounced chay.)"]},
+  {type:"Translate to English",q:"Россия",a:"Russia",opts:["Russia","Ukraine","Siberia","Belarus"],pron:"ra-see-ya",tr:"Russia (f)",ex:["Она живёт в России. (She lives in Russia.)","Россия — большая страна. (Russia is a big country.)","Москва — в России. (Moscow is in Russia.)"]},
+  // ── HANDWRITING: read the italic, pick the print ─────────────────────────
+  {type:"Read the handwriting",q:"да",a:"да",opts:["да","на","ла","га"],pron:"da",tr:"yes",ex:["Да — простое и очень частое слово. (Да is simple and very common.)","— Это чай? — Да! (Is this tea? — Yes!)","Да, я понимаю. (Yes, I understand.)"]},
+  {type:"Read the handwriting",q:"нет",a:"нет",opts:["нет","нот","нот","мет"],pron:"nyet",tr:"no",ex:["Нет — противоположность да. (Нет is the opposite of да.)","— Это водка? — Нет. (Is this vodka? — No.)","Нет, я не знаю. (No, I don't know.)"]},
+  {type:"Read the handwriting",q:"это",a:"это",opts:["это","ото","эта","ета"],pron:"e-ta",tr:"this / that / it",ex:["Что это? — Это чай. (What is this? — It's tea.)","Это борщ. (This is borsch.)","Это правда? (Is this true?)"]},
+  {type:"Read the handwriting",q:"привет",a:"привет",opts:["привет","приьет","пришет","приьеш"],pron:"pree-vet",tr:"hello (informal)",ex:["Привет, Ваня! (Hello, Vanya!)","Привет! Как дела? (Hi! How are you?)","— Привет! — Привет! (Hi! — Hi!)"]},
+  {type:"Read the handwriting",q:"спасибо",a:"спасибо",opts:["спасибо","сласибо","спасаьо","спасибс"],pron:"spa-see-ba",tr:"thank you",ex:["Спасибо за чай! (Thank you for the tea!)","— Три, пожалуйста. — Спасибо! (Three please. — Thank you!)","Большое спасибо! (Thank you very much!)"]},
+  {type:"Read the handwriting",q:"до свидания",a:"до свидания",opts:["до свидания","до свидаьия","де свидания","до свиданая"],pron:"da svee-da-nee-ya",tr:"goodbye",ex:["Спасибо. До свидания! (Thank you. Goodbye!)","— До свидания! — До свидания! (Goodbye! — Goodbye!)","До свидания, Мэри. (Goodbye, Mary.)"]},
+  {type:"Read the handwriting",q:"простите",a:"простите",opts:["простите","пюостите","просшите","простате"],pron:"pra-stee-tye",tr:"excuse me / I'm sorry",ex:["Простите, где туалет? (Excuse me, where is the toilet?)","Простите, как вас зовут? (Excuse me, what is your name?)","Простите, пожалуйста. (Excuse me, please.)"]},
+  {type:"Read the handwriting",q:"пожалуйста",a:"пожалуйста",opts:["пожалуйста","пожалайста","пожалупта","пожалуйсша"],pron:"pa-zhal-sta",tr:"please / you're welcome",ex:["Три, пожалуйста. (Three, please.)","— Спасибо! — Пожалуйста. (Thank you! — You're welcome.)","Чай, пожалуйста. (Tea, please.)"]},
+  {type:"Read the handwriting",q:"где",a:"где",opts:["где","гле","гяе","гдё"],pron:"(g)dye",tr:"where",ex:["Где туалет? (Where is the toilet?)","Где Ваня? Вот он! (Where is Vanya? Here he is!)","Где меню? (Where is the menu?)"]},
+  {type:"Read the handwriting",q:"что",a:"что",opts:["что","шта","чта","что"],pron:"shto",tr:"what",ex:["Что это? (What is this?)","Простите, что это? (Excuse me, what is this?)","Что вы говорите? (What are you saying?)"]},
+  {type:"Read the handwriting",q:"вот",a:"вот",opts:["вот","вош","вор","гот"],pron:"vot",tr:"here / there (pointing)",ex:["Где водка? Вот она! (Where is the vodka? There it is!)","Вот меню. (Here is the menu.)","Вот он, дядя Ваня! (There he is, Uncle Vanya!)"]},
+  {type:"Read the handwriting",q:"да, это чай",a:"да, это чай",opts:["да, это чай","па, это чай","да, ето чай","да, это шай"],pron:"da, e-ta chay",tr:"yes, this is tea",ex:["— Это чай? — Да, это чай. (Is this tea? — Yes, it's tea.)","Да, это чай. Вот он. (Yes, it's tea. Here it is.)","Да, это чай, а не кофе. (Yes, it's tea, not coffee.)"]},
+  {type:"Read the handwriting",q:"нет, это водка",a:"нет, это водка",opts:["нет, это водка","мет, это водка","нет, ето водка","нет, это водша"],pron:"nyet, e-ta vod-ka",tr:"no, this is vodka",ex:["— Это вино? — Нет, это водка. (Is this wine? — No, this is vodka.)","Нет, это водка. Вот она. (No, it's vodka. There it is.)","Нет, это водка, а не вино. (No, this is vodka, not wine.)"]},
+  {type:"Read the handwriting",q:"добрый день",a:"добрый день",opts:["добрый день","дабрый день","добрый дань","добрый яень"],pron:"do-bri dyen",tr:"good day",ex:["Добрый день, меня зовут Борис. (Good day, my name is Boris.)","Добрый день! Простите, где касса? (Good day! Excuse me, where is the desk?)","— Добрый день! — Добрый день! (Good day! — Good day!)"]},
+  {type:"Read the handwriting",q:"доброе утро",a:"доброе утро",opts:["доброе утро","добрае утро","доброе утра","добрае угро"],pron:"do-bra-ye oo-tra",tr:"good morning",ex:["Доброе утро, Наташа! (Good morning, Natasha!)","Доброе утро! Чай? (Good morning! Tea?)","— Доброе утро! — Доброе утро! (Good morning! — Good morning!)"]},
+  {type:"Read the handwriting",q:"Москва",a:"Москва",opts:["Москва","Масква","Мошква","Москьа"],pron:"mask-va",tr:"Moscow",ex:["Они в Москве. (They are in Moscow.)","Москва — столица России. (Moscow is the capital of Russia.)","Она живёт в Москве. (She lives in Moscow.)"]},
+  {type:"Read the handwriting",q:"Россия",a:"Россия",opts:["Россия","Росиья","Расия","Россяи"],pron:"ra-see-ya",tr:"Russia",ex:["Москва — в России. (Moscow is in Russia.)","Россия — большая страна. (Russia is a big country.)","Она живёт в России. (She lives in Russia.)"]},
+  {type:"Read the handwriting",q:"водка",a:"водка",opts:["водка","водша","вадка","водпа"],pron:"vod-ka",tr:"vodka",ex:["Где водка? Вот она! (Where is the vodka? There it is!)","Это водка? Нет, это вино. (Is this vodka? No, it's wine.)","Водка — она. (Vodka is feminine.)"]},
+  {type:"Read the handwriting",q:"журнал",a:"журнал",opts:["журнал","журмал","журнач","жарнал"],pron:"zhoor-nal",tr:"magazine",ex:["Где журнал? Вот он. (Where is the magazine? There it is.)","Это журнал? Да. (Is this a magazine? Yes.)","Журнал, пожалуйста. (The magazine, please.)"]},
+  {type:"Read the handwriting",q:"гостиница",a:"гостиница",opts:["гостиница","госпиница","гастиница","гостаница"],pron:"ga-stee-nee-tsa",tr:"hotel",ex:["Они в гостинице Россия. (They are at the Rossiya Hotel.)","Где гостиница? (Where is the hotel?)","Простите, где гостиница? (Excuse me, where is the hotel?)"]},
+  {type:"Read the handwriting",q:"англичанка",a:"англичанка",opts:["англичанка","амгличанка","англачанка","англичашка"],pron:"an-glee-chan-ka",tr:"Englishwoman",ex:["Мэри — англичанка. (Mary is an Englishwoman.)","Она англичанка. (She is an Englishwoman.)","Это англичанка? Да. (Is this an Englishwoman? Yes.)"]},
+  {type:"Read the handwriting",q:"без проблем",a:"без проблем",opts:["без проблем","без прайлем","бес проблем","без прошлем"],pron:"bez pro-blem",tr:"no problem",ex:["— Простите! — Без проблем. (Excuse me! — No problem.)","Без проблем, я понимаю. (No problem, I understand.)","— Спасибо! — Без проблем! (Thank you! — No problem!)"]},
+  {type:"Read the handwriting",q:"правда",a:"правда",opts:["правда","прайда","правта","прадва"],pron:"prav-da",tr:"truth / Pravda (newspaper)",ex:["Это правда? (Is this true?)","Правда — газета. (Pravda is a newspaper.)","Да, это правда. (Yes, that's the truth.)"]},
+  {type:"Read the handwriting",q:"борщ",a:"борщ",opts:["борщ","борч","борш","борзь"],pron:"borshch",tr:"beetroot soup",ex:["Что это? Это борщ. (What is this? It's borsch.)","Борщ со сметаной. (Borsch with sour cream.)","Борщ, пожалуйста! (Borsch, please!)"]},
+  {type:"Read the handwriting",q:"до свидания, спасибо",a:"до свидания, спасибо",opts:["до свидания, спасибо","до свидания, сласибо","де свидания, спасибо","до свидания, спасаьо"],pron:"da svee-da-nee-ya, spa-see-ba",tr:"goodbye, thank you",ex:["Спасибо. До свидания! (Thank you. Goodbye!)","До свидания, спасибо за всё. (Goodbye, thank you for everything.)","— До свидания! — Спасибо! (Goodbye! — Thank you!)"]},
+  // ── CITIES, COUNTRIES, FAMOUS PEOPLE ─────────────────────────────────────
+  {type:"Translate to English",q:"Лондон",a:"London",opts:["London","Paris","Berlin","Madrid"],pron:"lon-dan",tr:"London (m)",ex:["Она живёт в Лондоне. (She lives in London.)","Лондон — столица Англии. (London is the capital of England.)","Я еду в Лондон. (I am going to London.)"]},
+  {type:"Translate to English",q:"Париж",a:"Paris",opts:["Paris","London","Rome","Madrid"],pron:"pa-reezh",tr:"Paris (m)",ex:["Она живёт в Париже. (She lives in Paris.)","Париж — столица Франции. (Paris is the capital of France.)","Я еду в Париж. (I am going to Paris.)"]},
+  {type:"Translate to English",q:"Берлин",a:"Berlin",opts:["Berlin","Vienna","Munich","Hamburg"],pron:"byer-leen",tr:"Berlin (m)",ex:["Он живёт в Берлине. (He lives in Berlin.)","Берлин — столица Германии. (Berlin is the capital of Germany.)","Я живу в Берлине. (I live in Berlin.)"]},
+  {type:"Translate to English",q:"Рим",a:"Rome",opts:["Rome","Milan","Venice","Naples"],pron:"reem",tr:"Rome (m)",ex:["Она живёт в Риме. (She lives in Rome.)","Рим — столица Италии. (Rome is the capital of Italy.)","Я еду в Рим. (I am going to Rome.)"]},
+  {type:"Translate to English",q:"Нью Йорк",a:"New York",opts:["New York","Los Angeles","Chicago","Boston"],pron:"nyoo york",tr:"New York",ex:["Он живёт в Нью Йорке. (He lives in New York.)","Нью Йорк — в Америке. (New York is in America.)","Я еду в Нью Йорк. (I am going to New York.)"]},
+  {type:"Translate to English",q:"Англия",a:"England",opts:["England","France","Germany","Italy"],pron:"an-glee-ya",tr:"England (f)",ex:["Она живёт в Англии. (She lives in England.)","Лондон — в Англии. (London is in England.)","Я из Англии. (I am from England.)"]},
+  {type:"Translate to English",q:"Франция",a:"France",opts:["France","England","Spain","Italy"],pron:"fran-tsee-ya",tr:"France (f)",ex:["Мари — из Франции. (Marie is from France.)","Париж — в Франции. (Paris is in France.)","Они говорят по-французски, они из Франции. (They speak French, they are from France.)"]},
+  {type:"Translate to English",q:"Германия",a:"Germany",opts:["Germany","Austria","Switzerland","Netherlands"],pron:"gyer-ma-nee-ya",tr:"Germany (f)",ex:["Он живёт в Германии. (He lives in Germany.)","Берлин — в Германии. (Berlin is in Germany.)","Она говорит по-немецки, она из Германии. (She speaks German, she is from Germany.)"]},
+  {type:"Translate to English",q:"Италия",a:"Italy",opts:["Italy","Spain","France","Greece"],pron:"ee-ta-lee-ya",tr:"Italy (f)",ex:["Я живу в Италии. (I live in Italy.)","Рим — в Италии. (Rome is in Italy.)","Неаполь — в Италии. (Naples is in Italy.)"]},
+  {type:"Translate to English",q:"Америка",a:"America",opts:["America","Australia","Canada","Britain"],pron:"a-mye-ree-ka",tr:"America (f)",ex:["Он живёт в Америке. (He lives in America.)","Нью Йорк — в Америке. (New York is in America.)","Она из Америки. (She is from America.)"]},
+  {type:"Translate to English",q:"Владимир Ленин",a:"Vladimir Lenin",opts:["Vladimir Lenin","Joseph Stalin","Leon Trotsky","Mikhail Gorbachev"],pron:"vla-dee-meer lye-neen",tr:"Vladimir Lenin",ex:["Владимир Ленин — основатель СССР. (Vladimir Lenin was the founder of the USSR.)","Ленин жил в Москве. (Lenin lived in Moscow.)","Улица Волгина — в честь Ленина? Нет! (Volgin Street — named after Lenin? No!)"]},
+  {type:"Translate to English",q:"Лев Толстой",a:"Leo Tolstoy",opts:["Leo Tolstoy","Fyodor Dostoevsky","Anton Chekhov","Ivan Turgenev"],pron:"lyev tol-stoy",tr:"Leo Tolstoy",ex:["Лев Толстой — великий русский писатель. (Leo Tolstoy was a great Russian writer.)","Толстой написал «Войну и мир». (Tolstoy wrote War and Peace.)","Толстой — на нашей книжной полке! (Tolstoy is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Антон Чехов",a:"Anton Chekhov",opts:["Anton Chekhov","Leo Tolstoy","Ivan Turgenev","Alexander Pushkin"],pron:"an-ton chye-khov",tr:"Anton Chekhov",ex:["Антон Чехов — великий русский драматург. (Anton Chekhov was a great Russian playwright.)","Чехов написал «Дядю Ваню». (Chekhov wrote Uncle Vanya.)","Дядя Ваня — пьеса Чехова! (Uncle Vanya is a Chekhov play!)"]},
+  {type:"Translate to English",q:"Александр Пушкин",a:"Alexander Pushkin",opts:["Alexander Pushkin","Mikhail Lermontov","Nikolai Gogol","Ivan Turgenev"],pron:"a-lyek-san-dr poosh-keen",tr:"Alexander Pushkin",ex:["Александр Пушкин — великий русский поэт. (Alexander Pushkin is Russia's greatest poet.)","Пушкин родился в 1799 году. (Pushkin was born in 1799.)","Пушкин — на нашей книжной полке! (Pushkin is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Фёдор Достоевский",a:"Fyodor Dostoevsky",opts:["Fyodor Dostoevsky","Leo Tolstoy","Ivan Turgenev","Anton Chekhov"],pron:"fyo-dor da-sta-yev-skee",tr:"Fyodor Dostoevsky",ex:["Достоевский написал «Преступление и наказание». (Dostoevsky wrote Crime and Punishment.)","Достоевский — великий русский романист. (Dostoevsky is a great Russian novelist.)","Достоевский — на нашей книжной полке! (Dostoevsky is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Борис Пастернак",a:"Boris Pasternak",opts:["Boris Pasternak","Vladimir Nabokov","Mikhail Bulgakov","Ivan Turgenev"],pron:"ba-rees pas-tyer-nak",tr:"Boris Pasternak",ex:["Пастернак написал «Доктора Живаго». (Pasternak wrote Doctor Zhivago.)","Пастернак получил Нобелевскую премию. (Pasternak won the Nobel Prize.)","Пастернак — на нашей книжной полке! (Pasternak is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Санкт-Петербург",a:"St Petersburg",opts:["St Petersburg","Moscow","Novgorod","Vladivostok"],pron:"sankt pye-tyer-boorg",tr:"St Petersburg (m)",ex:["Санкт-Петербург — второй по величине город России. (St Petersburg is Russia's second city.)","Пушкин жил в Санкт-Петербурге. (Pushkin lived in St Petersburg.)","Невский Проспект — в Санкт-Петербурге. (Nevsky Prospect is in St Petersburg.)"]},
+  {type:"Translate to English",q:"Невский Проспект",a:"Nevsky Prospect",opts:["Nevsky Prospect","Red Square","the Hermitage","the Kremlin"],pron:"nyev-skee pra-spekt",tr:"Nevsky Prospect",ex:["Невский Проспект — главная улица Санкт-Петербурга. (Nevsky Prospect is St Petersburg's main street.)","Невский Проспект — знаменитый проспект. (Nevsky Prospect is a famous avenue.)","Он живёт на Невском Проспекте. (He lives on Nevsky Prospect.)"]},
+  {type:"Translate to English",q:"Владивосток",a:"Vladivostok",opts:["Vladivostok","Irkutsk","Novosibirsk","Krasnoyarsk"],pron:"vla-dee-va-stok",tr:"Vladivostok (m)",ex:["Владивосток — на берегу Тихого океана. (Vladivostok is on the Pacific coast.)","Транссибирская магистраль заканчивается во Владивостоке. (The Trans-Siberian railway ends in Vladivostok.)","Владивосток — он. (Vladivostok is masculine.)"]},
+  {type:"Translate to English",q:"Екатеринбург",a:"Yekaterinburg",opts:["Yekaterinburg","Novosibirsk","Omsk","Krasnoyarsk"],pron:"ye-ka-tye-reen-boorg",tr:"Yekaterinburg (m)",ex:["Екатеринбург — на Урале. (Yekaterinburg is in the Urals.)","Екатеринбург — он: заканчивается на согласный. (Yekaterinburg is masculine: ends in a consonant.)","Транссибирская магистраль проходит через Екатеринбург. (The Trans-Siberian passes through Yekaterinburg.)"]},
+  {type:"Translate to English",q:"Иркутск",a:"Irkutsk",opts:["Irkutsk","Omsk","Krasnoyarsk","Vladivostok"],pron:"eer-kootsk",tr:"Irkutsk (m)",ex:["Иркутск — рядом с озером Байкал. (Irkutsk is near Lake Baikal.)","Иркутск — он: заканчивается на согласный. (Irkutsk is masculine: ends in a consonant.)","Где Иркутск? В Сибири. (Where is Irkutsk? In Siberia.)"]},
+  {type:"Translate to English",q:"Михаил Булгаков",a:"Mikhail Bulgakov",opts:["Mikhail Bulgakov","Mikhail Lermontov","Nikolai Gogol","Vladimir Nabokov"],pron:"mee-khah-eel bool-ga-kov",tr:"Mikhail Bulgakov",ex:["Булгаков написал «Мастера и Маргариту». (Bulgakov wrote The Master and Margarita.)","Булгаков — великий русский писатель. (Bulgakov is a great Russian writer.)","Булгаков — на нашей книжной полке! (Bulgakov is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Владимир Набоков",a:"Vladimir Nabokov",opts:["Vladimir Nabokov","Mikhail Bulgakov","Boris Pasternak","Ivan Turgenev"],pron:"vla-dee-meer na-bo-kov",tr:"Vladimir Nabokov",ex:["Набоков написал «Лолиту» по-английски. (Nabokov wrote Lolita in English.)","Набоков — русский писатель, живший в Америке. (Nabokov was a Russian writer who lived in America.)","Набоков — на нашей книжной полке! (Nabokov is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Иван Тургенев",a:"Ivan Turgenev",opts:["Ivan Turgenev","Leo Tolstoy","Anton Chekhov","Fyodor Dostoevsky"],pron:"ee-van toor-gye-nyev",tr:"Ivan Turgenev",ex:["Тургенев написал «Отцы и дети». (Turgenev wrote Fathers and Sons.)","Тургенев — великий русский романист. (Turgenev is a great Russian novelist.)","Тургенев — на нашей книжной полке! (Turgenev is on our bookshelf!)"]},
+  {type:"Translate to English",q:"Николай Гоголь",a:"Nikolai Gogol",opts:["Nikolai Gogol","Nikolai Nekrasov","Nikolai Leskov","Nikolai Ostrovsky"],pron:"nee-ka-lie go-gol",tr:"Nikolai Gogol",ex:["Гоголь написал «Мёртвые души». (Gogol wrote Dead Souls.)","Гоголь — украинско-русский писатель. (Gogol was a Ukrainian-Russian writer.)","Гоголь — на нашей книжной полке! (Gogol is on our bookshelf!)"]},
+];
+
+let current = 0, score = 0, answered = false, selected20 = [];
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startQuiz() {
+  selected20 = shuffle(ALL_QUESTIONS).slice(0, 20);
+  current = 0; score = 0; answered = false;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz-header').style.display = 'block';
+  document.getElementById('question-card').style.display = 'block';
+  document.getElementById('options-grid').style.display = 'grid';
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = selected20[current];
+  document.getElementById('progress-label').textContent = `Question ${current + 1} of 20`;
+  document.getElementById('score-label').textContent = `${score} / 20`;
+  document.getElementById('progress-bar').style.width = `${(current / 20) * 100}%`;
+  document.getElementById('question-type').textContent = q.type;
+  const qtEl = document.getElementById('question-text');
+  if (q.type === 'Read the handwriting') {
+    qtEl.innerHTML = '<em style="font-size:1.8rem;">' + q.q + '</em>';
+  } else {
+    qtEl.textContent = q.q;
+  }
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('info-box').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  shuffle(q.opts).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, q.a);
+    grid.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, correct) {
+  if (answered) return;
+  answered = true;
+  const q = selected20[current];
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correct) btn.classList.add('correct');
+    else if (btn.textContent === selected) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  if (selected === correct) {
+    score++;
+    fb.className = 'feedback correct';
+    fb.textContent = '✓ Correct!';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ The answer is: ${correct}`;
+  }
+  document.getElementById('score-label').textContent = `${score} / 20`;
+
+  // Build info box
+  const infoBox = document.getElementById('info-box');
+  let html = '';
+  if (q.pron) {
+    html += `<div class="info-label">Pronunciation</div><div class="info-row">${q.pron}</div>`;
+  }
+  if (q.tr) {
+    html += `<div class="info-label" style="margin-top:0.5rem">Translation</div><div class="info-row">${q.tr}</div>`;
+  }
+  if (q.ex && q.ex.length > 0) {
+    const example = q.ex[Math.floor(Math.random() * q.ex.length)];
+    html += `<div class="info-label" style="margin-top:0.5rem">Example</div><div class="info-row">${example}</div>`;
+  }
+  if (html) {
+    infoBox.innerHTML = html;
+    infoBox.style.display = 'block';
+  }
+
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= 20) showResults();
+  else showQuestion();
+}
+
+function showResults() {
+  document.getElementById('quiz-header').style.display = 'none';
+  document.getElementById('question-card').style.display = 'none';
+  document.getElementById('options-grid').style.display = 'none';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('info-box').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  const pct = Math.round((score / 20) * 100);
+  document.getElementById('final-score').textContent = `${score} / 20 (${pct}%)`;
+  const msgs = ['Review the vocabulary and try again — каждый день!','Keep practising — you\'re getting there!','Good work! Хорошо!','Excellent! Очень хорошо!'];
+  document.getElementById('final-message').textContent = msgs[pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0];
+  document.getElementById('results').style.display = 'block';
+}
+
+function restartQuiz() { startQuiz(); }
+startQuiz();
+</script>
+</body>
+</html>

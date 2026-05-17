@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Russian Verb Conjugator</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Russian">
+<meta name="theme-color" content="#f5f3ee">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, serif;
+    background: #f5f3ee;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .container { width: 100%; max-width: 580px; }
+
+  h1 { font-size: 1.2rem; font-weight: normal; margin-bottom: 0.2rem; }
+  .subtitle { font-size: 0.8rem; color: #888; margin-bottom: 2rem; }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .verb-label { font-size: 0.75rem; color: #999; margin-bottom: 3px; }
+  .verb-display { font-size: 2rem; font-weight: normal; line-height: 1.2; }
+  .verb-translation { font-size: 0.9rem; color: #666; font-style: italic; margin-top: 2px; }
+
+  .score-box { text-align: right; }
+  .score-value { font-size: 1.2rem; font-weight: normal; }
+
+  .stem-row { margin-bottom: 1.5rem; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+
+  button {
+    background: #fff;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover { background: #f0ede6; }
+  button.btn-primary { background: #3a6ea8; color: #fff; border-color: #3a6ea8; }
+  button.btn-primary:hover { background: #2d5a8a; }
+  button.btn-danger { background: #fff; border-color: #e57373; color: #c62828; }
+  button.btn-danger:hover { background: #ffebee; }
+
+  .stem-text { font-size: 0.95rem; font-weight: bold; margin-left: 4px; display: none; }
+  .type-text { font-size: 0.75rem; color: #888; margin-left: 4px; display: none; }
+
+  .pronoun-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .pronoun-label { min-width: 120px; font-size: 0.9rem; font-weight: bold; }
+
+  input[type="text"] {
+    flex: 1;
+    font-size: 0.95rem;
+    font-family: Georgia, serif;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  input[type="text"]:focus { border-color: #999; }
+  input.correct { border-color: #81c784; color: #2e7d32; }
+  input.wrong { border-color: #e57373; color: #c62828; }
+  input.revealed { border-color: #ffb74d; color: #e65100; font-style: italic; }
+
+  .row-icon { min-width: 20px; font-size: 1rem; text-align: center; }
+  .icon-correct { color: #2e7d32; }
+  .icon-wrong { color: #c62828; }
+  .icon-revealed { color: #e65100; }
+
+  .feedback {
+    display: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .feedback.success { background: #e8f5e9; border: 1px solid #81c784; color: #2e7d32; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 1rem; align-items: center; flex-wrap: wrap; }
+
+  .progress-text { font-size: 0.75rem; color: #999; margin-bottom: 0.5rem; }
+
+  .speak-btn {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    border-radius: 4px;
+  }
+  .speak-btn:hover { opacity: 1; background: #f0ede6; }
+
+  .results {
+    display: none;
+    text-align: center;
+    padding: 3rem 0 2rem;
+  }
+  .results-score { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .results-msg { font-size: 1rem; color: #666; margin-bottom: 2rem; }
+  .results-btn {
+    background: #3a6ea8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 1.75rem;
+    font-size: 0.95rem;
+    font-family: Georgia, serif;
+    cursor: pointer;
+  }
+  .results-btn:hover { background: #2d5a8a; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Russian Verb Conjugator</h1>
+  <p class="subtitle">5 random verbs per session — 30 forms total</p>
+
+  <div id="quiz-area">
+    <div class="header-row">
+      <div>
+        <p class="verb-label">Verb</p>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <p class="verb-display" id="infinitive-display"></p>
+          <button class="speak-btn" onclick="speakInfinitive()" title="Listen">🔊</button>
+        </div>
+        <p class="verb-translation" id="translation-display"></p>
+      </div>
+      <div class="score-box">
+        <p class="verb-label">Score</p>
+        <p class="score-value" id="score-display">0 / 0</p>
+      </div>
+    </div>
+
+    <div class="stem-row">
+      <button id="stem-btn" onclick="revealStem()">Show stem</button>
+      <span class="stem-text" id="stem-display"></span>
+      <span class="type-text" id="type-display"></span>
+    </div>
+
+    <p class="progress-text" id="progress-text"></p>
+
+    <div id="conjugation-rows"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="next-btn" onclick="nextVerb()" style="display:none;">Next verb →</button>
+      <button id="reveal-btn" onclick="revealAll()">Reveal answers</button>
+      <button onclick="resetVerb()" style="margin-left: auto;">Reset verb</button>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-score" id="final-score"></div>
+    <div class="results-msg" id="final-msg"></div>
+    <button class="results-btn" onclick="startSession()">New session</button>
+  </div>
+</div>
+
+<script>
+const ALL_VERBS = [
+  {inf:"знать", tr:"to know", stem:"зна-", type:"Type 1", answers:["знаю","знаешь","знает","знаем","знаете","знают"]},
+  {inf:"читать", tr:"to read", stem:"чита-", type:"Type 1", answers:["читаю","читаешь","читает","читаем","читаете","читают"]},
+  {inf:"понимать", tr:"to understand", stem:"понима-", type:"Type 1", answers:["понимаю","понимаешь","понимает","понимаем","понимаете","понимают"]},
+  {inf:"изучать", tr:"to study", stem:"изуча-", type:"Type 1", answers:["изучаю","изучаешь","изучает","изучаем","изучаете","изучают"]},
+  {inf:"думать", tr:"to think", stem:"дума-", type:"Type 1", answers:["думаю","думаешь","думает","думаем","думаете","думают"]},
+  {inf:"работать", tr:"to work", stem:"работа-", type:"Type 1", answers:["работаю","работаешь","работает","работаем","работаете","работают"]},
+  {inf:"играть", tr:"to play", stem:"игра-", type:"Type 1", answers:["играю","играешь","играет","играем","играете","играют"]},
+  {inf:"делать", tr:"to do / make", stem:"дела-", type:"Type 1", answers:["делаю","делаешь","делает","делаем","делаете","делают"]},
+  {inf:"слушать", tr:"to listen", stem:"слуша-", type:"Type 1", answers:["слушаю","слушаешь","слушает","слушаем","слушаете","слушают"]},
+  {inf:"спрашивать", tr:"to ask", stem:"спрашива-", type:"Type 1", answers:["спрашиваю","спрашиваешь","спрашивает","спрашиваем","спрашиваете","спрашивают"]},
+  {inf:"отвечать", tr:"to answer", stem:"отвеча-", type:"Type 1", answers:["отвечаю","отвечаешь","отвечает","отвечаем","отвечаете","отвечают"]},
+  {inf:"начинать", tr:"to begin", stem:"начина-", type:"Type 1", answers:["начинаю","начинаешь","начинает","начинаем","начинаете","начинают"]},
+  {inf:"гулять", tr:"to walk / stroll", stem:"гуля-", type:"Type 1", answers:["гуляю","гуляешь","гуляет","гуляем","гуляете","гуляют"]},
+  {inf:"завтракать", tr:"to have breakfast", stem:"завтрака-", type:"Type 1", answers:["завтракаю","завтракаешь","завтракает","завтракаем","завтракаете","завтракают"]},
+  {inf:"обедать", tr:"to have lunch", stem:"обеда-", type:"Type 1", answers:["обедаю","обедаешь","обедает","обедаем","обедаете","обедают"]},
+  {inf:"ужинать", tr:"to have dinner", stem:"ужина-", type:"Type 1", answers:["ужинаю","ужинаешь","ужинает","ужинаем","ужинаете","ужинают"]},
+  {inf:"называть", tr:"to call / name", stem:"называ-", type:"Type 1", answers:["называю","называешь","называет","называем","называете","называют"]},
+  {inf:"кончать", tr:"to finish", stem:"конча-", type:"Type 1", answers:["кончаю","кончаешь","кончает","кончаем","кончаете","кончают"]},
+  {inf:"говорить", tr:"to speak", stem:"говор-", type:"Type 2", answers:["говорю","говоришь","говорит","говорим","говорите","говорят"]},
+  {inf:"курить", tr:"to smoke", stem:"кур-", type:"Type 2", answers:["курю","куришь","курит","курим","курите","курят"]},
+  {inf:"любить", tr:"to love / like", stem:"люб-", type:"Type 2", answers:["люблю","любишь","любит","любим","любите","любят"]},
+  {inf:"учить", tr:"to teach / learn", stem:"уч-", type:"Type 2", answers:["учу","учишь","учит","учим","учите","учат"]},
+  {inf:"видеть", tr:"to see", stem:"вид-", type:"Type 2", answers:["вижу","видишь","видит","видим","видите","видят"]},
+  {inf:"слышать", tr:"to hear", stem:"слыш-", type:"Type 2", answers:["слышу","слышишь","слышит","слышим","слышите","слышат"]},
+  {inf:"держать", tr:"to hold", stem:"держ-", type:"Type 2", answers:["держу","держишь","держит","держим","держите","держат"]},
+  {inf:"лежать", tr:"to lie (down)", stem:"леж-", type:"Type 2", answers:["лежу","лежишь","лежит","лежим","лежите","лежат"]},
+  {inf:"стоять", tr:"to stand", stem:"сто-", type:"Type 2", answers:["стою","стоишь","стоит","стоим","стоите","стоят"]},
+  {inf:"молчать", tr:"to be silent", stem:"молч-", type:"Type 2", answers:["молчу","молчишь","молчит","молчим","молчите","молчат"]},
+  {inf:"кричать", tr:"to shout", stem:"крич-", type:"Type 2", answers:["кричу","кричишь","кричит","кричим","кричите","кричат"]},
+  {inf:"просить", tr:"to ask / request", stem:"прос-", type:"Type 2", answers:["прошу","просишь","просит","просим","просите","просят"]},
+  {inf:"платить", tr:"to pay", stem:"плат-", type:"Type 2", answers:["плачу","платишь","платит","платим","платите","платят"]},
+  {inf:"жить", tr:"to live", stem:"жив-", type:"Type 1B", answers:["живу","живёшь","живёт","живём","живёте","живут"]},
+  {inf:"ехать", tr:"to go (by transport)", stem:"ед-", type:"Type 1B", answers:["еду","едешь","едет","едем","едете","едут"]},
+  {inf:"писать", tr:"to write", stem:"пиш-", type:"Type 1B", answers:["пишу","пишешь","пишет","пишем","пишете","пишут"]},
+  {inf:"пить", tr:"to drink", stem:"пь-", type:"Type 1B", answers:["пью","пьёшь","пьёт","пьём","пьёте","пьют"]},
+  {inf:"звать", tr:"to call", stem:"зов-", type:"Type 1B", answers:["зову","зовёшь","зовёт","зовём","зовёте","зовут"]},
+  {inf:"идти", tr:"to go (on foot)", stem:"ид-", type:"Type 1B", answers:["иду","идёшь","идёт","идём","идёте","идут"]},
+  {inf:"ждать", tr:"to wait", stem:"жд-", type:"Type 1B", answers:["жду","ждёшь","ждёт","ждём","ждёте","ждут"]},
+  {inf:"брать", tr:"to take", stem:"бер-", type:"Type 1B", answers:["беру","берёшь","берёт","берём","берёте","берут"]},
+  {inf:"мыть", tr:"to wash", stem:"мо-", type:"Type 1B", answers:["мою","моешь","моет","моем","моете","моют"]},
+  {inf:"петь", tr:"to sing", stem:"по-", type:"Type 1B", answers:["пою","поёшь","поёт","поём","поёте","поют"]},
+  {inf:"шить", tr:"to sew", stem:"шье-", type:"Type 1B", answers:["шью","шьёшь","шьёт","шьём","шьёте","шьют"]},
+  {inf:"лить", tr:"to pour", stem:"лье-", type:"Type 1B", answers:["лью","льёшь","льёт","льём","льёте","льют"]},
+  {inf:"бить", tr:"to hit / beat", stem:"бье-", type:"Type 1B", answers:["бью","бьёшь","бьёт","бьём","бьёте","бьют"]},
+  {inf:"резать", tr:"to cut", stem:"реж-", type:"Type 1B", answers:["режу","режешь","режет","режем","режете","режут"]},
+  {inf:"искать", tr:"to look for", stem:"ищ-", type:"Type 1B", answers:["ищу","ищешь","ищет","ищем","ищете","ищут"]},
+  {inf:"плакать", tr:"to cry / weep", stem:"плач-", type:"Type 1B", answers:["плачу","плачешь","плачет","плачем","плачете","плачут"]},
+  {inf:"сказать", tr:"to say", stem:"скаж-", type:"Type 1B", answers:["скажу","скажешь","скажет","скажем","скажете","скажут"]},
+  {inf:"вить", tr:"to weave / twist", stem:"вье-", type:"Type 1B", answers:["вью","вьёшь","вьёт","вьём","вьёте","вьют"]},
+  {inf:"вести", tr:"to lead / take", stem:"вед-", type:"Type 1B", answers:["веду","ведёшь","ведёт","ведём","ведёте","ведут"]},
+];
+
+const PRONOUNS = ["я","ты","он/она/оно","мы","вы","они"];
+const SESSION_SIZE = 5;
+
+let session = [], idx = 0, correct = 0, rowState = [], revealed = false;
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+function startSession() {
+  session = shuffle(ALL_VERBS).slice(0, SESSION_SIZE);
+  idx = 0; correct = 0;
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  updateScore();
+  loadVerb();
+}
+
+function loadVerb() {
+  const v = session[idx];
+  rowState = Array(6).fill(null);
+  revealed = false;
+
+  document.getElementById('infinitive-display').textContent = v.inf;
+  document.getElementById('translation-display').textContent = v.tr;
+  document.getElementById('stem-display').textContent = 'Stem: ' + v.stem;
+  document.getElementById('stem-display').style.display = 'none';
+  document.getElementById('type-display').textContent = v.type;
+  document.getElementById('type-display').style.display = 'none';
+  document.getElementById('stem-btn').style.display = 'inline-block';
+  document.getElementById('stem-btn').textContent = 'Show stem';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('reveal-btn').style.display = 'inline-block';
+  document.getElementById('reveal-btn').textContent = 'Reveal answers';
+  document.getElementById('reveal-btn').className = 'btn-danger';
+  document.getElementById('progress-text').textContent = 'Verb ' + (idx + 1) + ' of ' + SESSION_SIZE;
+
+  const rows = document.getElementById('conjugation-rows');
+  rows.innerHTML = '';
+
+  PRONOUNS.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'pronoun-row';
+    row.innerHTML = `
+      <span class="pronoun-label">${p}</span>
+      <input type="text" id="inp-${i}" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" />
+      <span class="row-icon" id="icon-${i}"></span>
+      <button class="speak-btn" id="speak-${i}" onclick="speakForm(${i})" title="Listen" style="display:none;">🔊</button>
+    `;
+    rows.appendChild(row);
+
+    const inp = row.querySelector('input');
+    inp.addEventListener('input', () => liveCheck(i));
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const next = document.getElementById('inp-' + (i + 1));
+        if (next) next.focus();
+      }
+    });
+  });
+
+  document.getElementById('inp-0').focus();
+}
+
+function liveCheck(i) {
+  if (revealed) return;
+  const v = session[idx];
+  const inp = document.getElementById('inp-' + i);
+  const icon = document.getElementById('icon-' + i);
+  const val = inp.value.trim();
+
+  if (val === '') {
+    inp.className = '';
+    icon.textContent = '';
+    if (rowState[i] === true) correct--;
+    rowState[i] = null;
+    updateScore();
+    return;
+  }
+
+  const wasCorrect = rowState[i] === true;
+
+  if (val === v.answers[i]) {
+    if (!wasCorrect) {
+      correct++;
+      rowState[i] = true;
+    }
+    inp.className = 'correct';
+    icon.innerHTML = '<span class="icon-correct">✓</span>';
+    document.getElementById('speak-' + i).style.display = 'inline-block';
+  } else {
+    if (wasCorrect) correct--;
+    rowState[i] = false;
+    inp.className = 'wrong';
+    icon.innerHTML = '<span class="icon-wrong">✗</span>';
+    document.getElementById('speak-' + i).style.display = 'none';
+  }
+
+  updateScore();
+  checkComplete();
+}
+
+function revealAll() {
+  if (revealed) return;
+  revealed = true;
+  const v = session[idx];
+
+  PRONOUNS.forEach((p, i) => {
+    const inp = document.getElementById('inp-' + i);
+    const icon = document.getElementById('icon-' + i);
+    if (rowState[i] !== true) {
+      rowState[i] = 'revealed';
+      inp.value = v.answers[i];
+      inp.className = 'revealed';
+      inp.disabled = true;
+      icon.innerHTML = '<span class="icon-revealed">→</span>';
+      document.getElementById('speak-' + i).style.display = 'inline-block';
+    } else {
+      inp.disabled = true;
+      document.getElementById('speak-' + i).style.display = 'inline-block';
+    }
+  });
+
+  updateScore();
+  document.getElementById('reveal-btn').style.display = 'none';
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  fb.className = 'feedback success';
+  fb.style.background = '#fff3e0';
+  fb.style.borderColor = '#ffb74d';
+  fb.style.color = '#e65100';
+  fb.textContent = 'Answers revealed — orange forms were not yet correct.';
+
+  if (idx < SESSION_SIZE - 1) {
+    document.getElementById('next-btn').style.display = 'inline-block';
+  } else {
+    showResults();
+  }
+}
+
+function checkComplete() {
+  if (rowState.every(s => s === true)) {
+    const fb = document.getElementById('feedback');
+    fb.style.display = 'block';
+    fb.className = 'feedback success';
+    fb.style.background = '#e8f5e9';
+    fb.style.borderColor = '#81c784';
+    fb.style.color = '#2e7d32';
+    fb.textContent = '✓ All correct!';
+    document.getElementById('reveal-btn').style.display = 'none';
+
+    PRONOUNS.forEach((p, i) => {
+      document.getElementById('inp-' + i).disabled = true;
+      document.getElementById('speak-' + i).style.display = 'inline-block';
+    });
+
+    if (idx < SESSION_SIZE - 1) {
+      document.getElementById('next-btn').style.display = 'inline-block';
+    } else {
+      setTimeout(showResults, 800);
+    }
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  const pct = Math.round((correct / 30) * 100);
+  document.getElementById('final-score').textContent = correct + ' / 30 (' + pct + '%)';
+  const msgs = [
+    'Keep at it — review and try again. Каждый день!',
+    'Getting there — keep practising!',
+    'Good work! Хорошо!',
+    'Excellent! Очень хорошо!'
+  ];
+  document.getElementById('final-msg').textContent = msgs[pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0];
+}
+
+function speakInfinitive() {
+  const v = session[idx];
+  if (!window.speechSynthesis) { alert('Speech not supported in this browser.'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(v.inf);
+  utt.lang = 'ru-RU';
+  utt.rate = 0.85;
+  const voices = window.speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+  if (ruVoice) utt.voice = ruVoice;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakForm(i) {
+  const v = session[idx];
+  const pronounsFull = ["я","ты","он","мы","вы","они"];
+  const text = pronounsFull[i] + ' ' + v.answers[i];
+  if (!window.speechSynthesis) { alert('Speech not supported in this browser.'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ru-RU';
+  utt.rate = 0.85;
+  const voices = window.speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+  if (ruVoice) utt.voice = ruVoice;
+  window.speechSynthesis.speak(utt);
+}
+
+function revealStem() {
+  document.getElementById('stem-display').style.display = 'inline';
+  document.getElementById('type-display').style.display = 'inline';
+  document.getElementById('stem-btn').style.display = 'none';
+}
+
+function nextVerb() { idx++; loadVerb(); }
+function resetVerb() { loadVerb(); }
+function updateScore() {
+  document.getElementById('score-display').textContent = correct + ' / 30';
+}
+
+startSession();
+</script>
+</body>
+</html>
