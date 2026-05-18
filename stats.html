@@ -73,7 +73,8 @@
 
   <div class="tool-tabs">
     <button class="tool-tab active" onclick="showTab('quiz')">Vocabulary Quiz</button>
-    <button class="tool-tab disabled" onclick="">Verb Conjugator</button>
+    <button class="tool-tab disabled">Verb Conjugator</button>
+    <button class="tool-tab disabled">Reading</button>
   </div>
 
   <div class="tab-content active" id="tab-quiz">
@@ -87,6 +88,7 @@
       <span class="sort-label">Sort:</span>
       <button class="sort-btn active" id="sort-desc" onclick="setSort('desc')">Best → Worst</button>
       <button class="sort-btn" id="sort-asc" onclick="setSort('asc')">Worst → Best</button>
+      <button class="sort-btn" id="sort-alpha" onclick="setSort('alpha')">A → Я</button>
     </div>
 
     <div class="word-list" id="word-list"></div>
@@ -156,7 +158,12 @@ function render() {
   document.getElementById('count-getting').textContent = getting;
   document.getElementById('count-work').textContent = work;
 
-  seen.sort((a, b) => sortDir === 'desc' ? b.score - a.score : a.score - b.score);
+  seen.sort((a, b) => {
+    if (sortDir === 'desc') return b.score - a.score;
+    if (sortDir === 'asc') return a.score - b.score;
+    // alpha: sort by display string using Russian locale
+    return a.display.localeCompare(b.display, 'ru');
+  });
 
   const list = document.getElementById('word-list');
   list.innerHTML = '';
@@ -188,6 +195,7 @@ function setSort(dir) {
   sortDir = dir;
   document.getElementById('sort-desc').className = 'sort-btn' + (dir === 'desc' ? ' active' : '');
   document.getElementById('sort-asc').className = 'sort-btn' + (dir === 'asc' ? ' active' : '');
+  document.getElementById('sort-alpha').className = 'sort-btn' + (dir === 'alpha' ? ' active' : '');
   render();
 }
 
