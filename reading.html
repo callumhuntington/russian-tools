@@ -43,20 +43,47 @@
   }
   .dialogue-line { display: flex; gap: 0.6rem; margin-bottom: 0.35rem; align-items: baseline; }
   .speaker { font-weight: bold; min-width: 1.4rem; font-size: 0.95rem; }
-  .line-text { font-size: 0.95rem; flex: 1; }
-  .speak-btn {
-    background: none;
-    border: none;
+  .line-text { font-size: 0.95rem; flex: 1; line-height: 1.75; }
+
+  /* Tappable words */
+  .rus-word {
     cursor: pointer;
-    font-size: 0.85rem;
-    padding: 0 0.1rem;
-    opacity: 0.4;
-    transition: opacity 0.15s;
-    flex-shrink: 0;
-    align-self: center;
+    border-bottom: 1px dotted #bbb;
+    position: relative;
+    display: inline;
   }
-  .speak-btn:hover { opacity: 0.8; }
-  .speak-btn.speaking { opacity: 1; }
+  .rus-word:hover { border-bottom-color: #888; }
+  .rus-word.active { background: #f0ede6; border-radius: 3px; border-bottom-color: transparent; }
+  .word-tooltip {
+    display: none;
+    position: fixed;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+    font-family: Georgia, serif;
+  }
+  .word-tooltip.visible { display: block; }
+
+  /* Key words section */
+  .key-words-box {
+    display: none;
+    background: #fff;
+    border: 1px solid #e0ddd6;
+    border-radius: 10px;
+    padding: 1.25rem 1.4rem;
+    margin-top: 1.5rem;
+  }
+  .key-words-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
+  .key-words-grid { display: flex; flex-direction: column; gap: 6px; }
+  .key-word-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.88rem; padding: 0.3rem 0; border-bottom: 1px solid #f0ede6; }
+  .key-word-row:last-child { border-bottom: none; }
+  .key-word-rus { font-weight: bold; }
+  .key-word-eng { color: #666; font-style: italic; }
 
   /* Questions */
   .questions-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
@@ -128,6 +155,7 @@
 </style>
 </head>
 <body>
+<div class="word-tooltip" id="word-tooltip"></div>
 <div class="container">
   <a class="back-btn" href="index.html">← Home</a>
   <h1>Reading Exercises</h1>
@@ -150,6 +178,11 @@
       <button class="nav-btn" onclick="nextPassage()">Next passage →</button>
     </div>
   </div>
+
+  <div class="key-words-box" id="key-words-box">
+    <div class="key-words-title">Key words</div>
+    <div class="key-words-grid" id="key-words-grid"></div>
+  </div>
 </div>
 
 <script>
@@ -167,6 +200,38 @@ const PASSAGES = [
       { speaker: "В", text: "Здравствуйте, Миша." },
       { speaker: "А", text: "Простите, вас зовут Мэри?" },
       { speaker: "В", text: "Нет, Мари. Это французское имя. Но я не говорю по-французски." },
+    ],
+    vocab: {
+      "здравствуй": "hello (informal)",
+      "куда": "where to?",
+      "едешь": "you are going",
+      "домой": "home",
+      "улицу": "street (acc.)",
+      "университет": "university",
+      "тоже": "also / too",
+      "еду": "I am going",
+      "теперь": "now",
+      "живу": "I live",
+      "улице": "street (prep.)",
+      "познакомьтесь": "let me introduce you",
+      "моя": "my",
+      "подруга": "female friend",
+      "англичанка": "Englishwoman",
+      "простите": "excuse me",
+      "зовут": "they call (name)",
+      "французское": "French",
+      "имя": "name",
+      "говорю": "I speak",
+      "по-французски": "in French",
+    },
+    keywords: [
+      { rus: "куда", eng: "where to?" },
+      { rus: "домой", eng: "home (direction)" },
+      { rus: "улица", eng: "street" },
+      { rus: "подруга", eng: "female friend" },
+      { rus: "англичанка", eng: "Englishwoman" },
+      { rus: "имя", eng: "name" },
+      { rus: "по-французски", eng: "in French" },
     ],
     questions: [
       { q: "What is the name of А?", opts: ["Ваня", "Миша", "Мари", "Борис"], a: 1 },
@@ -198,6 +263,30 @@ const PASSAGES = [
       { speaker: "О", text: "Да, есть. Пожалуйста." },
       { speaker: "Д", text: "Спасибо!" },
     ],
+    vocab: {
+      "добрый": "good",
+      "день": "day",
+      "говорите": "you speak",
+      "по-английски": "in English",
+      "по-русски": "in Russian",
+      "немного": "a little",
+      "меню": "menu",
+      "борщ": "beetroot soup",
+      "со": "with",
+      "сметаной": "sour cream (instr.)",
+      "хорошо": "good / fine",
+      "белое": "white",
+      "вино": "wine",
+      "есть": "there is / is available",
+    },
+    keywords: [
+      { rus: "немного", eng: "a little" },
+      { rus: "меню", eng: "menu" },
+      { rus: "борщ", eng: "beetroot soup" },
+      { rus: "сметана", eng: "sour cream" },
+      { rus: "белое вино", eng: "white wine" },
+      { rus: "есть", eng: "there is / is available" },
+    ],
     questions: [
       { q: "What nationality is Джон?", opts: ["American", "French", "English", "Australian"], a: 2 },
       { q: "Does the waitress speak English?", opts: ["Yes, a little", "Yes, very well", "No", "She doesn't say"], a: 2 },
@@ -227,6 +316,34 @@ const PASSAGES = [
       { speaker: "А", text: "Да, автобус и троллейбус." },
       { speaker: "Л", text: "Отлично. Спасибо!" },
       { speaker: "А", text: "Пожалуйста. До свидания!" },
+    ],
+    vocab: {
+      "меня": "me (acc.)",
+      "зовут": "they call (name)",
+      "живу": "I live",
+      "говорите": "you speak",
+      "по-русски": "in Russian",
+      "немного": "a little",
+      "изучаю": "I am studying",
+      "русский": "Russian",
+      "язык": "language",
+      "очень": "very",
+      "метро": "metro",
+      "прямо": "straight on",
+      "направо": "to the right",
+      "автобус": "bus",
+      "тоже": "also",
+      "там": "there",
+      "троллейбус": "trolleybus",
+      "отлично": "excellent",
+    },
+    keywords: [
+      { rus: "изучаю", eng: "I am studying" },
+      { rus: "язык", eng: "language" },
+      { rus: "прямо", eng: "straight on" },
+      { rus: "направо", eng: "to the right" },
+      { rus: "троллейбус", eng: "trolleybus" },
+      { rus: "отлично", eng: "excellent" },
     ],
     questions: [
       { q: "Where is Лука from?", opts: ["Rome", "Milan", "Naples", "Turin"], a: 2 },
@@ -258,6 +375,35 @@ const PASSAGES = [
       { speaker: "А", text: "Понятно. До свидания, Юля!" },
       { speaker: "Ю", text: "До свидания, Аня!" },
     ],
+    vocab: {
+      "теперь": "now",
+      "живёшь": "you live",
+      "живу": "I live",
+      "Белград": "Belgrade",
+      "Сербии": "Serbia (prep.)",
+      "красивый": "beautiful",
+      "город": "city / town",
+      "говоришь": "you speak",
+      "по-сербски": "in Serbian",
+      "немного": "a little",
+      "понимаю": "I understand",
+      "потому что": "because",
+      "по-русски": "in Russian",
+      "едешь": "you are going",
+      "домой": "home",
+      "изучаю": "I am studying",
+      "язык": "language",
+      "здесь": "here",
+      "понятно": "I see / understood",
+    },
+    keywords: [
+      { rus: "красивый", eng: "beautiful" },
+      { rus: "город", eng: "city / town" },
+      { rus: "по-сербски", eng: "in Serbian" },
+      { rus: "потому что", eng: "because" },
+      { rus: "понятно", eng: "I see / understood" },
+      { rus: "здесь", eng: "here" },
+    ],
     questions: [
       { q: "Where does Юлия now live?", opts: ["Moscow", "Warsaw", "Belgrade", "Sofia"], a: 2 },
       { q: "In which country is Belgrade?", opts: ["Russia", "Serbia", "Poland", "Bulgaria"], a: 1 },
@@ -287,6 +433,37 @@ const PASSAGES = [
       { speaker: "Б", text: "Вот он. А твой?" },
       { speaker: "В", text: "Вот мой билет. Отлично!" },
       { speaker: "Б", text: "Спартак — чемпион!" },
+    ],
+    vocab: {
+      "стадион": "stadium",
+      "играет": "is playing",
+      "сегодня": "today",
+      "матч": "match",
+      "знаю": "I know",
+      "мой": "my",
+      "любимый": "favourite",
+      "клуб": "club",
+      "тоже": "also / too",
+      "живёшь": "you live",
+      "далеко": "far",
+      "от": "from",
+      "близко": "close / nearby",
+      "обычно": "usually",
+      "быстрее": "faster",
+      "твой": "your (informal)",
+      "билет": "ticket",
+      "отлично": "excellent",
+      "чемпион": "champion",
+    },
+    keywords: [
+      { rus: "стадион", eng: "stadium" },
+      { rus: "играет", eng: "is playing" },
+      { rus: "сегодня", eng: "today" },
+      { rus: "любимый", eng: "favourite" },
+      { rus: "далеко", eng: "far" },
+      { rus: "близко", eng: "close / nearby" },
+      { rus: "обычно", eng: "usually" },
+      { rus: "билет", eng: "ticket" },
     ],
     questions: [
       { q: "Where are Вадим and Борис going?", opts: ["To the cinema", "To the restaurant", "To the stadium", "To the hotel"], a: 2 },
@@ -348,13 +525,47 @@ function loadPassage() {
   let html = `<div class="passage-title">${p.title}</div>`;
   if (p.intro) html += `<div class="passage-intro">${p.intro}</div>`;
   for (const line of p.dialogue) {
+    const wordHtml = line.text.split(/(\s+)/).map(token => {
+      if (/^\s+$/.test(token)) return token;
+      const clean = token.replace(/[.,!?—:;«»""()\-]/g, '').toLowerCase();
+      if (p.vocab && p.vocab[clean]) {
+        return `<span class="rus-word" data-tr="${p.vocab[clean]}">${token}</span>`;
+      }
+      return token;
+    }).join('');
     html += `<div class="dialogue-line">
       <span class="speaker">${line.speaker}:</span>
-      <span class="line-text">${line.text}</span>
-      <button class="speak-btn" onclick="speakLine(this, ${JSON.stringify(line.text)})" title="Listen">🔊</button>
+      <span class="line-text">${wordHtml}</span>
     </div>`;
   }
   box.innerHTML = html;
+
+  // Attach tooltip listeners
+  const tooltip = document.getElementById('word-tooltip');
+  let activeWord = null;
+  box.querySelectorAll('.rus-word').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      if (activeWord && activeWord !== el) activeWord.classList.remove('active');
+      if (activeWord === el) {
+        el.classList.remove('active');
+        tooltip.classList.remove('visible');
+        activeWord = null;
+        return;
+      }
+      activeWord = el;
+      el.classList.add('active');
+      tooltip.textContent = el.dataset.tr;
+      const rect = el.getBoundingClientRect();
+      tooltip.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+      tooltip.style.top = (rect.top - 36 + window.scrollY) + 'px';
+      tooltip.classList.add('visible');
+    });
+  });
+  document.addEventListener('click', () => {
+    if (activeWord) { activeWord.classList.remove('active'); activeWord = null; }
+    tooltip.classList.remove('visible');
+  }, { once: false });
 
   updateScore();
 
@@ -428,10 +639,27 @@ function showResults() {
   let label = pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort — review the answers above.' : 'Keep practising — the answers are highlighted above.';
   document.getElementById('results-label').textContent = label;
   box.style.display = 'block';
+
+  // Show key words
+  const p = PASSAGES[currentPassageIdx];
+  if (p.keywords && p.keywords.length > 0) {
+    const kwBox = document.getElementById('key-words-box');
+    const kwGrid = document.getElementById('key-words-grid');
+    kwGrid.innerHTML = '';
+    p.keywords.forEach(kw => {
+      const row = document.createElement('div');
+      row.className = 'key-word-row';
+      row.innerHTML = `<span class="key-word-rus">${kw.rus}</span><span class="key-word-eng">${kw.eng}</span>`;
+      kwGrid.appendChild(row);
+    });
+    kwBox.style.display = 'block';
+  }
+
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function nextPassage() {
+  document.getElementById('key-words-box').style.display = 'none';
   currentPassageIdx = getNextPassageIdx();
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadPassage();
@@ -439,39 +667,6 @@ function nextPassage() {
 
 function goHome() {
   window.location.href = 'index.html';
-}
-
-function speakLine(btn, text) {
-  window.speechSynthesis.cancel();
-  const allBtns = document.querySelectorAll('.speak-btn');
-  allBtns.forEach(b => b.classList.remove('speaking'));
-
-  function doSpeak() {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'ru-RU';
-    utter.rate = 0.9;
-    const voices = window.speechSynthesis.getVoices();
-    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
-    if (ruVoice) utter.voice = ruVoice;
-    btn.classList.add('speaking');
-    utter.onend = () => btn.classList.remove('speaking');
-    utter.onerror = () => btn.classList.remove('speaking');
-    window.speechSynthesis.speak(utter);
-  }
-
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    doSpeak();
-  } else {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak();
-    };
-    // Fallback: speak anyway after short delay even if voices don't load
-    setTimeout(() => {
-      if (!window.speechSynthesis.speaking) doSpeak();
-    }, 300);
-  }
 }
 
 // Start with a random passage
