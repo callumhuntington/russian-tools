@@ -156,31 +156,16 @@ const PASSAGES = [
       { speaker: "В", text: "Нет, Мари. Это французское имя. Но я не говорю по-французски." },
     ],
     questions: [
-      {
-        q: "What is the name of А?",
-        opts: ["Ваня", "Миша", "Мари", "Борис"],
-        a: 1
-      },
-      {
-        q: "Where does А now live?",
-        opts: ["улица Волгина", "улица Вавилова", "улица Пушкина", "улица Ленина"],
-        a: 1
-      },
-      {
-        q: "Where is Б going?",
-        opts: ["To university", "To the shops", "Home", "To the metro"],
-        a: 2
-      },
-      {
-        q: "What nationality is В?",
-        opts: ["French", "Russian", "American", "English"],
-        a: 3
-      },
-      {
-        q: "Which language does В say she does not speak?",
-        opts: ["Russian", "English", "French", "German"],
-        a: 2
-      },
+      { q: "What is the name of А?", opts: ["Ваня", "Миша", "Мари", "Борис"], a: 1 },
+      { q: "Where does А now live?", opts: ["улица Волгина", "улица Вавилова", "улица Пушкина", "улица Ленина"], a: 1 },
+      { q: "Where is Б going?", opts: ["To university", "To the shops", "Home", "To the metro"], a: 2 },
+      { q: "What nationality is В?", opts: ["French", "Russian", "American", "English"], a: 3 },
+      { q: "Which language does В say she does not speak?", opts: ["Russian", "English", "French", "German"], a: 2 },
+      { q: "What is the name of Б?", opts: ["Миша", "Ваня", "Мари", "Наташа"], a: 1 },
+      { q: "Where is Б going home to?", opts: ["улица Вавилова", "улица Пушкина", "улица Волгина", "улица Ленина"], a: 2 },
+      { q: "What does В say about her name?", opts: ["It is a Russian name", "It is a French name", "It is an English name", "It is a German name"], a: 1 },
+      { q: "Was А going to university?", opts: ["Yes", "No", "He doesn't say", "He was already there"], a: 1 },
+      { q: "How does А greet Б at the start?", opts: ["Добрый день", "Здравствуйте", "Привет", "Здравствуй"], a: 3 },
     ]
   },
   {
@@ -201,31 +186,16 @@ const PASSAGES = [
       { speaker: "Д", text: "Спасибо!" },
     ],
     questions: [
-      {
-        q: "What nationality is Джон?",
-        opts: ["American", "French", "English", "Australian"],
-        a: 2
-      },
-      {
-        q: "Does the waitress speak English?",
-        opts: ["Yes, a little", "Yes, very well", "No", "She doesn't say"],
-        a: 2
-      },
-      {
-        q: "What food does Джон order?",
-        opts: ["Салат", "Борщ", "Шоколад", "Сметана"],
-        a: 1
-      },
-      {
-        q: "What does Джон ask about the dish before ordering?",
-        opts: ["Whether it is fresh", "Whether it is expensive", "Whether it is borsch", "Whether it comes with bread"],
-        a: 2
-      },
-      {
-        q: "What does Джон drink with his meal?",
-        opts: ["Чай", "Водка", "Пиво", "Вино"],
-        a: 3
-      },
+      { q: "What nationality is Джон?", opts: ["American", "French", "English", "Australian"], a: 2 },
+      { q: "Does the waitress speak English?", opts: ["Yes, a little", "Yes, very well", "No", "She doesn't say"], a: 2 },
+      { q: "What food does Джон order?", opts: ["Салат", "Борщ", "Шоколад", "Сметана"], a: 1 },
+      { q: "What does Джон ask about the dish before ordering?", opts: ["Whether it is fresh", "Whether it is expensive", "Whether it is borsch", "Whether it comes with bread"], a: 2 },
+      { q: "What does Джон drink with his meal?", opts: ["Чай", "Водка", "Пиво", "Вино"], a: 3 },
+      { q: "Does the борщ come with something?", opts: ["Хлеб", "Сахар", "Сметана", "Шоколад"], a: 2 },
+      { q: "How does Джон describe his Russian?", opts: ["Very good", "A little", "Not at all", "Only reading"], a: 1 },
+      { q: "What colour wine does Джон ask for?", opts: ["Red", "White", "Rosé", "He doesn't specify"], a: 1 },
+      { q: "What does Джон ask for before ordering food?", opts: ["Water", "The bill", "The menu", "A table"], a: 2 },
+      { q: "How does the waitress greet Джон?", opts: ["Привет", "Здравствуй", "Добрый день", "До свидания"], a: 2 },
     ]
   },
   {
@@ -246,47 +216,119 @@ const PASSAGES = [
       { speaker: "А", text: "Пожалуйста. До свидания!" },
     ],
     questions: [
-      {
-        q: "Where is Лука from?",
-        opts: ["Rome", "Milan", "Naples", "Turin"],
-        a: 2
-      },
-      {
-        q: "Why does Лука speak some Russian?",
-        opts: ["He has a Russian wife", "He is studying Russian", "He lived in Moscow", "He doesn't say"],
-        a: 1
-      },
-      {
-        q: "What does the administrator say about Лука's Russian?",
-        opts: ["It needs improvement", "It is very good", "It is a little strange", "It is bad"],
-        a: 1
-      },
-      {
-        q: "What does Лука ask the administrator to help him find?",
-        opts: ["A restaurant", "A taxi", "The metro", "The post office"],
-        a: 2
-      },
-      {
-        q: "How does the administrator direct Лука to the metro?",
-        opts: ["Left and then straight on", "Straight on and turn right", "Right and then left", "Straight on and turn left"],
-        a: 1
-      },
+      { q: "Where is Лука from?", opts: ["Rome", "Milan", "Naples", "Turin"], a: 2 },
+      { q: "Why does Лука speak some Russian?", opts: ["He has a Russian wife", "He is studying Russian", "He lived in Moscow", "He doesn't say"], a: 1 },
+      { q: "What does the administrator say about Лука's Russian?", opts: ["It needs improvement", "It is very good", "It is a little strange", "It is bad"], a: 1 },
+      { q: "What does Лука ask the administrator to help him find?", opts: ["A restaurant", "A taxi", "The metro", "The post office"], a: 2 },
+      { q: "How does the administrator direct Лука?", opts: ["Left and then straight on", "Straight on and turn right", "Right and then left", "Straight on and turn left"], a: 1 },
+      { q: "Is there a bus stop near the metro?", opts: ["No", "Yes, bus and trolleybus", "Yes, bus only", "He doesn't ask"], a: 1 },
+      { q: "Where does Лука normally live?", opts: ["In Moscow", "In Rome", "In Naples", "In Milan"], a: 2 },
+      { q: "How does Лука describe his Russian at first?", opts: ["Very good", "A little", "Not at all", "Only reading"], a: 1 },
+      { q: "What does the administrator say when Лука thanks him at the end?", opts: ["Спасибо", "Привет", "Пожалуйста", "Хорошо"], a: 2 },
+      { q: "Where is Лука speaking from at the start of the conversation?", opts: ["A restaurant", "A metro station", "A hotel", "A bus stop"], a: 2 },
+    ]
+  },
+  {
+    id: "belgrade",
+    title: "Юлия в Белграде",
+    difficulty: "easy",
+    intro: "Юлия (Ю), a Russian student, now lives in Belgrade. She speaks to her friend Анна (А) on the phone.",
+    dialogue: [
+      { speaker: "А", text: "Привет, Юля! Где ты теперь живёшь?" },
+      { speaker: "Ю", text: "Привет, Аня! Я теперь живу в Белграде." },
+      { speaker: "А", text: "В Белграде? Это в Сербии?" },
+      { speaker: "Ю", text: "Да, в Сербии. Белград — красивый город." },
+      { speaker: "А", text: "Ты говоришь по-сербски?" },
+      { speaker: "Ю", text: "Немного. Но я понимаю, потому что я говорю по-русски." },
+      { speaker: "А", text: "Ты едешь домой в Москву?" },
+      { speaker: "Ю", text: "Нет, я не еду. Я изучаю язык здесь." },
+      { speaker: "А", text: "Понятно. До свидания, Юля!" },
+      { speaker: "Ю", text: "До свидания, Аня!" },
+    ],
+    questions: [
+      { q: "Where does Юлия now live?", opts: ["Moscow", "Warsaw", "Belgrade", "Sofia"], a: 2 },
+      { q: "In which country is Belgrade?", opts: ["Russia", "Serbia", "Poland", "Bulgaria"], a: 1 },
+      { q: "Does Юлия speak Serbian?", opts: ["Yes, very well", "A little", "Not at all", "She doesn't say"], a: 1 },
+      { q: "Why does Юлия understand Serbian?", opts: ["She studied it at university", "Because she speaks Russian", "She lived in Serbia before", "She doesn't say"], a: 1 },
+      { q: "Is Юлия going back to Moscow?", opts: ["Yes, soon", "No", "She doesn't know", "Yes, next week"], a: 1 },
+      { q: "What is Юлия doing in Belgrade?", opts: ["Working", "Studying the language", "Visiting friends", "She doesn't say"], a: 1 },
+      { q: "What does Юлия say about Belgrade?", opts: ["It is very big", "It is a beautiful city", "It is cold", "It is expensive"], a: 1 },
+      { q: "What is the name of Юлия's friend?", opts: ["Наташа", "Мари", "Анна", "Мэри"], a: 2 },
+      { q: "How are the two friends speaking?", opts: ["In person in Moscow", "On the phone", "By letter", "In Belgrade"], a: 1 },
+      { q: "How does Юлия address her friend informally?", opts: ["Анна", "Аня", "Анечка", "Аннушка"], a: 1 },
+    ]
+  },
+  {
+    id: "spartak",
+    title: "На стадионе",
+    difficulty: "easy",
+    intro: "Вадим (В) and his friend Борис (Б) are going to watch Spartak Moscow play. They talk on the metro.",
+    dialogue: [
+      { speaker: "В", text: "Борис! Привет! Ты едешь на стадион?" },
+      { speaker: "Б", text: "Да! Спартак играет сегодня. Это матч!" },
+      { speaker: "В", text: "Я знаю. Спартак — мой любимый клуб." },
+      { speaker: "Б", text: "И мой тоже! Ты живёшь далеко от стадиона?" },
+      { speaker: "В", text: "Нет, я живу на улице Волгина. Это близко." },
+      { speaker: "Б", text: "Хорошо. Я еду на автобусе обычно, но сегодня на метро." },
+      { speaker: "В", text: "Метро быстрее. Где твой билет?" },
+      { speaker: "Б", text: "Вот он. А твой?" },
+      { speaker: "В", text: "Вот мой билет. Отлично!" },
+      { speaker: "Б", text: "Спартак — чемпион!" },
+    ],
+    questions: [
+      { q: "Where are Вадим and Борис going?", opts: ["To the cinema", "To the restaurant", "To the stadium", "To the hotel"], a: 2 },
+      { q: "Which football club is playing today?", opts: ["Динамо", "Спартак", "ЦСКА", "Локомотив"], a: 1 },
+      { q: "Whose favourite club is Спартак?", opts: ["Only Вадим's", "Only Борис's", "Both of theirs", "Neither of theirs"], a: 2 },
+      { q: "Does Вадим live far from the stadium?", opts: ["Yes, very far", "No, it is close", "He doesn't say", "He lives in another city"], a: 1 },
+      { q: "How does Борис usually travel to the stadium?", opts: ["By metro", "By trolleybus", "By bus", "By taxi"], a: 2 },
+      { q: "How is Борис travelling today?", opts: ["By bus", "By trolleybus", "By metro", "On foot"], a: 2 },
+      { q: "What does Вадим say about the metro?", opts: ["It is expensive", "It is faster", "It is far", "It is slow"], a: 1 },
+      { q: "What does Борис show Вадим?", opts: ["His passport", "His ticket", "His phone", "His metro card"], a: 1 },
+      { q: "What street does Вадим live on?", opts: ["улица Вавилова", "улица Ленина", "улица Волгина", "улица Пушкина"], a: 2 },
+      { q: "What does Борис shout at the end?", opts: ["Спартак играет!", "Спартак — чемпион!", "Спартак — клуб!", "Спартак — матч!"], a: 1 },
     ]
   }
 ];
 
-let passageIdx = 0;
+const QUESTIONS_PER_SESSION = 4;
+
+// Shuffles an array in place (Fisher-Yates)
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Passage order: shuffled queue, refills when empty
+let passageQueue = [];
+let currentPassageIdx = 0;
+let sessionQuestions = []; // the 4 picked questions for this round
 let answered = [];
 let correct = 0;
 
+function getNextPassageIdx() {
+  if (passageQueue.length === 0) {
+    passageQueue = shuffle([...Array(PASSAGES.length).keys()]);
+  }
+  return passageQueue.shift();
+}
+
 function loadPassage() {
-  const p = PASSAGES[passageIdx];
-  answered = new Array(p.questions.length).fill(false);
+  const p = PASSAGES[currentPassageIdx];
+
+  // Pick 4 random questions from the full bank
+  const allQ = p.questions.map((q, i) => i);
+  shuffle(allQ);
+  sessionQuestions = allQ.slice(0, QUESTIONS_PER_SESSION);
+
+  answered = new Array(QUESTIONS_PER_SESSION).fill(false);
   correct = 0;
 
   // Label
   document.getElementById('passage-label').textContent =
-    `Passage ${passageIdx + 1} of ${PASSAGES.length} — ${p.difficulty}`;
+    `${p.title} — ${p.difficulty}`;
 
   // Passage box
   const box = document.getElementById('passage-box');
@@ -297,20 +339,20 @@ function loadPassage() {
   }
   box.innerHTML = html;
 
-  // Score
   updateScore();
 
-  // Questions
+  // Render the 4 selected questions
   const area = document.getElementById('questions-area');
   area.innerHTML = '';
-  p.questions.forEach((q, qi) => {
+  sessionQuestions.forEach((qi, displayIdx) => {
+    const q = p.questions[qi];
     const block = document.createElement('div');
     block.className = 'question-block';
-    block.id = `q${qi}`;
+    block.id = `q${displayIdx}`;
 
     const qtext = document.createElement('div');
     qtext.className = 'question-text';
-    qtext.textContent = `${qi + 1}. ${q.q}`;
+    qtext.textContent = `${displayIdx + 1}. ${q.q}`;
     block.appendChild(qtext);
 
     const opts = document.createElement('div');
@@ -319,7 +361,7 @@ function loadPassage() {
       const btn = document.createElement('button');
       btn.className = 'opt-btn';
       btn.textContent = opt;
-      btn.onclick = () => handleAnswer(qi, oi);
+      btn.onclick = () => handleAnswer(displayIdx, oi);
       opts.appendChild(btn);
     });
     block.appendChild(opts);
@@ -329,13 +371,14 @@ function loadPassage() {
   document.getElementById('results-box').style.display = 'none';
 }
 
-function handleAnswer(qi, oi) {
-  if (answered[qi]) return;
-  answered[qi] = true;
+function handleAnswer(displayIdx, oi) {
+  if (answered[displayIdx]) return;
+  answered[displayIdx] = true;
 
-  const p = PASSAGES[passageIdx];
+  const p = PASSAGES[currentPassageIdx];
+  const qi = sessionQuestions[displayIdx];
   const q = p.questions[qi];
-  const block = document.getElementById(`q${qi}`);
+  const block = document.getElementById(`q${displayIdx}`);
   const btns = block.querySelectorAll('.opt-btn');
 
   btns.forEach(b => b.disabled = true);
@@ -356,17 +399,15 @@ function handleAnswer(qi, oi) {
 }
 
 function updateScore() {
-  const total = PASSAGES[passageIdx].questions.length;
   const done = answered.filter(Boolean).length;
   document.getElementById('score-display').textContent =
     done > 0 ? `${correct} / ${done} correct` : '';
 }
 
 function showResults() {
-  const total = PASSAGES[passageIdx].questions.length;
   const box = document.getElementById('results-box');
-  document.getElementById('results-score').textContent = `${correct} / ${total}`;
-  const pct = Math.round((correct / total) * 100);
+  document.getElementById('results-score').textContent = `${correct} / ${QUESTIONS_PER_SESSION}`;
+  const pct = Math.round((correct / QUESTIONS_PER_SESSION) * 100);
   let label = pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort — review the answers above.' : 'Keep practising — the answers are highlighted above.';
   document.getElementById('results-label').textContent = label;
   box.style.display = 'block';
@@ -374,7 +415,7 @@ function showResults() {
 }
 
 function nextPassage() {
-  passageIdx = (passageIdx + 1) % PASSAGES.length;
+  currentPassageIdx = getNextPassageIdx();
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadPassage();
 }
@@ -383,6 +424,8 @@ function goHome() {
   window.location.href = 'index.html';
 }
 
+// Start with a random passage
+currentPassageIdx = getNextPassageIdx();
 loadPassage();
 </script>
 </body>
