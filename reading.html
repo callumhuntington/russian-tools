@@ -43,7 +43,20 @@
   }
   .dialogue-line { display: flex; gap: 0.6rem; margin-bottom: 0.35rem; align-items: baseline; }
   .speaker { font-weight: bold; min-width: 1.4rem; font-size: 0.95rem; }
-  .line-text { font-size: 0.95rem; }
+  .line-text { font-size: 0.95rem; flex: 1; }
+  .speak-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0 0.1rem;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .speak-btn:hover { opacity: 0.8; }
+  .speak-btn.speaking { opacity: 1; }
 
   /* Questions */
   .questions-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
@@ -335,7 +348,11 @@ function loadPassage() {
   let html = `<div class="passage-title">${p.title}</div>`;
   if (p.intro) html += `<div class="passage-intro">${p.intro}</div>`;
   for (const line of p.dialogue) {
-    html += `<div class="dialogue-line"><span class="speaker">${line.speaker}:</span><span class="line-text">${line.text}</span></div>`;
+    html += `<div class="dialogue-line">
+      <span class="speaker">${line.speaker}:</span>
+      <span class="line-text">${line.text}</span>
+      <button class="speak-btn" onclick="speakLine(this, ${JSON.stringify(line.text)})" title="Listen">🔊</button>
+    </div>`;
   }
   box.innerHTML = html;
 
@@ -422,6 +439,27 @@ function nextPassage() {
 
 function goHome() {
   window.location.href = 'index.html';
+}
+
+function speakLine(btn, text) {
+  window.speechSynthesis.cancel();
+  const allBtns = document.querySelectorAll('.speak-btn');
+  allBtns.forEach(b => b.classList.remove('speaking'));
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ru-RU';
+  utter.rate = 0.9;
+
+  // Try to pick a Russian voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+  if (ruVoice) utter.voice = ruVoice;
+
+  btn.classList.add('speaking');
+  utter.onend = () => btn.classList.remove('speaking');
+  utter.onerror = () => btn.classList.remove('speaking');
+
+  window.speechSynthesis.speak(utter);
 }
 
 // Start with a random passage
