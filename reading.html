@@ -446,20 +446,32 @@ function speakLine(btn, text) {
   const allBtns = document.querySelectorAll('.speak-btn');
   allBtns.forEach(b => b.classList.remove('speaking'));
 
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'ru-RU';
-  utter.rate = 0.9;
+  function doSpeak() {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ru-RU';
+    utter.rate = 0.9;
+    const voices = window.speechSynthesis.getVoices();
+    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+    if (ruVoice) utter.voice = ruVoice;
+    btn.classList.add('speaking');
+    utter.onend = () => btn.classList.remove('speaking');
+    utter.onerror = () => btn.classList.remove('speaking');
+    window.speechSynthesis.speak(utter);
+  }
 
-  // Try to pick a Russian voice if available
   const voices = window.speechSynthesis.getVoices();
-  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
-  if (ruVoice) utter.voice = ruVoice;
-
-  btn.classList.add('speaking');
-  utter.onend = () => btn.classList.remove('speaking');
-  utter.onerror = () => btn.classList.remove('speaking');
-
-  window.speechSynthesis.speak(utter);
+  if (voices.length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+    // Fallback: speak anyway after short delay even if voices don't load
+    setTimeout(() => {
+      if (!window.speechSynthesis.speaking) doSpeak();
+    }, 300);
+  }
 }
 
 // Start with a random passage

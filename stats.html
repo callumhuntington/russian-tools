@@ -114,17 +114,15 @@ const ALL_WORDS = [{"key":"да","display":"да (yes)"},{"key":"нет","displa
 let sortDir = 'desc';
 
 function scoreToColor(s) {
-  // 0 = dark red, 5 = amber, 10 = green
-  if (s <= 5) {
-    // dark red (#8b0000) to amber (#c17f00)
-    const t = s / 5;
+  // 0 = dark red, 2.5 = amber, 5 = green
+  if (s <= 2.5) {
+    const t = s / 2.5;
     const r = Math.round(139 + (193 - 139) * t);
     const g = Math.round(0 + (127 - 0) * t);
     const b = 0;
     return `rgb(${r},${g},${b})`;
   } else {
-    // amber (#c17f00) to green (#2d7a3a)
-    const t = (s - 5) / 5;
+    const t = (s - 2.5) / 2.5;
     const r = Math.round(193 + (45 - 193) * t);
     const g = Math.round(127 + (122 - 127) * t);
     const b = Math.round(0 + (58 - 0) * t);
@@ -145,8 +143,8 @@ function render() {
   ALL_WORDS.forEach(w => {
     if (w.key in scores) {
       const s = scores[w.key];
-      if (s === 10) mastered++;
-      else if (s >= 5) getting++;
+      if (s === 5) mastered++;
+      else if (s >= 3) getting++;
       else work++;
       seen.push({ ...w, score: s });
     } else {
@@ -172,7 +170,7 @@ function render() {
     const pill = document.createElement('div');
     pill.className = 'word-pill';
     pill.style.background = scoreToColor(w.score);
-    pill.textContent = w.display + '  —  ' + w.score + ' / 10';
+    pill.textContent = w.display + '  —  ' + w.score + ' / 5';
     list.appendChild(pill);
   });
 

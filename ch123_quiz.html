@@ -375,17 +375,17 @@ function getScore(q, scores) {
 function updateScore(q, correct) {
   const scores = loadScores();
   const cur = q in scores ? scores[q] : 0;
-  scores[q] = Math.max(0, Math.min(10, cur + (correct ? 1 : -1)));
+  scores[q] = Math.max(0, Math.min(5, cur + (correct ? 1 : -1)));
   saveScores(scores);
 }
 
-// Weighted selection: score 0 → weight 6, score 10 → weight 1
+// Weighted selection: score 0 → weight 6, score 5 → weight 1
 function weightedShuffle(questions) {
   const scores = loadScores();
   const weighted = [];
   questions.forEach(q => {
     const s = q.q in scores ? scores[q.q] : 0;
-    const w = Math.round(6 - (s / 10) * 5); // 6 down to 1
+    const w = Math.round(6 - (s / 5) * 5); // 6 down to 1
     for (let i = 0; i < w; i++) weighted.push(q);
   });
   // Shuffle weighted pool, then pick 20 unique questions

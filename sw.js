@@ -1,4 +1,4 @@
-const CACHE = 'russian-tools-v13';
+const CACHE = 'russian-tools-v14';
 const FILES = [
   '/russian-tools/',
   '/russian-tools/index.html',
