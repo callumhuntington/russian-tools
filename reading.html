@@ -182,6 +182,96 @@ const PASSAGES = [
         a: 2
       },
     ]
+  },
+  {
+    id: "restaurant",
+    title: "В ресторане",
+    difficulty: "easy",
+    intro: "Джон (Д), an Englishman visiting Moscow, sits down at a restaurant. Официантка (О) comes to take his order.",
+    dialogue: [
+      { speaker: "О", text: "Здравствуйте. Добрый день." },
+      { speaker: "Д", text: "Здравствуйте. Простите, вы говорите по-английски?" },
+      { speaker: "О", text: "Нет, я не говорю по-английски. Вы говорите по-русски?" },
+      { speaker: "Д", text: "Да, немного. Где меню, пожалуйста?" },
+      { speaker: "О", text: "Вот меню." },
+      { speaker: "Д", text: "Спасибо. Это борщ?" },
+      { speaker: "О", text: "Да, это борщ. Со сметаной." },
+      { speaker: "Д", text: "Хорошо. Борщ, пожалуйста. И вино. Белое вино есть?" },
+      { speaker: "О", text: "Да, есть. Пожалуйста." },
+      { speaker: "Д", text: "Спасибо!" },
+    ],
+    questions: [
+      {
+        q: "What nationality is Джон?",
+        opts: ["American", "French", "English", "Australian"],
+        a: 2
+      },
+      {
+        q: "Does the waitress speak English?",
+        opts: ["Yes, a little", "Yes, very well", "No", "She doesn't say"],
+        a: 2
+      },
+      {
+        q: "What food does Джон order?",
+        opts: ["Салат", "Борщ", "Шоколад", "Сметана"],
+        a: 1
+      },
+      {
+        q: "What does Джон ask about the dish before ordering?",
+        opts: ["Whether it is fresh", "Whether it is expensive", "Whether it is borsch", "Whether it comes with bread"],
+        a: 2
+      },
+      {
+        q: "What does Джон drink with his meal?",
+        opts: ["Чай", "Водка", "Пиво", "Вино"],
+        a: 3
+      },
+    ]
+  },
+  {
+    id: "hotel",
+    title: "В гостинице",
+    difficulty: "easy",
+    intro: "Лука (Л), a Neapolitan visiting Moscow, arrives at his hotel. Администратор (А) is at the desk.",
+    dialogue: [
+      { speaker: "Л", text: "Здравствуйте. Меня зовут Лука. Я живу в Неаполе." },
+      { speaker: "А", text: "Здравствуйте. Вы говорите по-русски?" },
+      { speaker: "Л", text: "Да, немного. Я изучаю русский язык." },
+      { speaker: "А", text: "Хорошо! Вы говорите по-русски очень хорошо." },
+      { speaker: "Л", text: "Спасибо! Простите, где метро?" },
+      { speaker: "А", text: "Метро? Вот. Прямо и направо." },
+      { speaker: "Л", text: "А автобус тоже там?" },
+      { speaker: "А", text: "Да, автобус и троллейбус." },
+      { speaker: "Л", text: "Отлично. Спасибо!" },
+      { speaker: "А", text: "Пожалуйста. До свидания!" },
+    ],
+    questions: [
+      {
+        q: "Where is Лука from?",
+        opts: ["Rome", "Milan", "Naples", "Turin"],
+        a: 2
+      },
+      {
+        q: "Why does Лука speak some Russian?",
+        opts: ["He has a Russian wife", "He is studying Russian", "He lived in Moscow", "He doesn't say"],
+        a: 1
+      },
+      {
+        q: "What does the administrator say about Лука's Russian?",
+        opts: ["It needs improvement", "It is very good", "It is a little strange", "It is bad"],
+        a: 1
+      },
+      {
+        q: "What does Лука ask the administrator to help him find?",
+        opts: ["A restaurant", "A taxi", "The metro", "The post office"],
+        a: 2
+      },
+      {
+        q: "How does the administrator direct Лука to the metro?",
+        opts: ["Left and then straight on", "Straight on and turn right", "Right and then left", "Straight on and turn left"],
+        a: 1
+      },
+    ]
   }
 ];
 
