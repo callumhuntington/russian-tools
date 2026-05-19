@@ -550,8 +550,6 @@ const FAMOUS = [
 FAMOUS.forEach(q => QUESTIONS.push(q));
 
 // ── SCORING ──────────────────────────────────────────────────────────────────
-const STORE_KEY = 'names_scores_v1';
-const SESSION_SIZE = 10;
 
 function loadScores() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e) { return {}; }
