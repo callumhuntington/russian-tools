@@ -56,7 +56,10 @@
   .rus-word.active { background: #f0ede6; border-radius: 3px; border-bottom-color: transparent; }
   .word-tooltip {
     display: none;
-    position: fixed;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
     background: #1a1a1a;
     color: #fff;
     font-size: 0.8rem;
@@ -66,8 +69,10 @@
     z-index: 999;
     white-space: nowrap;
     font-family: Georgia, serif;
+    font-style: normal;
+    font-weight: normal;
   }
-  .word-tooltip.visible { display: block; }
+  .rus-word.active .word-tooltip { display: block; }
 
   /* Key words section */
   .key-words-box {
@@ -155,7 +160,6 @@
 </style>
 </head>
 <body>
-<div class="word-tooltip" id="word-tooltip"></div>
 <div class="container">
   <a class="back-btn" href="index.html">← Home</a>
   <h1>Reading Exercises</h1>
@@ -704,7 +708,7 @@ function loadPassage() {
       if (/^\s+$/.test(token)) return token;
       const clean = token.replace(/[.,!?—:;«»""()\-]/g, '').toLowerCase();
       if (p.vocab && p.vocab[clean]) {
-        return `<span class="rus-word" data-tr="${p.vocab[clean]}">${token}</span>`;
+        return `<span class="rus-word" data-tr="${p.vocab[clean]}">${token}<span class="word-tooltip">${p.vocab[clean]}</span></span>`;
       }
       return token;
     }).join('');
@@ -716,7 +720,6 @@ function loadPassage() {
   box.innerHTML = html;
 
   // Attach tooltip listeners
-  const tooltip = document.getElementById('word-tooltip');
   let activeWord = null;
   box.querySelectorAll('.rus-word').forEach(el => {
     el.addEventListener('click', e => {
@@ -724,22 +727,15 @@ function loadPassage() {
       if (activeWord && activeWord !== el) activeWord.classList.remove('active');
       if (activeWord === el) {
         el.classList.remove('active');
-        tooltip.classList.remove('visible');
         activeWord = null;
         return;
       }
       activeWord = el;
       el.classList.add('active');
-      tooltip.textContent = el.dataset.tr;
-      const rect = el.getBoundingClientRect();
-      tooltip.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
-      tooltip.style.top = (rect.top - 36 + window.scrollY) + 'px';
-      tooltip.classList.add('visible');
     });
   });
   document.addEventListener('click', () => {
     if (activeWord) { activeWord.classList.remove('active'); activeWord = null; }
-    tooltip.classList.remove('visible');
   }, { once: false });
 
   updateScore();
