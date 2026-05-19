@@ -92,60 +92,223 @@ const SESSION_SIZE = 10;
 
 // ── NAME DATA ────────────────────────────────────────────────────────────────
 const FEMALE_NAMES = [
-  { official: "Александра", familiar: "Саша" },
-  { official: "Анна",       familiar: "Аня" },
-  { official: "Варвара",    familiar: "Варя" },
-  { official: "Галина",     familiar: "Галя" },
-  { official: "Дарья",      familiar: "Даша" },
-  { official: "Екатерина",  familiar: "Катя" },
-  { official: "Елена",      familiar: "Лена" },
-  { official: "Ирина",      familiar: "Ира" },
-  { official: "Ксения",     familiar: "Ксюша" },
-  { official: "Людмила",    familiar: "Люда" },
-  { official: "Любовь",     familiar: "Люба" },
-  { official: "Мария",      familiar: "Маша" },
-  { official: "Надежда",    familiar: "Надя" },
-  { official: "Наталья",    familiar: "Наташа" },
-  { official: "Нина",       familiar: "Ниночка" },
-  { official: "Ольга",      familiar: "Оля" },
-  { official: "Светлана",   familiar: "Света" },
-  { official: "Татьяна",    familiar: "Таня" },
-  { official: "Тамара",     familiar: "Тома" },
-  { official: "Юлия",       familiar: "Юля" },
+  { official: "Александра", familiar: "Саша",     fact: "Александра Фёдоровна (6 June 1872 – 17 July 1918) was the last Empress of Russia, wife of Nicholas II. Her familiar name Саша was also used by her husband Alexander III." },
+  { official: "Анна",       familiar: "Аня",      fact: "Anna Akhmatova (23 June 1889 – 5 March 1966) was one of the most significant Russian poets of the 20th century, known for her lyric poetry and the epic Requiem." },
+  { official: "Варвара",    familiar: "Варя",     fact: "Varya (Варя) is a character in Chekhov's The Cherry Orchard (1904). Her official name Варвара derives from the Greek for 'foreign' or 'strange' — the same root as 'barbarian'." },
+  { official: "Галина",     familiar: "Галя",     fact: "Galina Ulanova (8 January 1910 – 21 March 1998) was a Soviet prima ballerina, widely considered one of the greatest ballet dancers of the 20th century." },
+  { official: "Дарья",      familiar: "Даша",     fact: "Dasha Zhukova (born 1981) is a Russian entrepreneur and art collector, founder of the Garage Museum of Contemporary Art in Moscow." },
+  { official: "Екатерина",  familiar: "Катя",     fact: "Catherine the Great (Екатерина Великая, 2 May 1729 – 17 November 1796) was Empress of Russia from 1762 to 1796, the country's longest-ruling female leader." },
+  { official: "Елена",      familiar: "Лена",     fact: "Elena Isinbayeva (born 3 June 1982) is a Russian pole vaulter who set 28 world records and won two Olympic gold medals. Lena is the standard familiar form of Elena." },
+  { official: "Ирина",      familiar: "Ира",      fact: "Irina Rodnina (born 12 September 1949) is a Soviet and Russian figure skater who won three Olympic gold medals — the most of any figure skater in history." },
+  { official: "Ксения",     familiar: "Ксюша",   fact: "Xenia of Saint Petersburg (Ксения Петербургская, c.1730 – c.1803) is a Russian Orthodox saint venerated for her humility and piety. Ксюша is the warm familiar form." },
+  { official: "Людмила",    familiar: "Люда",     fact: "Lyudmila is the heroine of Pushkin's early poem Ruslan and Lyudmila (1820). The name means 'dear to the people' in Slavic — люд (people) + мила (dear)." },
+  { official: "Любовь",     familiar: "Люба",     fact: "Lyubov Orlova (29 January 1902 – 26 January 1975) was a Soviet actress and one of the first major stars of Soviet cinema. Любовь literally means 'love'." },
+  { official: "Мария",      familiar: "Маша",     fact: "Masha is one of the three sisters in Chekhov's Three Sisters (1900). Her official name is Мария — the Russian form of Mary, ultimately from Hebrew Miriam." },
+  { official: "Надежда",    familiar: "Надя",     fact: "Nadezhda Krupskaya (26 February 1869 – 27 February 1939) was a Russian Marxist revolutionary and wife of Vladimir Lenin. Надежда means 'hope' in Russian." },
+  { official: "Наталья",    familiar: "Наташа",   fact: "Natasha Rostova (Наташа Ростова) is the beloved heroine of Tolstoy's War and Peace (1869). Her official name is Наталья Ильинична Ростова." },
+  { official: "Нина",       familiar: "Ниночка",  fact: "Nina is the protagonist of Chekhov's The Seagull (1895). Ниночка is an especially tender diminutive — adding both -очка as an extra layer of affection." },
+  { official: "Ольга",      familiar: "Оля",      fact: "Princess Olga of Kiev (c.890 – 969) was the first ruler of Kievan Rus to convert to Christianity and is venerated as a saint in the Orthodox Church." },
+  { official: "Светлана",   familiar: "Света",    fact: "Svetlana Alexievich (born 31 May 1948) is a Belarusian investigative journalist and prose writer who won the Nobel Prize in Literature in 2015." },
+  { official: "Татьяна",    familiar: "Таня",     fact: "Tatiana Larina is the heroine of Pushkin's verse novel Eugene Onegin (1833). Her famous letter to Onegin is one of the most celebrated passages in Russian literature." },
+  { official: "Тамара",     familiar: "Тома",     fact: "Tamara is the heroine of Lermontov's poem The Demon (1841). The name is of Hebrew origin (תָּמָר), meaning 'date palm'. Тома is the warm everyday familiar form." },
+  { official: "Юлия",       familiar: "Юля",      fact: "Yulia Lipnitskaya (born 5 June 1998) is a Russian figure skater who became the youngest individual gold medallist in Winter Olympic history at the 2014 Sochi Games." },
 ];
 
 const MALE_NAMES = [
-  { official: "Александр",  familiar: "Саша" },
-  { official: "Алексей",    familiar: "Лёша" },
-  { official: "Андрей",     familiar: "Андрюша" },
-  { official: "Антон",      familiar: "Тоша" },
-  { official: "Борис",      familiar: "Боря" },
-  { official: "Василий",    familiar: "Вася" },
-  { official: "Владимир",   familiar: "Володя" },
-  { official: "Григорий",   familiar: "Гриша" },
-  { official: "Дмитрий",    familiar: "Дима" },
-  { official: "Евгений",    familiar: "Женя" },
-  { official: "Иван",       familiar: "Ваня" },
-  { official: "Константин", familiar: "Костя" },
-  { official: "Михаил",     familiar: "Миша" },
-  { official: "Николай",    familiar: "Коля" },
-  { official: "Павел",      familiar: "Паша" },
-  { official: "Пётр",       familiar: "Петя" },
-  { official: "Роман",      familiar: "Рома" },
-  { official: "Сергей",     familiar: "Серёжа" },
-  { official: "Фёдор",      familiar: "Федя" },
-  { official: "Юрий",       familiar: "Юра" },
+  { official: "Александр",  familiar: "Саша",     fact: "Alexander Pushkin (Александр Сергеевич Пушкин, 6 June 1799 – 10 February 1837) is regarded as the greatest Russian poet and founder of modern Russian literature." },
+  { official: "Алексей",    familiar: "Лёша",     fact: "Alexei Navalny (Алексей Анатольевич Навальный, 4 June 1976 – 16 February 2024) was a Russian opposition politician and anti-corruption activist." },
+  { official: "Андрей",     familiar: "Андрюша",  fact: "Prince Andrei Bolkonsky (Андрей Николаевич Болконский) is a central character in Tolstoy's War and Peace (1869) — aristocratic, idealistic, and searching for meaning." },
+  { official: "Антон",      familiar: "Тоша",     fact: "Anton Chekhov (Антон Павлович Чехов, 29 January 1860 – 15 July 1904) was a Russian playwright and short story writer, widely regarded as one of the greatest writers in history." },
+  { official: "Борис",      familiar: "Боря",     fact: "Boris Pasternak (Борис Леонидович Пастернак, 10 February 1890 – 30 May 1960) was a Russian poet and novelist, best known for the novel Doctor Zhivago (1957)." },
+  { official: "Василий",    familiar: "Вася",     fact: "Vasily Kandinsky (Василий Васильевич Кандинский, 16 December 1866 – 13 December 1944) was a Russian painter widely credited as the pioneer of abstract art." },
+  { official: "Владимир",   familiar: "Володя",   fact: "Vladimir Lenin (Владимир Ильич Ленин, 22 April 1870 – 21 January 1924) was a Russian revolutionary and politician who led the Bolshevik Revolution of 1917." },
+  { official: "Григорий",   familiar: "Гриша",    fact: "Grigori Rasputin (Григорий Ефимович Распутин, c.1869 – 30 December 1916) was a Russian mystic who wielded considerable influence over the Romanov royal family." },
+  { official: "Дмитрий",    familiar: "Дима",     fact: "Dmitri Mendeleev (Дмитрий Иванович Менделеев, 8 February 1834 – 2 February 1907) was a Russian chemist who formulated the Periodic Law and created the periodic table." },
+  { official: "Евгений",    familiar: "Женя",     fact: "Eugene Onegin (Евгений Онегин) is the titular hero of Pushkin's verse novel (1833). Женя is the gender-neutral familiar form used for both Евгений and Евгения." },
+  { official: "Иван",       familiar: "Ваня",     fact: "Ivan the Terrible (Иван Васильевич, 25 August 1530 – 28 March 1584) was the first Tsar of Russia. Ваня is also the name of the uncle in Chekhov's play Дядя Ваня (1898)." },
+  { official: "Константин", familiar: "Костя",    fact: "Konstantin Stanislavski (Константин Сергеевич Станиславский, 17 January 1863 – 7 August 1938) was a Russian theatre director who developed the Stanislavski method of acting." },
+  { official: "Михаил",     familiar: "Миша",     fact: "Mikhail Gorbachev (Михаил Сергеевич Горбачёв, 2 March 1931 – 30 August 2022) was the last leader of the Soviet Union, initiating the policies of glasnost and perestroika." },
+  { official: "Николай",    familiar: "Коля",     fact: "Nikolai Gogol (Николай Васильевич Гоголь, 1 April 1809 – 4 March 1852) was a Russian and Ukrainian writer whose works include Dead Souls and The Government Inspector." },
+  { official: "Павел",      familiar: "Паша",     fact: "Pavel Tretyakov (Павел Михайлович Третьяков, 27 December 1832 – 16 December 1898) was a Russian merchant and art collector who founded the Tretyakov Gallery in Moscow." },
+  { official: "Пётр",       familiar: "Петя",     fact: "Peter the Great (Пётр Алексеевич, 10 June 1672 – 8 February 1725) was Tsar of Russia who transformed Russia into a major European power and founded St Petersburg." },
+  { official: "Роман",      familiar: "Рома",     fact: "Roman Abramovich (Роман Аркадьевич Абрамович, born 24 October 1966) is a Russian-Israeli businessman, former owner of Chelsea Football Club and Governor of Chukotka." },
+  { official: "Сергей",     familiar: "Серёжа",   fact: "Sergei Rachmaninoff (Сергей Васильевич Рахманинов, 1 April 1873 – 28 March 1943) was a Russian composer and pianist, one of the last great representatives of Romanticism." },
+  { official: "Фёдор",      familiar: "Федя",     fact: "Fyodor Dostoevsky (Фёдор Михайлович Достоевский, 11 November 1821 – 9 February 1881) was a Russian novelist whose works include Crime and Punishment and The Brothers Karamazov." },
+  { official: "Юрий",       familiar: "Юра",      fact: "Yuri Gagarin (Юрий Алексеевич Гагарин, 9 March 1934 – 27 March 1968) was a Soviet pilot and cosmonaut who became the first human to journey into outer space in 1961." },
 ];
 
-// Patronymic formation rules
+// Facts for patronymic questions — one per father's name, slightly different across question types
+const PAT_FACTS = {
+  "Александр": {
+    m: "Александрович is one of the most common patronymics in Russia. Alexander III (Александр Александрович, 10 March 1845 – 1 November 1894) was Emperor of Russia from 1881 to 1894.",
+    f: "Александровна is the female patronymic of Александр. Maria Alexandrovna was the name of both Alexander II's wife and his daughter — a very common female name in the Romanov family.",
+    decode: "Александрович means 'son of Alexander'. Alexander Nevsky (Александр Невский, c.1220 – 14 November 1263) was a prince of Novgorod famous for defeating the Teutonic Knights at the Battle of the Ice in 1242.",
+    mf: "Александрович → Александровна. Both are among the most common patronymics in Russia, derived from the ancient Greek name Ἀλέξανδρος (Alexandros), meaning 'defender of men'.",
+    fm: "Александровна → Александрович. Tsar Alexander II (Александр Николаевич, 29 April 1818 – 13 March 1881) was Emperor of Russia, known as the 'Tsar Liberator' for emancipating the serfs in 1861.",
+  },
+  "Алексей": {
+    m: "Алексеевич is the male patronymic of Алексей. Tsar Alexei I (Алексей Михайлович, 19 March 1629 – 8 February 1676) was the father of Peter the Great — so Peter the Great's patronymic was Алексеевич.",
+    f: "Алексеевна is the female patronymic of Алексей. Catherine the Great was given the patronymic Алексеевна when she converted to Orthodoxy — in honour of Peter the Great's father Alexei.",
+    decode: "Алексеевич means 'son of Alexei'. Alexei Tolstoy (Алексей Николаевич Толстой, 10 January 1883 – 23 February 1945) was a Russian and Soviet writer, distant relative of Leo Tolstoy.",
+    mf: "Алексеевич → Алексеевна. Note the soft ending -евич/-евна because Алексей ends in й. Alexei is derived from the Greek Ἀλέξιος, meaning 'defender'.",
+    fm: "Алексеевна → Алексеевич. Alexei Romanov (Алексей Николаевич, 12 August 1904 – 17 July 1918) was the tsarevich, son of Nicholas II, and suffered from haemophilia.",
+  },
+  "Андрей": {
+    m: "Андреевич is the male patronymic of Андрей. Andrei Sakharov (Андрей Дмитриевич Сахаров, 21 May 1921 – 14 December 1989) was a Soviet nuclear physicist and Nobel Peace Prize laureate.",
+    f: "Андреевна is the female patronymic of Андрей. Note the soft ending — Андрей ends in й, so the patronymic uses -евич/-евна. Андрей derives from the Greek Andreas, meaning 'manly'.",
+    decode: "Андреевич means 'son of Andrei'. Andrei Gromyko (Андрей Андреевич Громыко, 18 July 1909 – 2 July 1989) was a Soviet statesman and longtime Foreign Minister known in the West as 'Mr Nyet'.",
+    mf: "Андреевич → Андреевна. Anna Akhmatova's real surname was Gorenko; her patronymic was Андреевна — Анна Андреевна Горенко — before she adopted her pen name.",
+    fm: "Андреевна → Андреевич. Andrei Rublev (Андрей Рублёв, c.1360 – c.1430) was a Russian icon painter whose Holy Trinity icon is considered the greatest work of Russian medieval art.",
+  },
+  "Антон": {
+    m: "Антонович is the male patronymic of Антон. Anton Chekhov's own patronymic was Павлович — Антон Павлович Чехов — so Антонович would belong to the son of an Anton.",
+    f: "Антоновна is the female patronymic of Антон. Антон is derived from the Latin Antonius; the patronymic follows the regular hard-consonant rule: Антон + овна.",
+    decode: "Антонович means 'son of Anton'. The name Anton entered Russia via the Latin Antonius and Greek Ἀντώνιος. Marc Antony (Marcus Antonius) is the Roman general whose name this ultimately derives from.",
+    mf: "Антонович → Антоновна. Антон is a hard-consonant name, so both patronymics use the -ов- stem: Антонович (m), Антоновна (f).",
+    fm: "Антоновна → Антонович. Antoni Gaudí's name in Russian is Антони Гауди — were he Russian, his patronymic form would contribute Антонович to his children.",
+  },
+  "Борис": {
+    m: "Борисович is the male patronymic of Борис. Boris Nikolayevich Yeltsin (Борис Николаевич Ельцин, 1 February 1931 – 23 April 2007) was the first President of Russia, serving from 1991 to 1999.",
+    f: "Борисовна is the female patronymic of Борис. Boris Godunov (Борис Фёдорович Годунов, c.1552 – 23 April 1605) was Tsar of Russia; his daughter Ksenia would have been Ксения Борисовна.",
+    decode: "Борисович means 'son of Boris'. Boris Pasternak (Борис Леонидович Пастернак, 10 February 1890 – 30 May 1960) was a Russian poet and novelist, awarded the Nobel Prize in Literature in 1958.",
+    mf: "Борисович → Борисовна. Борис is a Slavic name, possibly derived from the Turkic 'wolf' or from the Slavic 'battle-glory'. Both patronymics use the regular hard-consonant -ов- stem.",
+    fm: "Борисовна → Борисович. Boris Yeltsin's own patronymic was Николаевич — son of Nikolai. His children would carry the patronymic Борисович (sons) or Борисовна (daughters).",
+  },
+  "Василий": {
+    m: "Васильевич is the male patronymic of Василий. Ivan the Terrible's full name was Иван Васильевич — son of Vasily III. Васильевич uses the soft -ьев- stem because Василий ends in -ий.",
+    f: "Васильевна is the female patronymic of Василий. Note the pattern: Василий → drop -ий, add -ьевич/-ьевна. This soft pattern applies to all names ending -ий.",
+    decode: "Васильевич means 'son of Vasily'. Vasily Surikov (Василий Иванович Суриков, 24 January 1848 – 19 March 1916) was a Russian painter famous for his large historical canvases.",
+    mf: "Васильевич → Васильевна. Василий derives from the Greek Βασίλειος (Basileios), meaning 'royal' or 'kingly' — the same root as 'basilica' and 'basil' (the herb).",
+    fm: "Васильевна → Васильевич. Vasily Kandinsky (Василий Васильевич Кандинский, 16 December 1866 – 13 December 1944) was a pioneer of abstract art — both his name and patronymic were Василий/Васильевич.",
+  },
+  "Владимир": {
+    m: "Владимирович is the male patronymic of Владимир. Vladimir Vladimirovich Putin (born 7 October 1952) is the President of Russia. Both his name and patronymic derive from Владимир.",
+    f: "Владимировна is the female patronymic of Владимир. Vladimir is a Slavic name meaning 'ruler of the world' (владеть — to rule, мир — world/peace). The patronymic uses the regular hard-consonant stem.",
+    decode: "Владимирович means 'son of Vladimir'. Vladimir the Great (Владимир Святославич, c.958 – 15 July 1015) was Prince of Kiev who converted Kievan Rus to Christianity in 988.",
+    mf: "Владимирович → Владимировна. Vladimir is one of the most common Russian male names. The city of Vladimir (founded c.990) was named after Vladimir the Great.",
+    fm: "Владимировна → Владимирович. Volodya (Володя) is the familiar form of Vladimir. Lenin was known to close associates simply as Владимир Ильич or Володя.",
+  },
+  "Григорий": {
+    m: "Григорьевич is the male patronymic of Григорий. Note the soft pattern: Григорий → drop -ий → Григорь + евич = Григорьевич. Gregory the Theologian is one of the great Church Fathers venerated in Orthodoxy.",
+    f: "Григорьевна is the female patronymic of Григорий. Grigori Rasputin's daughters would have been Григорьевны. Rasputin himself was Григорий Ефимович Распутин.",
+    decode: "Григорьевич means 'son of Grigory'. Grigory Potemkin (Григорий Александрович Потёмкин, 24 September 1739 – 16 October 1791) was a Russian statesman and favourite of Catherine the Great.",
+    mf: "Григорьевич → Григорьевна. Григорий derives from the Greek Γρηγόριος, meaning 'watchful' or 'alert'. Pope Gregory I, who sent missionaries to England, bore the same name.",
+    fm: "Григорьевна → Григорьевич. The soft -ьев- stem in Григорьевич/-евна is required because Григорий ends in -ий. This is the same pattern as Василий, Дмитрий, and Юрий.",
+  },
+  "Дмитрий": {
+    m: "Дмитриевич is the male patronymic of Дмитрий. Dmitri Shostakovich (Дмитрий Дмитриевич Шостакович, 25 September 1906 – 9 August 1975) was a Soviet composer — both his name and patronymic were Дмитрий/Дмитриевич.",
+    f: "Дмитриевна is the female patronymic of Дмитрий. Note the pattern: Дмитрий → drop -ий → Дмитри + евна = Дмитриевна. Дмитрий derives from Demeter, the Greek goddess of the harvest.",
+    decode: "Дмитриевич means 'son of Dmitry'. Dmitry Donskoy (Дмитрий Иванович Донской, 12 October 1350 – 19 May 1389) was Prince of Moscow who defeated the Mongols at the Battle of Kulikovo in 1380.",
+    mf: "Дмитриевич → Дмитриевна. Дмитрий follows the -ий soft pattern throughout. Dmitry Medvedev (Дмитрий Анатольевич Медведев, born 14 September 1965) served as President of Russia 2008–2012.",
+    fm: "Дмитриевна → Дмитриевич. Dmitri Mendeleev (Дмитрий Иванович Менделеев, 8 February 1834 – 2 February 1907) was the Russian chemist who created the periodic table of elements.",
+  },
+  "Евгений": {
+    m: "Евгеньевич is the male patronymic of Евгений. Note the soft ending: Евгений → drop й → Евгени + евич = Евгеньевич. Евгений derives from the Greek Εὐγένιος, meaning 'well-born' or 'noble'.",
+    f: "Евгеньевна is the female patronymic of Евгений. Евгения (the female form of Евгений) shares the familiar form Женя with the male Евгений — making Женя gender-neutral.",
+    decode: "Евгеньевич means 'son of Evgeny'. Yevgeny Yevtushenko (Евгений Александрович Евтушенко, 18 July 1932 – 1 April 2017) was a Soviet and Russian poet famous for Babi Yar.",
+    mf: "Евгеньевич → Евгеньевна. Женя is the familiar form of both Евгений and Евгения — one of the few truly gender-neutral familiar names in Russian.",
+    fm: "Евгеньевна → Евгеньевич. Yevgeny Zamyatin (Евгений Иванович Замятин, 1 February 1884 – 10 March 1937) wrote We (Мы), a dystopian novel that influenced both Orwell's 1984 and Huxley's Brave New World.",
+  },
+  "Иван": {
+    m: "Иванович is the male patronymic of Иван. Ivan Ivanovich is a stock name in Russian folklore — the equivalent of 'John Smith' in English. Иванович is one of the most common patronymics in Russia.",
+    f: "Ивановна is the female patronymic of Иван. Nadezhda Krupskaya's patronymic was Константиновна, but Ивановна is extremely common — reflecting how widespread the name Иван has always been.",
+    decode: "Иванович means 'son of Ivan'. Ivan Turgenev (Иван Сергеевич Тургенев, 9 November 1818 – 3 September 1883) was a Russian novelist whose works include Fathers and Sons and A Hunter's Sketches.",
+    mf: "Иванович → Ивановна. Иван is the Russian form of John, from the Hebrew Yohanan ('God is gracious'). It has been the most common male name in Russia for centuries.",
+    fm: "Ивановна → Иванович. Anna Ivanovna (Анна Ивановна, 7 February 1693 – 28 October 1740) was Empress of Russia from 1730 to 1740 — one of several empresses bearing the patronymic Ивановна.",
+  },
+  "Константин": {
+    m: "Константинович is the male patronymic of Константин. Constantine the Great (Константин Великий, c.272 – 22 May 337) was the first Roman emperor to convert to Christianity. The name means 'constant' or 'steadfast'.",
+    f: "Константиновна is the female patronymic of Константин. Nadezhda Krupskaya's full name was Надежда Константиновна Крупская — daughter of a man named Konstantin.",
+    decode: "Константинович means 'son of Konstantin'. Grand Duke Konstantin Nikolayevich (Константин Николаевич, 21 September 1827 – 25 January 1892) was a Russian naval reformer and brother of Alexander II.",
+    mf: "Константинович → Константиновна. Константин is derived from the Latin Constantinus — the same root as the city Constantinople (now Istanbul), founded by Constantine the Great.",
+    fm: "Константиновна → Константинович. Konstantin Stanislavski (Константин Сергеевич Станиславский, 17 January 1863 – 7 August 1938) was a theatre director who developed the famous Stanislavski method of acting.",
+  },
+  "Михаил": {
+    m: "Михайлович is the male patronymic of Михаил. Note: Михаил drops the л before adding -евич → Михайлович. Fyodor Dostoevsky's patronymic was Михайлович — Фёдор Михайлович Достоевский.",
+    f: "Михайловна is the female patronymic of Михаил. Tsar Alexei I's patronymic was Михайлович (son of Mikhail Romanov). His daughters would have been Михайловны.",
+    decode: "Михайлович means 'son of Mikhail'. Mikhail Lomonosov (Михаил Васильевич Ломоносов, 19 November 1711 – 15 April 1765) was a Russian polymath and scientist who founded Moscow State University.",
+    mf: "Михайлович → Михайловна. Михаил is the Russian form of Michael, from the Hebrew מִיכָאֵל (Mikha'el) meaning 'Who is like God?'. The archangel Michael bears this name.",
+    fm: "Михайловна → Михайлович. Mikhail Gorbachev (Михаил Сергеевич Горбачёв, 2 March 1931 – 30 August 2022) was the last leader of the Soviet Union, awarded the Nobel Peace Prize in 1990.",
+  },
+  "Николай": {
+    m: "Николаевич is the male patronymic of Николай. Note the soft ending: Николай drops й and adds -евич. Leo Tolstoy's patronymic was Николаевич — Лев Николаевич Толстой.",
+    f: "Николаевна is the female patronymic of Николай. The four daughters of Nicholas II were all Николаевны: Ольга, Татьяна, Мария, and Анастасия Николаевны.",
+    decode: "Николаевич means 'son of Nikolai'. Nikolai Gogol (Николай Васильевич Гоголь, 1 April 1809 – 4 March 1852) was a Ukrainian-born Russian writer, author of Dead Souls and The Government Inspector.",
+    mf: "Николаевич → Николаевна. Николай is the Russian form of Nicholas, from the Greek Νικόλαος meaning 'victory of the people'. Saint Nicholas, the model for Santa Claus, bore this name.",
+    fm: "Николаевна → Николаевич. Boris Yeltsin's patronymic was Николаевич (son of Nikolai). Nicholas II (Николай Александрович Романов, 18 May 1868 – 17 July 1918) was the last Emperor of Russia.",
+  },
+  "Павел": {
+    m: "Павлович is the male patronymic of Павел. Note: Павел drops the final л and adds -ович → Павлович. Anton Chekhov's patronymic was Павлович — Антон Павлович Чехов.",
+    f: "Павловна is the female patronymic of Павел. Pavel I (Павел Петрович, 1 October 1754 – 23 March 1801) was Emperor of Russia; his daughters were Павловны.",
+    decode: "Павлович means 'son of Pavel'. Pavel Tretyakov (Павел Михайлович Третьяков, 27 December 1832 – 16 December 1898) was the merchant and art collector who founded the Tretyakov Gallery in Moscow.",
+    mf: "Павлович → Павловна. Павел is the Russian form of Paul, from the Latin Paulus meaning 'small' or 'humble'. The dropping of final -ел in the patronymic stem is a characteristic Russian phonological change.",
+    fm: "Павловна → Павлович. Grand Duchess Maria Pavlovna (Мария Павловна, 15 May 1890 – 13 December 1958) was a Russian princess who later worked as a designer and wrote two memoirs of imperial Russia.",
+  },
+  "Пётр": {
+    m: "Петрович is the male patronymic of Пётр. Note: Пётр → Петр + ович = Петрович (the ё becomes е in the patronymic). Uncle Vanya's full name is Иван Петрович Войницкий — son of Pyotr.",
+    f: "Петровна is the female patronymic of Пётр. Empress Elizabeth of Russia (Елизавета Петровна, 29 December 1709 – 5 January 1762) was the daughter of Peter the Great — hence her patronymic Петровна.",
+    decode: "Петрович means 'son of Pyotr'. Peter the Great (Пётр Алексеевич, 10 June 1672 – 8 February 1725) was Tsar of Russia who modernised the country and founded St Petersburg in 1703.",
+    mf: "Петрович → Петровна. Пётр is the Russian form of Peter, from the Greek Πέτρος (Petros) meaning 'rock' or 'stone' — the name given by Jesus to the apostle Simon.",
+    fm: "Петровна → Петрович. Grigori Rasputin's patronymic was not Петрович but Ефимович. However, the Petrovichi (Петровичи) dynasty — sons of Pyotr — feature throughout Russian history.",
+  },
+  "Роман": {
+    m: "Романович is the male patronymic of Роман. Rodion Romanovich Raskolnikov (Родион Романович Раскольников) is the fictional protagonist of Dostoevsky's Crime and Punishment (1866) — son of Roman.",
+    f: "Романовна is the female patronymic of Роман. Романовна is also the patronymic suffix of the Romanov dynasty, though in that context it functions as a surname suffix rather than a patronymic.",
+    decode: "Романович means 'son of Roman'. Roman Abramovich (Роман Аркадьевич Абрамович, born 24 October 1966) is a Russian-Israeli businessman, formerly the owner of Chelsea Football Club.",
+    mf: "Романович → Романовна. Роман derives from the Latin Romanus, meaning 'a Roman' or 'from Rome'. The Romanov dynasty name has the same root — Romanovy were originally the Romanovichi.",
+    fm: "Романовна → Романович. The four daughters of Nicholas II — Ольга, Татьяна, Мария, Анастасия — were all Николаевны, not Романовны. Романовна as a patronymic means specifically 'daughter of Roman'.",
+  },
+  "Сергей": {
+    m: "Сергеевич is the male patronymic of Сергей. Note the soft ending: Сергей drops й and adds -евич → Сергеевич. Mikhail Gorbachev's patronymic was Сергеевич — Михаил Сергеевич Горбачёв.",
+    f: "Сергеевна is the female patronymic of Сергей. Alexander Pushkin's patronymic was Сергеевич — Александр Сергеевич Пушкин. His daughters would have been Александровны, but his children's patronymic would be Александровна/Александрович.",
+    decode: "Сергеевич means 'son of Sergei'. Sergei Rachmaninoff (Сергей Васильевич Рахманинов, 1 April 1873 – 28 March 1943) was a Russian composer and virtuoso pianist.",
+    mf: "Сергеевич → Сергеевна. Сергей derives from the Latin Sergius, an ancient Roman family name. The pronunciation shortening Сергеич (dropping -ев-) is common in everyday speech.",
+    fm: "Сергеевна → Сергеевич. Sergei Prokofiev (Сергей Сергеевич Прокофьев, 23 April 1891 – 5 March 1953) was a Soviet composer — both his name and patronymic were Сергей/Сергеевич.",
+  },
+  "Фёдор": {
+    m: "Фёдорович is the male patronymic of Фёдор. Boris Godunov's full name was Борис Фёдорович Годунов — son of Fyodor. The ё in Фёдор becomes е in the patronymic stem: Федор + ович.",
+    f: "Фёдоровна is the female patronymic of Фёдор. Alexandra Feodorovna (Александра Фёдоровна) was the name adopted by several empresses of Russia, including the wife of Nicholas II.",
+    decode: "Фёдорович means 'son of Fyodor'. Fyodor Dostoevsky (Фёдор Михайлович Достоевский, 11 November 1821 – 9 February 1881) was a Russian novelist whose works profoundly influenced world literature.",
+    mf: "Фёдорович → Фёдоровна. Фёдор is the Russian form of Theodore, from the Greek Θεόδωρος meaning 'gift of God' (θεός — god, δῶρον — gift). The ё/е alternation in the stem is a standard Russian pattern.",
+    fm: "Фёдоровна → Фёдорович. The three Karamazov brothers in Dostoevsky's final novel all share the patronymic Фёдорович — their father is Fyodor Pavlovich Karamazov.",
+  },
+  "Юрий": {
+    m: "Юрьевич is the male patronymic of Юрий. Note: Юрий → drop -ий → Юрь + евич = Юрьевич. Yuri Gagarin's patronymic was Алексеевич — Юрий Алексеевич Гагарин.",
+    f: "Юрьевна is the female patronymic of Юрий. Юрий is derived from the Greek Γεώργιος (Georgios), meaning 'farmer' — the same root as George. The soft -ьев- stem is required because Юрий ends in -ий.",
+    decode: "Юрьевич means 'son of Yuri'. Yuri Dolgoruky (Юрий Владимирович Долгорукий, c.1099 – 15 May 1157) was a Prince of Suzdal credited with founding Moscow in 1147.",
+    mf: "Юрьевич → Юрьевна. Юрий follows the same soft -ий pattern as Василий, Дмитрий, and Григорий: drop -ий, add -ьевич or -ьевна.",
+    fm: "Юрьевна → Юрьевич. Yuri Gagarin (Юрий Алексеевич Гагарин, 9 March 1934 – 27 March 1968) became the first human in space on 12 April 1961 — a date still celebrated in Russia as Cosmonautics Day.",
+  },
+  "Илья": {
+    m: "Ильич is the irregular male patronymic of Илья. This is one of the biblical special cases — not Ильяевич but Ильич. Vladimir Lenin's patronymic was Ильич — Владимир Ильич Ленин.",
+    f: "Ильинична is the irregular female patronymic of Илья. Lenin's sister Anna was Анна Ильинична Ульянова. This is one of five irregular biblical patronymics you need to learn separately.",
+    decode: "Ильич means 'son of Ilya'. Pyotr Ilyich Tchaikovsky (Пётр Ильич Чайковский, 7 May 1840 – 6 November 1893) was a Russian composer whose works include Swan Lake, The Nutcracker, and the 1812 Overture.",
+    mf: "Ильич → Ильинична. This irregular pair (Ильич/Ильинична) is one of five special biblical cases. Ilya is the Russian form of the Hebrew Elijah — the prophet who was taken to heaven in a chariot of fire.",
+    fm: "Ильинична → Ильич. Natasha Rostova's full name in War and Peace is Наталья Ильинична Ростова — daughter of Count Ilya Rostov, making her an Ильинична.",
+  },
+  "Лука": {
+    m: "Лукич is the irregular male patronymic of Лука. Like Илья, this is a biblical special case — not Лукаевич but Лукич. Luka is the Russian form of Luke, the author of the third Gospel.",
+    f: "Лукинична is the irregular female patronymic of Лука. The five irregular biblical patronymics (Илья, Лука, Никита, Кузьма, Фома) all end differently from the standard pattern.",
+    decode: "Лукич means 'son of Luka'. In Gogol's play The Government Inspector (1836), the Mayor's full name is Антон Антонович Сквозник-Дмухановский — but many characters have the patronymic Лукич.",
+    mf: "Лукич → Лукинична. Лука is one of the rare Russian male names ending in -а. In Gorky's play The Lower Depths (1902), the wanderer Luka is a central character who preaches compassionate lying.",
+    fm: "Лукинична → Лукич. Luka (Лука) is the Russian form of the Latin Lucas, itself from the Greek Λουκᾶς. Saint Luke the Evangelist is venerated in the Orthodox Church on 18 October.",
+  },
+  "Никита": {
+    m: "Никитич is the irregular male patronymic of Никита. This is one of the five biblical special cases. Nikita Khrushchev's patronymic was Сергеевич — Никита Сергеевич Хрущёв.",
+    f: "Никитична is the irregular female patronymic of Никита. The daughter of a man named Nikita would be called Никитична. Никита derives from the Greek Νικήτας, meaning 'victor'.",
+    decode: "Никитич means 'son of Nikita'. Dobrynya Nikitich (Добрыня Никитич) is one of the three great bogatyrs (heroes) of Russian epic poetry, son of Nikita.",
+    mf: "Никитич → Никитична. Никита is primarily a male name in Russian, though it also exists as a female name in some traditions. The irregular patronymic pattern reflects its Church Slavonic origin.",
+    fm: "Никитична → Никитич. Nikita Khrushchev (Никита Сергеевич Хрущёв, 15 April 1894 – 11 September 1971) was the leader of the Soviet Union from 1953 to 1964, known for de-Stalinisation.",
+  },
+};
+
+// ── PATRONYMIC FORMATION ─────────────────────────────────────────────────────
 function malePatronymic(name) {
-  // Special cases first
   const specials = {
     "Илья": "Ильич", "Кузьма": "Кузьмич", "Лука": "Лукич",
     "Никита": "Никитич", "Фома": "Фомич"
   };
   if (specials[name]) return specials[name];
-  // Remove ending
   let stem = name;
   if (name.endsWith("ий")) stem = name.slice(0, -2) + "ьев";
   else if (name.endsWith("й")) stem = name.slice(0, -1) + "ев";
@@ -170,354 +333,226 @@ function femalePatronymic(name) {
   return stem + "на";
 }
 
-// All father names used for patronymic questions (male official names + some famous father names)
-const FATHER_NAMES = [
+const ALL_FATHER_NAMES = [...new Set([
   ...MALE_NAMES.map(n => n.official),
-  "Илья", "Лука", "Никита", "Борис", "Сергей", "Николай", "Алексей", "Станислав"
-];
-
-// Remove duplicates
-const ALL_FATHER_NAMES = [...new Set(FATHER_NAMES)];
+  "Илья", "Лука", "Никита"
+])];
 
 // ── QUESTION BANK ────────────────────────────────────────────────────────────
 const QUESTIONS = [];
 
-// 1. Official → Familiar (female) — 20 questions
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 1. Official → Familiar (female)
 FEMALE_NAMES.forEach(n => {
-  const distractors = FEMALE_NAMES.filter(x => x.familiar !== n.familiar)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.familiar);
-  QUESTIONS.push({
-    key: `f_off_fam_${n.official}`,
-    type: "Official → Familiar",
-    q: n.official,
+  const d = shuffle(FEMALE_NAMES.filter(x => x.familiar !== n.familiar)).slice(0, 3).map(x => x.familiar);
+  QUESTIONS.push({ key: `f_off_fam_${n.official}`, nameGroup: `f_${n.official}`,
+    type: "Official → Familiar", q: n.official,
     context: "female first name — what is the familiar form?",
-    a: n.familiar,
-    opts: shuffle([n.familiar, ...distractors]),
-    fact: null,
-  });
+    a: n.familiar, opts: shuffle([n.familiar, ...d]), fact: n.fact });
 });
 
-// 2. Familiar → Official (female) — 20 questions
+// 2. Familiar → Official (female)
 FEMALE_NAMES.forEach(n => {
-  const distractors = FEMALE_NAMES.filter(x => x.official !== n.official)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.official);
-  QUESTIONS.push({
-    key: `f_fam_off_${n.familiar}`,
-    type: "Familiar → Official",
-    q: n.familiar,
+  const d = shuffle(FEMALE_NAMES.filter(x => x.official !== n.official)).slice(0, 3).map(x => x.official);
+  QUESTIONS.push({ key: `f_fam_off_${n.familiar}_${n.official}`, nameGroup: `f_${n.official}`,
+    type: "Familiar → Official", q: n.familiar,
     context: "female familiar name — what is the official form?",
-    a: n.official,
-    opts: shuffle([n.official, ...distractors]),
-    fact: null,
-  });
+    a: n.official, opts: shuffle([n.official, ...d]), fact: n.fact });
 });
 
-// 3. Official → Familiar (male) — 20 questions
+// 3. Official → Familiar (male)
 MALE_NAMES.forEach(n => {
-  const distractors = MALE_NAMES.filter(x => x.familiar !== n.familiar)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.familiar);
-  QUESTIONS.push({
-    key: `m_off_fam_${n.official}`,
-    type: "Official → Familiar",
-    q: n.official,
+  const d = shuffle(MALE_NAMES.filter(x => x.familiar !== n.familiar)).slice(0, 3).map(x => x.familiar);
+  QUESTIONS.push({ key: `m_off_fam_${n.official}`, nameGroup: `m_${n.official}`,
+    type: "Official → Familiar", q: n.official,
     context: "male first name — what is the familiar form?",
-    a: n.familiar,
-    opts: shuffle([n.familiar, ...distractors]),
-    fact: null,
-  });
+    a: n.familiar, opts: shuffle([n.familiar, ...d]), fact: n.fact });
 });
 
-// 4. Familiar → Official (male) — 20 questions
+// 4. Familiar → Official (male)
 MALE_NAMES.forEach(n => {
-  const distractors = MALE_NAMES.filter(x => x.official !== n.official)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.official);
-  QUESTIONS.push({
-    key: `m_fam_off_${n.familiar}`,
-    type: "Familiar → Official",
-    q: n.familiar,
+  const d = shuffle(MALE_NAMES.filter(x => x.official !== n.official)).slice(0, 3).map(x => x.official);
+  QUESTIONS.push({ key: `m_fam_off_${n.familiar}_${n.official}`, nameGroup: `m_${n.official}`,
+    type: "Familiar → Official", q: n.familiar,
     context: "male familiar name — what is the official form?",
-    a: n.official,
-    opts: shuffle([n.official, ...distractors]),
-    fact: null,
-  });
+    a: n.official, opts: shuffle([n.official, ...d]), fact: n.fact });
 });
 
-// 5. Official name → Male patronymic — 20 questions (one per father name subset)
-const PAT_NAMES_M = ALL_FATHER_NAMES.slice(0, 20);
-PAT_NAMES_M.forEach(name => {
+// 5. Official → Male patronymic
+ALL_FATHER_NAMES.forEach(name => {
   const correct = malePatronymic(name);
-  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => malePatronymic(x));
-  QUESTIONS.push({
-    key: `pat_m_${name}`,
-    type: "Form the patronymic",
-    q: name,
-    context: "father's name — form the male patronymic (-ович/-евич)",
-    a: correct,
-    opts: shuffle([correct, ...distractors]),
-    fact: null,
-  });
+  const d = shuffle(ALL_FATHER_NAMES.filter(x => x !== name)).slice(0, 3).map(x => malePatronymic(x));
+  const f = PAT_FACTS[name] ? PAT_FACTS[name].m : null;
+  QUESTIONS.push({ key: `pat_m_${name}`, nameGroup: `pat_${name}`,
+    type: "Form the patronymic", q: name,
+    context: "father's name — form the male patronymic (-ович/-евич/-ич)",
+    a: correct, opts: shuffle([correct, ...d]), fact: f });
 });
 
-// 6. Official name → Female patronymic — 20 questions
-const PAT_NAMES_F = ALL_FATHER_NAMES.slice(0, 20);
-PAT_NAMES_F.forEach(name => {
+// 6. Official → Female patronymic
+ALL_FATHER_NAMES.forEach(name => {
   const correct = femalePatronymic(name);
-  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => femalePatronymic(x));
-  QUESTIONS.push({
-    key: `pat_f_${name}`,
-    type: "Form the patronymic",
-    q: name,
-    context: "father's name — form the female patronymic (-овна/-евна)",
-    a: correct,
-    opts: shuffle([correct, ...distractors]),
-    fact: null,
-  });
+  const d = shuffle(ALL_FATHER_NAMES.filter(x => x !== name)).slice(0, 3).map(x => femalePatronymic(x));
+  const f = PAT_FACTS[name] ? PAT_FACTS[name].f : null;
+  QUESTIONS.push({ key: `pat_f_${name}`, nameGroup: `pat_${name}`,
+    type: "Form the patronymic", q: name,
+    context: "father's name — form the female patronymic (-овна/-евна/-инична)",
+    a: correct, opts: shuffle([correct, ...d]), fact: f });
 });
 
-// 7. Male patronymic → Father's name — 15 questions
-const PAT_NAMES_DECODE = ALL_FATHER_NAMES.slice(0, 15);
-PAT_NAMES_DECODE.forEach(name => {
+// 7. Male patronymic → Father's name
+ALL_FATHER_NAMES.forEach(name => {
   const pat = malePatronymic(name);
-  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
-    .sort(() => Math.random() - 0.5).slice(0, 3);
-  QUESTIONS.push({
-    key: `pat_decode_m_${name}`,
-    type: "Patronymic → Father's name",
-    q: pat,
+  const d = shuffle(ALL_FATHER_NAMES.filter(x => x !== name)).slice(0, 3);
+  const f = PAT_FACTS[name] ? PAT_FACTS[name].decode : null;
+  QUESTIONS.push({ key: `pat_decode_m_${name}`, nameGroup: `pat_${name}`,
+    type: "Patronymic → Father's name", q: pat,
     context: "male patronymic — what is the father's official name?",
-    a: name,
-    opts: shuffle([name, ...distractors]),
-    fact: null,
-  });
+    a: name, opts: shuffle([name, ...d]), fact: f });
 });
 
-// 8. Male → Female patronymic — 10 questions
-const CROSS_NAMES = ALL_FATHER_NAMES.slice(0, 10);
-CROSS_NAMES.forEach(name => {
+// 8. Male → Female patronymic
+ALL_FATHER_NAMES.forEach(name => {
   const mPat = malePatronymic(name);
   const fPat = femalePatronymic(name);
-  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => femalePatronymic(x));
-  QUESTIONS.push({
-    key: `pat_cross_mf_${name}`,
-    type: "Male → Female patronymic",
-    q: mPat,
+  const d = shuffle(ALL_FATHER_NAMES.filter(x => x !== name)).slice(0, 3).map(x => femalePatronymic(x));
+  const f = PAT_FACTS[name] ? PAT_FACTS[name].mf : null;
+  QUESTIONS.push({ key: `pat_cross_mf_${name}`, nameGroup: `pat_${name}`,
+    type: "Male → Female patronymic", q: mPat,
     context: "male patronymic — form the equivalent female patronymic",
-    a: fPat,
-    opts: shuffle([fPat, ...distractors]),
-    fact: null,
-  });
+    a: fPat, opts: shuffle([fPat, ...d]), fact: f });
 });
 
-// 9. Female → Male patronymic — 10 questions
-const CROSS_NAMES_F = ALL_FATHER_NAMES.slice(5, 15);
-CROSS_NAMES_F.forEach(name => {
+// 9. Female → Male patronymic
+ALL_FATHER_NAMES.forEach(name => {
   const mPat = malePatronymic(name);
   const fPat = femalePatronymic(name);
-  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
-    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => malePatronymic(x));
-  QUESTIONS.push({
-    key: `pat_cross_fm_${name}`,
-    type: "Female → Male patronymic",
-    q: fPat,
+  const d = shuffle(ALL_FATHER_NAMES.filter(x => x !== name)).slice(0, 3).map(x => malePatronymic(x));
+  const f = PAT_FACTS[name] ? PAT_FACTS[name].fm : null;
+  QUESTIONS.push({ key: `pat_cross_fm_${name}`, nameGroup: `pat_${name}`,
+    type: "Female → Male patronymic", q: fPat,
     context: "female patronymic — form the equivalent male patronymic",
-    a: mPat,
-    opts: shuffle([mPat, ...distractors]),
-    fact: null,
-  });
+    a: mPat, opts: shuffle([mPat, ...d]), fact: f });
 });
 
-// 10. Famous context questions — 20 questions with fun facts
+// 10. Famous context questions
 const FAMOUS = [
-  // Historical
-  {
-    key: "famous_lenin_father",
-    type: "Famous figure",
-    q: "Владимир Ильич Ленин",
+  { key: "famous_lenin_father", nameGroup: "famous_Lenin",
+    type: "Famous figure", q: "Владимир Ильич Ленин",
     context: "What is Lenin's father's name?",
-    a: "Илья",
-    opts: ["Илья", "Иван", "Николай", "Борис"],
-    fact: "Lenin's father was Ilya Nikolayevich Ulyanov, a school inspector. Ильич means 'son of Ilya' — one of the irregular biblical patronymics."
-  },
-  {
-    key: "famous_lenin_f_pat",
-    type: "Famous figure",
-    q: "Владимир Ильич Ленин",
+    a: "Илья", opts: ["Илья", "Иван", "Николай", "Борис"],
+    fact: "Lenin's father was Ilya Nikolayevich Ulyanov (Илья Николаевич Ульянов, 26 July 1831 – 24 January 1886), a schoolteacher who rose to become a school inspector. Ильич is the irregular patronymic of Илья." },
+  { key: "famous_lenin_f_pat", nameGroup: "famous_Lenin",
+    type: "Famous figure", q: "Владимир Ильич Ленин",
     context: "If Lenin had a sister, what would her patronymic be?",
-    a: "Ильинична",
-    opts: ["Ильинична", "Ильевна", "Ильяновна", "Ильична"],
-    fact: "Ильинична is the female patronymic of Илья — one of the irregular forms from the biblical name list. Lenin did in fact have a sister, Анна Ильинична Ульянова."
-  },
-  {
-    key: "famous_yeltsin_father",
-    type: "Famous figure",
-    q: "Борис Николаевич Ельцин",
+    a: "Ильинична", opts: ["Ильинична", "Ильевна", "Ильяновна", "Ильична"],
+    fact: "Lenin did have a sister — Анна Ильинична Ульянова (14 August 1864 – 19 June 1935), a revolutionary in her own right. Ильинична is the correct irregular female patronymic of Илья." },
+  { key: "famous_yeltsin_father", nameGroup: "famous_Yeltsin",
+    type: "Famous figure", q: "Борис Николаевич Ельцин",
     context: "What is Yeltsin's father's name?",
-    a: "Николай",
-    opts: ["Николай", "Борис", "Иван", "Михаил"],
-    fact: "Yeltsin was Russia's first president after the fall of the USSR. His patronymic Николаевич means 'son of Nikolai' — a regular hard-consonant ending."
-  },
-  {
-    key: "famous_gorbachev_father",
-    type: "Famous figure",
-    q: "Михаил Сергеевич Горбачёв",
+    a: "Николай", opts: ["Николай", "Борис", "Иван", "Михаил"],
+    fact: "Boris Nikolayevich Yeltsin (Борис Николаевич Ельцин, 1 February 1931 – 23 April 2007) was the first President of Russia, serving from 1991 to 1999. His father was Nikolai Ignátyevich Yeltsin." },
+  { key: "famous_gorbachev_father", nameGroup: "famous_Gorbachev",
+    type: "Famous figure", q: "Михаил Сергеевич Горбачёв",
     context: "What is Gorbachev's father's name?",
-    a: "Сергей",
-    opts: ["Сергей", "Михаил", "Александр", "Владимир"],
-    fact: "Gorbachev was the last leader of the Soviet Union. Сергеевич is the patronymic of Сергей — note the soft ending -евич because Сергей ends in й."
-  },
-  {
-    key: "famous_gorbachev_m_to_f",
-    type: "Famous figure",
-    q: "Сергеевич (Gorbachev's patronymic)",
+    a: "Сергей", opts: ["Сергей", "Михаил", "Александр", "Владимир"],
+    fact: "Mikhail Sergeyevich Gorbachev (Михаил Сергеевич Горбачёв, 2 March 1931 – 30 August 2022) was the last General Secretary of the Soviet Union and was awarded the Nobel Peace Prize in 1990." },
+  { key: "famous_gorbachev_m_to_f", nameGroup: "famous_Gorbachev",
+    type: "Famous figure", q: "Сергеевич — Gorbachev's patronymic",
     context: "Form the female equivalent of this patronymic",
-    a: "Сергеевна",
-    opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
-    fact: "Gorbachev's patronymic is Сергеевич. The female form simply changes -евич to -евна: Сергеевна. Gorbachev's wife was Раиса Максимовна Горбачёва."
-  },
-  {
-    key: "famous_peter_father",
-    type: "Famous figure",
-    q: "Пётр Алексеевич (Пётр Великий)",
+    a: "Сергеевна", opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
+    fact: "Gorbachev's wife was Raisa Maximovna Gorbacheva (Раиса Максимовна Горбачёва, 5 January 1932 – 20 September 1999), a philosopher and sociologist who was the first Soviet leader's wife to play a public role." },
+  { key: "famous_peter_father", nameGroup: "famous_PeterGreat",
+    type: "Famous figure", q: "Пётр Алексеевич (Пётр Великий)",
     context: "What is Peter the Great's father's name?",
-    a: "Алексей",
-    opts: ["Алексей", "Пётр", "Иван", "Михаил"],
-    fact: "Peter the Great's father was Tsar Alexei I (Алексей Михайлович). The patronymic Алексеевич means 'son of Alexei' — soft ending because Алексей ends in й."
-  },
-  {
-    key: "famous_catherine_father",
-    type: "Famous figure",
-    q: "Екатерина Алексеевна (Екатерина Великая)",
-    context: "What is Catherine the Great's father's name (as recorded in Russia)?",
-    a: "Алексей",
-    opts: ["Алексей", "Пётр", "Фридрих", "Иван"],
-    fact: "Catherine the Great was born Sophie of Anhalt-Zerbst, a German princess. When she converted to Russian Orthodoxy she was given the patronymic Алексеевна in honour of Peter the Great's father."
-  },
-  {
-    key: "famous_pushkin_pat",
-    type: "Famous figure",
-    q: "Александр Сергеевич Пушкин",
+    a: "Алексей", opts: ["Алексей", "Пётр", "Иван", "Михаил"],
+    fact: "Peter the Great (Пётр Алексеевич, 10 June 1672 – 8 February 1725) was Tsar of Russia from 1682 and Emperor from 1721. His father was Tsar Alexei I (Алексей Михайлович), known as 'the Most Quiet'." },
+  { key: "famous_catherine_father", nameGroup: "famous_CatherineGreat",
+    type: "Famous figure", q: "Екатерина Алексеевна (Екатерина Великая)",
+    context: "What is Catherine the Great's patronymic father's name?",
+    a: "Алексей", opts: ["Алексей", "Пётр", "Фридрих", "Иван"],
+    fact: "Catherine the Great (2 May 1729 – 17 November 1796) was born Sophie of Anhalt-Zerbst. On converting to Russian Orthodoxy she was given the patronymic Алексеевна in honour of Peter the Great's father Alexei." },
+  { key: "famous_pushkin_pat", nameGroup: "famous_Pushkin",
+    type: "Famous figure", q: "Александр Сергеевич Пушкин",
     context: "Form the female patronymic for Pushkin's father's name",
-    a: "Сергеевна",
-    opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
-    fact: "Pushkin's father was Sergei Lvovich Pushkin. The female patronymic Сергеевна follows the same soft pattern as the male Сергеевич — just swap -евич for -евна."
-  },
-  {
-    key: "famous_tchaikovsky_father",
-    type: "Famous figure",
-    q: "Пётр Ильич Чайковский",
+    a: "Сергеевна", opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
+    fact: "Pushkin's father was Sergei Lvovich Pushkin (Сергей Львович Пушкин, 23 July 1770 – 29 July 1848), a literary enthusiast who hosted writers at his Moscow home. The female patronymic of Сергей is Сергеевна." },
+  { key: "famous_pushkin_father", nameGroup: "famous_Pushkin",
+    type: "Famous figure", q: "Александр Сергеевич Пушкин",
+    context: "What is Pushkin's father's name?",
+    a: "Сергей", opts: ["Сергей", "Александр", "Лев", "Николай"],
+    fact: "Alexander Pushkin (Александр Сергеевич Пушкин, 6 June 1799 – 10 February 1837) is regarded as the greatest Russian poet. His patronymic Сергеевич tells us his father's name was Sergei." },
+  { key: "famous_tchaikovsky_father", nameGroup: "famous_Tchaikovsky",
+    type: "Famous figure", q: "Пётр Ильич Чайковский",
     context: "What is Tchaikovsky's father's name?",
-    a: "Илья",
-    opts: ["Илья", "Иван", "Лука", "Никита"],
-    fact: "Tchaikovsky's father was Ilya Petrovich Tchaikovsky, a mining engineer. Like Lenin, Tchaikovsky's patronymic is Ильич — from the irregular biblical name Илья."
-  },
-  {
-    key: "famous_chekhov_father",
-    type: "Famous figure",
-    q: "Антон Павлович Чехов",
+    a: "Илья", opts: ["Илья", "Иван", "Лука", "Никита"],
+    fact: "Pyotr Ilyich Tchaikovsky (Пётр Ильич Чайковский, 7 May 1840 – 6 November 1893) was a Russian composer. His father Ilya Petrovich Tchaikovsky was a mining inspector. Like Lenin, his patronymic Ильич is irregular." },
+  { key: "famous_chekhov_father", nameGroup: "famous_Chekhov",
+    type: "Famous figure", q: "Антон Павлович Чехов",
     context: "What is Chekhov's father's name?",
-    a: "Павел",
-    opts: ["Павел", "Антон", "Николай", "Иван"],
-    fact: "Chekhov's father was Pavel Yegorovich Chekhov, a grocer. Павлович is a regular hard-consonant patronymic — Павел drops the л and adds -ович."
-  },
-  {
-    key: "famous_tolstoy_father",
-    type: "Famous figure",
-    q: "Лев Николаевич Толстой",
+    a: "Павел", opts: ["Павел", "Антон", "Николай", "Иван"],
+    fact: "Anton Chekhov (Антон Павлович Чехов, 29 January 1860 – 15 July 1904) was a Russian playwright and short story writer. His father Pavel Yegorovich Chekhov was a grocer in Taganrog." },
+  { key: "famous_tolstoy_father", nameGroup: "famous_Tolstoy",
+    type: "Famous figure", q: "Лев Николаевич Толстой",
     context: "What is Tolstoy's father's name?",
-    a: "Николай",
-    opts: ["Николай", "Лев", "Иван", "Александр"],
-    fact: "Tolstoy's father was Count Nikolai Ilyich Tolstoy. Николаевич is a regular soft-ending patronymic — Николай drops the й and adds -евич."
-  },
-  {
-    key: "famous_dostoevsky_father",
-    type: "Famous figure",
-    q: "Фёдор Михайлович Достоевский",
-    context: "What is Dostoevsky's father's name?",
-    a: "Михаил",
-    opts: ["Михаил", "Фёдор", "Иван", "Александр"],
-    fact: "Dostoevsky's father was Mikhail Andreyevich Dostoevsky, a doctor. Михайлович drops the й from Михаил and adds -евич — the regular soft pattern."
-  },
-  // Literary
-  {
-    key: "famous_raskolnikov_father",
-    type: "Literary figure",
-    q: "Родион Романович Раскольников",
+    a: "Николай", opts: ["Николай", "Лев", "Иван", "Александр"],
+    fact: "Leo Tolstoy (Лев Николаевич Толстой, 9 September 1828 – 20 November 1910) was a Russian novelist. His father Count Nikolai Ilyich Tolstoy appears as a model for the character of Prince Bolkonsky in War and Peace." },
+  { key: "famous_raskolnikov_father", nameGroup: "famous_Raskolnikov",
+    type: "Literary figure", q: "Родион Романович Раскольников",
     context: "What is Raskolnikov's father's name?",
-    a: "Роман",
-    opts: ["Роман", "Родион", "Иван", "Дмитрий"],
-    fact: "Raskolnikov is the protagonist of Dostoevsky's Crime and Punishment (Преступление и наказание). Романович means 'son of Roman' — a regular hard-consonant patronymic."
-  },
-  {
-    key: "famous_raskolnikov_f_pat",
-    type: "Literary figure",
-    q: "Романович (Raskolnikov's patronymic)",
+    a: "Роман", opts: ["Роман", "Родион", "Иван", "Дмитрий"],
+    fact: "Rodion Romanovich Raskolnikov is the fictional protagonist of Dostoevsky's Crime and Punishment (Преступление и наказание, 1866). His patronymic Романович tells us his father's name was Roman." },
+  { key: "famous_raskolnikov_f_pat", nameGroup: "famous_Raskolnikov",
+    type: "Literary figure", q: "Романович — Raskolnikov's patronymic",
     context: "Form the female equivalent of this patronymic",
-    a: "Романовна",
-    opts: ["Романовна", "Романевна", "Романична", "Романна"],
-    fact: "Романовна is also famously the patronymic of the Romanov dynasty — Николай II's daughters were all Николаевны. But as a patronymic, Романовна simply means 'daughter of Roman'."
-  },
-  {
-    key: "famous_karenina_father",
-    type: "Literary figure",
-    q: "Анна Аркадьевна Каренина",
+    a: "Романовна", opts: ["Романовна", "Романевна", "Романична", "Романна"],
+    fact: "Raskolnikov's sister Dunya's full name is Авдотья Романовна Раскольникова — she shares the patronymic Романовна, confirming they are children of the same father Roman." },
+  { key: "famous_karenina_father", nameGroup: "famous_Karenina",
+    type: "Literary figure", q: "Анна Аркадьевна Каренина",
     context: "What is Anna Karenina's father's name?",
-    a: "Аркадий",
-    opts: ["Аркадий", "Алексей", "Андрей", "Антон"],
-    fact: "Anna Karenina is the heroine of Tolstoy's novel of the same name. Аркадьевна is a soft-ending female patronymic — Аркадий drops -ий, adds ь, then -евна."
-  },
-  {
-    key: "famous_bolkonsky_father",
-    type: "Literary figure",
-    q: "Андрей Николаевич Болконский",
+    a: "Аркадий", opts: ["Аркадий", "Алексей", "Андрей", "Антон"],
+    fact: "Anna Karenina (Анна Аркадьевна Каренина) is the heroine of Tolstoy's novel of the same name (1878). Her patronymic Аркадьевна uses the soft -ьевна ending because Аркадий ends in -ий." },
+  { key: "famous_bolkonsky_father", nameGroup: "famous_Bolkonsky",
+    type: "Literary figure", q: "Андрей Николаевич Болконский",
     context: "What is Prince Andrei's father's name?",
-    a: "Николай",
-    opts: ["Николай", "Андрей", "Пётр", "Иван"],
-    fact: "Prince Andrei is a central character in Tolstoy's War and Peace (Война и мир). His father is the strict old Prince Nikolai Bolkonsky, who also appears in the novel."
-  },
-  {
-    key: "famous_onegin_father",
-    type: "Literary figure",
-    q: "Евгений Онегин",
-    context: "Onegin has no patronymic given by Pushkin — but if his father were Владимир, what would his patronymic be?",
-    a: "Владимирович",
-    opts: ["Владимирович", "Владимирович", "Владимович", "Владиморович"],
-    fact: "Pushkin's verse novel Eugene Onegin (1833) is considered the foundation of Russian literature. Ongin's father's name is never given — but Владимирович follows the regular hard-consonant rule: Владимир + ович."
-  },
-  {
-    key: "famous_karamazov_father",
-    type: "Literary figure",
-    q: "Иван Фёдорович Карамазов",
+    a: "Николай", opts: ["Николай", "Андрей", "Пётр", "Иван"],
+    fact: "Prince Andrei Bolkonsky (Андрей Николаевич Болконский) is a central character in Tolstoy's War and Peace (1869). His father, the stern old Prince Nikolai Bolkonsky, is one of the novel's memorable characters." },
+  { key: "famous_karamazov_father", nameGroup: "famous_Karamazov",
+    type: "Literary figure", q: "Иван Фёдорович Карамазов",
     context: "What is Ivan Karamazov's father's name?",
-    a: "Фёдор",
-    opts: ["Фёдор", "Иван", "Дмитрий", "Алексей"],
-    fact: "Ivan is one of the three Karamazov brothers in Dostoevsky's The Brothers Karamazov. Their father is Fyodor Pavlovich Karamazov — so all three brothers are Фёдоровичи."
-  },
-  {
-    key: "famous_natasha_father",
-    type: "Literary figure",
-    q: "Наташа Ростова — her official name is Наталья Ильинична",
+    a: "Фёдор", opts: ["Фёдор", "Иван", "Дмитрий", "Алексей"],
+    fact: "Ivan Karamazov is one of the three brothers in Dostoevsky's The Brothers Karamazov (Братья Карамазовы, 1880). Their father Fyodor Pavlovich Karamazov is a debauched landowner — all three brothers are Фёдоровичи." },
+  { key: "famous_natasha_father", nameGroup: "famous_NatashaRostova",
+    type: "Literary figure", q: "Наталья Ильинична Ростова (Наташа)",
     context: "What is Natasha Rostova's father's name?",
-    a: "Илья",
-    opts: ["Илья", "Иван", "Лука", "Никита"],
-    fact: "Natasha Rostova is the heroine of War and Peace. Her father is Count Ilya Rostov — and Ильинична is the irregular female patronymic of Илья, just as Ильич is the male form."
-  },
-  {
-    key: "famous_vanya_patronymic",
-    type: "Famous figure",
-    q: "Дядя Ваня (Uncle Vanya) — his official name is Иван Петрович Войницкий",
+    a: "Илья", opts: ["Илья", "Иван", "Лука", "Никита"],
+    fact: "Natasha Rostova's father in War and Peace is Count Ilya Rostov (Илья Андреевич Ростов) — a warm, generous, and financially reckless man. The irregular patronymic Ильинична correctly identifies her father as Ilya." },
+  { key: "famous_vanya_patronymic", nameGroup: "famous_UncleVanya",
+    type: "Literary figure", q: "Дядя Ваня — Иван Петрович Войницкий",
     context: "What is Uncle Vanya's father's name?",
-    a: "Пётр",
-    opts: ["Пётр", "Иван", "Николай", "Павел"],
-    fact: "Uncle Vanya (Дядя Ваня) is Chekhov's most celebrated play (1898). Вanya is the familiar form of Иван, and his patronymic Петрович means 'son of Pyotr'."
-  },
+    a: "Пётр", opts: ["Пётр", "Иван", "Николай", "Павел"],
+    fact: "Uncle Vanya (Дядя Ваня) is Chekhov's play first performed in 1898. Vanya's official name is Иван Петрович Войницкий — his patronymic Петрович means 'son of Pyotr'." },
+  { key: "famous_onegin_father", nameGroup: "famous_Onegin",
+    type: "Literary figure", q: "Евгений Онегин",
+    context: "If Onegin's father were Владимир, what would his patronymic be?",
+    a: "Владимирович", opts: ["Владимирович", "Владимович", "Владимирич", "Владиморевич"],
+    fact: "Pushkin's novel in verse Eugene Onegin (Евгений Онегин, 1833) never reveals Onegin's patronymic. Владимирович follows the regular hard-consonant rule: Владимир + ович. The novel is considered the cornerstone of Russian literature." },
 ];
 
 FAMOUS.forEach(q => QUESTIONS.push(q));
 
 // ── SCORING ──────────────────────────────────────────────────────────────────
+const STORE_KEY = 'names_scores_v1';
+const SESSION_SIZE = 10;
+
 function loadScores() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e) { return {}; }
 }
@@ -531,16 +566,6 @@ function updateScore(key, correct) {
   saveScores(s);
 }
 
-// ── WEIGHTED SHUFFLE ──────────────────────────────────────────────────────────
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function weightedPick(n) {
   const scores = loadScores();
   const weighted = [];
@@ -549,17 +574,10 @@ function weightedPick(n) {
     const w = Math.round(6 - (s / 5) * 5);
     for (let i = 0; i < w; i++) weighted.push(q);
   });
-  const picked = [];
-  const seen = new Set();
-  const pool = shuffle(weighted);
-  for (const q of pool) {
-    if (!seen.has(q.key)) {
-      seen.add(q.key);
-      picked.push(q);
-      if (picked.length === n) break;
-    }
+  const picked = [], seen = new Set();
+  for (const q of shuffle(weighted)) {
+    if (!seen.has(q.key)) { seen.add(q.key); picked.push(q); if (picked.length === n) break; }
   }
-  // fallback if not enough weighted
   if (picked.length < n) {
     for (const q of shuffle(QUESTIONS)) {
       if (!seen.has(q.key)) { seen.add(q.key); picked.push(q); if (picked.length === n) break; }
@@ -568,16 +586,12 @@ function weightedPick(n) {
   return picked;
 }
 
-// ── SESSION STATE ─────────────────────────────────────────────────────────────
-let session = [];
-let idx = 0;
-let correct = 0;
-let answered = false;
+// ── SESSION ───────────────────────────────────────────────────────────────────
+let session = [], idx = 0, correct = 0, answered = false;
 
 function startSession() {
   session = weightedPick(SESSION_SIZE);
-  idx = 0;
-  correct = 0;
+  idx = 0; correct = 0;
   document.getElementById('results-box').style.display = 'none';
   loadQuestion();
 }
@@ -592,19 +606,16 @@ function loadQuestion() {
   document.getElementById('q-text').textContent = q.q;
   document.getElementById('q-context').textContent = q.context;
   document.getElementById('fact-box').className = 'fact-box';
-  document.getElementById('fact-box').textContent = '';
   document.getElementById('next-btn').className = 'next-btn';
 
-  const optionsEl = document.getElementById('options');
-  optionsEl.innerHTML = '';
-  // Regenerate shuffled opts each load for first-name questions
-  let opts = q.opts;
-  opts.forEach((opt, i) => {
+  const optEl = document.getElementById('options');
+  optEl.innerHTML = '';
+  shuffle(q.opts).forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'opt-btn';
     btn.textContent = opt;
     btn.onclick = () => handleAnswer(opt, q);
-    optionsEl.appendChild(btn);
+    optEl.appendChild(btn);
   });
 }
 
@@ -612,37 +623,30 @@ function handleAnswer(chosen, q) {
   if (answered) return;
   answered = true;
   updateScore(q.key, chosen === q.a);
-
   const btns = document.querySelectorAll('.opt-btn');
   btns.forEach(b => {
     b.disabled = true;
     if (b.textContent === q.a) b.classList.add(chosen === q.a ? 'correct' : 'revealed');
     else if (b.textContent === chosen && chosen !== q.a) b.classList.add('wrong');
   });
-
   if (chosen === q.a) correct++;
-
   if (q.fact) {
     const fb = document.getElementById('fact-box');
     fb.textContent = q.fact;
     fb.className = 'fact-box visible';
   }
-
   document.getElementById('next-btn').className = 'next-btn visible';
 }
 
 function nextQuestion() {
   idx++;
-  if (idx >= SESSION_SIZE) {
-    showResults();
-  } else {
-    loadQuestion();
-  }
+  if (idx >= SESSION_SIZE) showResults();
+  else loadQuestion();
 }
 
 function showResults() {
   document.getElementById('progress-fill').style.width = '100%';
-  document.getElementById('q-counter').textContent = `Session complete`;
+  document.getElementById('q-counter').textContent = 'Session complete';
   document.getElementById('score-display').textContent = `${correct} / ${SESSION_SIZE} correct`;
   document.getElementById('options').innerHTML = '';
   document.getElementById('fact-box').className = 'fact-box';
@@ -650,7 +654,6 @@ function showResults() {
   document.getElementById('q-type').textContent = '';
   document.getElementById('q-text').textContent = '';
   document.getElementById('q-context').textContent = '';
-
   const rb = document.getElementById('results-box');
   document.getElementById('results-score').textContent = `${correct} / ${SESSION_SIZE}`;
   const pct = Math.round((correct / SESSION_SIZE) * 100);

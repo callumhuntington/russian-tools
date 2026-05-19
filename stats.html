@@ -246,23 +246,65 @@ function loadNamesScores() {
 function renderNames() {
   const scores = loadNamesScores();
   let mastered = 0, getting = 0, work = 0;
-  const seen = [], unseen = [];
 
-  // Build list of all question IDs from the names tool categories
-  const cats = [
-    'Official → familiar', 'Familiar → official',
-    'Official → male patronymic', 'Official → female patronymic',
-    'Male → female patronymic', 'Female → male patronymic',
-    'Patronymic → father\'s name', 'Famous context'
+  // Build name groups with display labels
+  const NAME_GROUPS = [
+    // Female names: f_Александра etc.
+    ...["Александра","Анна","Варвара","Галина","Дарья","Екатерина","Елена","Ирина",
+        "Ксения","Людмила","Любовь","Мария","Надежда","Наталья","Нина","Ольга",
+        "Светлана","Татьяна","Тамара","Юлия"].map(n => ({
+      group: `f_${n}`,
+      label: `${n} (f)`,
+      keys: [`f_off_fam_${n}`, `f_fam_off_${["Саша","Аня","Варя","Галя","Даша","Катя","Лена","Ира","Ксюша","Люда","Люба","Маша","Надя","Наташа","Ниночка","Оля","Света","Таня","Тома","Юля"][["Александра","Анна","Варвара","Галина","Дарья","Екатерина","Елена","Ирина","Ксения","Людмила","Любовь","Мария","Надежда","Наталья","Нина","Ольга","Светлана","Татьяна","Тамара","Юлия"].indexOf(n)]}_${n}`]
+    })),
+    // Male names: m_Александр etc.
+    ...["Александр","Алексей","Андрей","Антон","Борис","Василий","Владимир","Григорий",
+        "Дмитрий","Евгений","Иван","Константин","Михаил","Николай","Павел","Пётр",
+        "Роман","Сергей","Фёдор","Юрий"].map(n => ({
+      group: `m_${n}`,
+      label: `${n} (m)`,
+      keys: [`m_off_fam_${n}`, `m_fam_off_${["Саша","Лёша","Андрюша","Тоша","Боря","Вася","Володя","Гриша","Дима","Женя","Ваня","Костя","Миша","Коля","Паша","Петя","Рома","Серёжа","Федя","Юра"][["Александр","Алексей","Андрей","Антон","Борис","Василий","Владимир","Григорий","Дмитрий","Евгений","Иван","Константин","Михаил","Николай","Павел","Пётр","Роман","Сергей","Фёдор","Юрий"].indexOf(n)]}_${n}`]
+    })),
+    // Patronymic groups
+    ...["Александр","Алексей","Андрей","Антон","Борис","Василий","Владимир","Григорий",
+        "Дмитрий","Евгений","Иван","Константин","Михаил","Николай","Павел","Пётр",
+        "Роман","Сергей","Фёдор","Юрий","Илья","Лука","Никита"].map(n => {
+      const mP = malePatronymicStat(n), fP = femalePatronymicStat(n);
+      return {
+        group: `pat_${n}`,
+        label: `${n} → ${mP} / ${fP}`,
+        keys: [`pat_m_${n}`,`pat_f_${n}`,`pat_decode_m_${n}`,`pat_cross_mf_${n}`,`pat_cross_fm_${n}`]
+      };
+    }),
+    // Famous groups
+    { group: "famous_Lenin",         label: "Владимир Ильич Ленин",             keys: ["famous_lenin_father","famous_Lenin_f_pat"] },
+    { group: "famous_Yeltsin",       label: "Борис Николаевич Ельцин",          keys: ["famous_yeltsin_father"] },
+    { group: "famous_Gorbachev",     label: "Михаил Сергеевич Горбачёв",        keys: ["famous_gorbachev_father","famous_gorbachev_m_to_f"] },
+    { group: "famous_PeterGreat",    label: "Пётр Алексеевич (Пётр Великий)",   keys: ["famous_peter_father"] },
+    { group: "famous_CatherineGreat",label: "Екатерина Алексеевна (Великая)",   keys: ["famous_catherine_father"] },
+    { group: "famous_Pushkin",       label: "Александр Сергеевич Пушкин",       keys: ["famous_pushkin_father","famous_pushkin_pat"] },
+    { group: "famous_Tchaikovsky",   label: "Пётр Ильич Чайковский",            keys: ["famous_tchaikovsky_father"] },
+    { group: "famous_Chekhov",       label: "Антон Павлович Чехов",             keys: ["famous_chekhov_father"] },
+    { group: "famous_Tolstoy",       label: "Лев Николаевич Толстой",           keys: ["famous_tolstoy_father"] },
+    { group: "famous_Raskolnikov",   label: "Родион Романович Раскольников",    keys: ["famous_raskolnikov_father","famous_raskolnikov_f_pat"] },
+    { group: "famous_Karenina",      label: "Анна Аркадьевна Каренина",         keys: ["famous_karenina_father"] },
+    { group: "famous_Bolkonsky",     label: "Андрей Николаевич Болконский",     keys: ["famous_bolkonsky_father"] },
+    { group: "famous_Karamazov",     label: "Иван Фёдорович Карамазов",         keys: ["famous_karamazov_father"] },
+    { group: "famous_NatashaRostova",label: "Наталья Ильинична Ростова",        keys: ["famous_natasha_father"] },
+    { group: "famous_UncleVanya",    label: "Иван Петрович Войницкий (Дядя Ваня)", keys: ["famous_vanya_patronymic"] },
+    { group: "famous_Onegin",        label: "Евгений Онегин",                   keys: ["famous_onegin_father"] },
   ];
 
-  Object.keys(scores).forEach(key => {
-    const s = scores[key];
-    const display = key.replace(/^[mf]_[a-z_]+_/, '').replace(/_/g, ' ');
-    if (s === 5) mastered++;
-    else if (s >= 3) getting++;
+  const seen = [], unseen = [];
+  NAME_GROUPS.forEach(g => {
+    const attempted = g.keys.filter(k => k in scores);
+    if (attempted.length === 0) { unseen.push(g); return; }
+    const avg = attempted.reduce((s, k) => s + scores[k], 0) / attempted.length;
+    const rounded = Math.round(avg * 10) / 10;
+    if (rounded >= 4.5) mastered++;
+    else if (rounded >= 2.5) getting++;
     else work++;
-    seen.push({ key, display, score: s });
+    seen.push({ ...g, score: rounded });
   });
 
   document.getElementById('names-count-mastered').textContent = mastered;
@@ -272,13 +314,13 @@ function renderNames() {
   seen.sort((a, b) => {
     if (namesSortDir === 'desc') return b.score - a.score;
     if (namesSortDir === 'asc') return a.score - b.score;
-    return a.display.localeCompare(b.display, 'ru');
+    return a.label.localeCompare(b.label, 'ru');
   });
 
   const list = document.getElementById('names-list');
   list.innerHTML = '';
 
-  if (seen.length === 0) {
+  if (seen.length === 0 && unseen.length > 0) {
     const msg = document.createElement('div');
     msg.style.cssText = 'color:#aaa;font-size:0.85rem;padding:1rem 0;font-style:italic;';
     msg.textContent = 'No questions attempted yet — start the Names exercise!';
@@ -289,10 +331,45 @@ function renderNames() {
   seen.forEach(w => {
     const pill = document.createElement('div');
     pill.className = 'word-pill';
-    pill.style.background = scoreToColor(w.score);
-    pill.textContent = w.display + '  —  ' + w.score + ' / 5';
+    pill.style.background = scoreToColor(w.score / 5 * 5);
+    pill.textContent = w.label + '  —  ' + w.score.toFixed(1) + ' / 5';
     list.appendChild(pill);
   });
+
+  if (unseen.length > 0) {
+    const label = document.createElement('div');
+    label.className = 'unseen-section-label';
+    label.textContent = `Not yet attempted (${unseen.length})`;
+    list.appendChild(label);
+    unseen.forEach(w => {
+      const pill = document.createElement('div');
+      pill.className = 'word-pill unseen';
+      pill.textContent = w.label;
+      list.appendChild(pill);
+    });
+  }
+}
+
+function malePatronymicStat(name) {
+  const sp = {"Илья":"Ильич","Лука":"Лукич","Никита":"Никитич"};
+  if (sp[name]) return sp[name];
+  let s = name;
+  if (name.endsWith("ий")) s = name.slice(0,-2)+"ьев";
+  else if (name.endsWith("й")) s = name.slice(0,-1)+"ев";
+  else if (name.endsWith("ь")) s = name.slice(0,-1)+"ев";
+  else s = name+"ов";
+  return s+"ич";
+}
+
+function femalePatronymicStat(name) {
+  const sp = {"Илья":"Ильинична","Лука":"Лукинична","Никита":"Никитична"};
+  if (sp[name]) return sp[name];
+  let s = name;
+  if (name.endsWith("ий")) s = name.slice(0,-2)+"ьев";
+  else if (name.endsWith("й")) s = name.slice(0,-1)+"ев";
+  else if (name.endsWith("ь")) s = name.slice(0,-1)+"ев";
+  else s = name+"ов";
+  return s+"на";
 }
 
 function setNamesSort(dir) {
