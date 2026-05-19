@@ -73,6 +73,7 @@
 
   <div class="tool-tabs">
     <button class="tool-tab active" onclick="showTab('quiz')">Vocabulary Quiz</button>
+    <button class="tool-tab" onclick="showTab('names')">Names</button>
     <button class="tool-tab disabled">Verb Conjugator</button>
     <button class="tool-tab disabled">Reading</button>
   </div>
@@ -96,6 +97,25 @@
 
   <div class="tab-content" id="tab-conj">
     <p class="coming-soon">Coming soon</p>
+  </div>
+
+  <div class="tab-content" id="tab-reading">
+    <p class="coming-soon">Coming soon</p>
+  </div>
+
+  <div class="tab-content" id="tab-names">
+    <div class="buckets">
+      <div class="bucket mastered"><div class="bucket-count" id="names-count-mastered">0</div><div class="bucket-label">Mastered</div></div>
+      <div class="bucket getting-there"><div class="bucket-count" id="names-count-getting">0</div><div class="bucket-label">Getting there</div></div>
+      <div class="bucket need-work"><div class="bucket-count" id="names-count-work">0</div><div class="bucket-label">Need work</div></div>
+    </div>
+    <div class="sort-row">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" id="names-sort-desc" onclick="setNamesSort('desc')">Best → Worst</button>
+      <button class="sort-btn" id="names-sort-asc" onclick="setNamesSort('asc')">Worst → Best</button>
+      <button class="sort-btn" id="names-sort-alpha" onclick="setNamesSort('alpha')">A → Я</button>
+    </div>
+    <div class="word-list" id="names-list"></div>
   </div>
 </div>
 
@@ -204,10 +224,83 @@ function setSort(dir) {
 
 function showTab(tab) {
   document.querySelectorAll('.tool-tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'quiz') || (i === 1 && tab === 'conj'));
+    t.classList.toggle('active',
+      (i === 0 && tab === 'quiz') ||
+      (i === 1 && tab === 'names')
+    );
   });
   document.getElementById('tab-quiz').className = 'tab-content' + (tab === 'quiz' ? ' active' : '');
   document.getElementById('tab-conj').className = 'tab-content' + (tab === 'conj' ? ' active' : '');
+  document.getElementById('tab-reading').className = 'tab-content' + (tab === 'reading' ? ' active' : '');
+  document.getElementById('tab-names').className = 'tab-content' + (tab === 'names' ? ' active' : '');
+  if (tab === 'names') renderNames();
+}
+
+const NAMES_STORE_KEY = 'names_scores_v1';
+let namesSortDir = 'desc';
+
+function loadNamesScores() {
+  try { return JSON.parse(localStorage.getItem(NAMES_STORE_KEY) || '{}'); } catch(e) { return {}; }
+}
+
+function renderNames() {
+  const scores = loadNamesScores();
+  let mastered = 0, getting = 0, work = 0;
+  const seen = [], unseen = [];
+
+  // Build list of all question IDs from the names tool categories
+  const cats = [
+    'Official → familiar', 'Familiar → official',
+    'Official → male patronymic', 'Official → female patronymic',
+    'Male → female patronymic', 'Female → male patronymic',
+    'Patronymic → father\'s name', 'Famous context'
+  ];
+
+  Object.keys(scores).forEach(key => {
+    const s = scores[key];
+    const display = key.replace(/^[mf]_[a-z_]+_/, '').replace(/_/g, ' ');
+    if (s === 5) mastered++;
+    else if (s >= 3) getting++;
+    else work++;
+    seen.push({ key, display, score: s });
+  });
+
+  document.getElementById('names-count-mastered').textContent = mastered;
+  document.getElementById('names-count-getting').textContent = getting;
+  document.getElementById('names-count-work').textContent = work;
+
+  seen.sort((a, b) => {
+    if (namesSortDir === 'desc') return b.score - a.score;
+    if (namesSortDir === 'asc') return a.score - b.score;
+    return a.display.localeCompare(b.display, 'ru');
+  });
+
+  const list = document.getElementById('names-list');
+  list.innerHTML = '';
+
+  if (seen.length === 0) {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'color:#aaa;font-size:0.85rem;padding:1rem 0;font-style:italic;';
+    msg.textContent = 'No questions attempted yet — start the Names exercise!';
+    list.appendChild(msg);
+    return;
+  }
+
+  seen.forEach(w => {
+    const pill = document.createElement('div');
+    pill.className = 'word-pill';
+    pill.style.background = scoreToColor(w.score);
+    pill.textContent = w.display + '  —  ' + w.score + ' / 5';
+    list.appendChild(pill);
+  });
+}
+
+function setNamesSort(dir) {
+  namesSortDir = dir;
+  document.getElementById('names-sort-desc').className = 'sort-btn' + (dir === 'desc' ? ' active' : '');
+  document.getElementById('names-sort-asc').className = 'sort-btn' + (dir === 'asc' ? ' active' : '');
+  document.getElementById('names-sort-alpha').className = 'sort-btn' + (dir === 'alpha' ? ' active' : '');
+  renderNames();
 }
 
 render();

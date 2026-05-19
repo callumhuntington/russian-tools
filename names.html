@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Русский — Names</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Русский">
+<meta name="theme-color" content="#f5f3ee">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #f5f3ee; color: #1a1a1a; min-height: 100vh; padding: 1.5rem 1rem 3rem; }
+  .container { width: 100%; max-width: 620px; margin: 0 auto; }
+  .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
+  .back-btn:hover { color: #444; }
+  h1 { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 0.8rem; color: #888; margin-bottom: 2rem; }
+
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.82rem; color: #888; }
+  .progress-bar { width: 100%; height: 3px; background: #e0ddd6; border-radius: 2px; margin-bottom: 1.75rem; }
+  .progress-fill { height: 100%; background: #1a1a1a; border-radius: 2px; transition: width 0.3s; }
+
+  .question-card { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 1.25rem 1.4rem; margin-bottom: 1.25rem; }
+  .q-type { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 0.6rem; }
+  .q-text { font-size: 1.2rem; line-height: 1.4; }
+  .q-context { font-size: 0.82rem; color: #666; font-style: italic; margin-top: 0.4rem; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt-btn { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 16px; font-family: Georgia, serif; text-align: left; cursor: pointer; color: #1a1a1a; transition: background 0.12s, border-color 0.12s; line-height: 1.3; }
+  .opt-btn:hover:not(:disabled) { background: #f0ede6; border-color: #bbb; }
+  .opt-btn.correct { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
+  .opt-btn.wrong { background: #fdecea; border-color: #e57373; color: #5c1010; }
+  .opt-btn.revealed { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
+  .opt-btn:disabled { cursor: default; }
+
+  .fact-box { display: none; background: #f5f3ee; border-left: 3px solid #c17f00; border-radius: 0 6px 6px 0; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5; color: #444; }
+  .fact-box.visible { display: block; }
+
+  .next-btn { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.75rem; font-size: 0.95rem; font-family: Georgia, serif; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #333; }
+  .next-btn.visible { display: inline-block; }
+
+  .score-row { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; text-align: right; }
+
+  .results-box { display: none; background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 1.5rem; text-align: center; margin-top: 1rem; }
+  .results-score { font-size: 2rem; font-weight: bold; margin-bottom: 0.4rem; }
+  .results-label { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
+  .results-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .nav-btn { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.4rem; font-size: 0.9rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
+  .nav-btn:hover { background: #333; }
+  .nav-btn.secondary { background: transparent; color: #1a1a1a; border: 1px solid #ccc; }
+  .nav-btn.secondary:hover { background: #f0ede6; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back-btn" href="index.html">← Home</a>
+  <h1>Russian Names</h1>
+  <p class="subtitle">First names, patronymics, and famous figures — 10 questions per session</p>
+
+  <div class="progress-row">
+    <span id="q-counter">Question 1 of 10</span>
+    <span id="score-display"></span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="question-card">
+    <div class="q-type" id="q-type"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-context" id="q-context"></div>
+  </div>
+
+  <div class="options" id="options"></div>
+  <div class="fact-box" id="fact-box"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+
+  <div class="results-box" id="results-box">
+    <div class="results-score" id="results-score"></div>
+    <div class="results-label" id="results-label"></div>
+    <div class="results-btns">
+      <button class="nav-btn secondary" onclick="window.location.href='index.html'">← Home</button>
+      <button class="nav-btn" onclick="startSession()">Play again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'names_scores_v1';
+const SESSION_SIZE = 10;
+
+// ── NAME DATA ────────────────────────────────────────────────────────────────
+const FEMALE_NAMES = [
+  { official: "Александра", familiar: "Саша" },
+  { official: "Анна",       familiar: "Аня" },
+  { official: "Варвара",    familiar: "Варя" },
+  { official: "Галина",     familiar: "Галя" },
+  { official: "Дарья",      familiar: "Даша" },
+  { official: "Екатерина",  familiar: "Катя" },
+  { official: "Елена",      familiar: "Лена" },
+  { official: "Ирина",      familiar: "Ира" },
+  { official: "Ксения",     familiar: "Ксюша" },
+  { official: "Людмила",    familiar: "Люда" },
+  { official: "Любовь",     familiar: "Люба" },
+  { official: "Мария",      familiar: "Маша" },
+  { official: "Надежда",    familiar: "Надя" },
+  { official: "Наталья",    familiar: "Наташа" },
+  { official: "Нина",       familiar: "Ниночка" },
+  { official: "Ольга",      familiar: "Оля" },
+  { official: "Светлана",   familiar: "Света" },
+  { official: "Татьяна",    familiar: "Таня" },
+  { official: "Тамара",     familiar: "Тома" },
+  { official: "Юлия",       familiar: "Юля" },
+];
+
+const MALE_NAMES = [
+  { official: "Александр",  familiar: "Саша" },
+  { official: "Алексей",    familiar: "Лёша" },
+  { official: "Андрей",     familiar: "Андрюша" },
+  { official: "Антон",      familiar: "Тоша" },
+  { official: "Борис",      familiar: "Боря" },
+  { official: "Василий",    familiar: "Вася" },
+  { official: "Владимир",   familiar: "Володя" },
+  { official: "Григорий",   familiar: "Гриша" },
+  { official: "Дмитрий",    familiar: "Дима" },
+  { official: "Евгений",    familiar: "Женя" },
+  { official: "Иван",       familiar: "Ваня" },
+  { official: "Константин", familiar: "Костя" },
+  { official: "Михаил",     familiar: "Миша" },
+  { official: "Николай",    familiar: "Коля" },
+  { official: "Павел",      familiar: "Паша" },
+  { official: "Пётр",       familiar: "Петя" },
+  { official: "Роман",      familiar: "Рома" },
+  { official: "Сергей",     familiar: "Серёжа" },
+  { official: "Фёдор",      familiar: "Федя" },
+  { official: "Юрий",       familiar: "Юра" },
+];
+
+// Patronymic formation rules
+function malePatronymic(name) {
+  // Special cases first
+  const specials = {
+    "Илья": "Ильич", "Кузьма": "Кузьмич", "Лука": "Лукич",
+    "Никита": "Никитич", "Фома": "Фомич"
+  };
+  if (specials[name]) return specials[name];
+  // Remove ending
+  let stem = name;
+  if (name.endsWith("ий")) stem = name.slice(0, -2) + "ьев";
+  else if (name.endsWith("й")) stem = name.slice(0, -1) + "ев";
+  else if (name.endsWith("ь")) stem = name.slice(0, -1) + "ев";
+  else if (name.endsWith("а") || name.endsWith("я")) stem = name.slice(0, -1) + "ов";
+  else stem = name + "ов";
+  return stem + "ич";
+}
+
+function femalePatronymic(name) {
+  const specials = {
+    "Илья": "Ильинична", "Кузьма": "Кузьминична", "Лука": "Лукинична",
+    "Никита": "Никитична", "Фома": "Фоминична"
+  };
+  if (specials[name]) return specials[name];
+  let stem = name;
+  if (name.endsWith("ий")) stem = name.slice(0, -2) + "ьев";
+  else if (name.endsWith("й")) stem = name.slice(0, -1) + "ев";
+  else if (name.endsWith("ь")) stem = name.slice(0, -1) + "ев";
+  else if (name.endsWith("а") || name.endsWith("я")) stem = name.slice(0, -1) + "ов";
+  else stem = name + "ов";
+  return stem + "на";
+}
+
+// All father names used for patronymic questions (male official names + some famous father names)
+const FATHER_NAMES = [
+  ...MALE_NAMES.map(n => n.official),
+  "Илья", "Лука", "Никита", "Борис", "Сергей", "Николай", "Алексей", "Станислав"
+];
+
+// Remove duplicates
+const ALL_FATHER_NAMES = [...new Set(FATHER_NAMES)];
+
+// ── QUESTION BANK ────────────────────────────────────────────────────────────
+const QUESTIONS = [];
+
+// 1. Official → Familiar (female) — 20 questions
+FEMALE_NAMES.forEach(n => {
+  const distractors = FEMALE_NAMES.filter(x => x.familiar !== n.familiar)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.familiar);
+  QUESTIONS.push({
+    key: `f_off_fam_${n.official}`,
+    type: "Official → Familiar",
+    q: n.official,
+    context: "female first name — what is the familiar form?",
+    a: n.familiar,
+    opts: shuffle([n.familiar, ...distractors]),
+    fact: null,
+  });
+});
+
+// 2. Familiar → Official (female) — 20 questions
+FEMALE_NAMES.forEach(n => {
+  const distractors = FEMALE_NAMES.filter(x => x.official !== n.official)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.official);
+  QUESTIONS.push({
+    key: `f_fam_off_${n.familiar}`,
+    type: "Familiar → Official",
+    q: n.familiar,
+    context: "female familiar name — what is the official form?",
+    a: n.official,
+    opts: shuffle([n.official, ...distractors]),
+    fact: null,
+  });
+});
+
+// 3. Official → Familiar (male) — 20 questions
+MALE_NAMES.forEach(n => {
+  const distractors = MALE_NAMES.filter(x => x.familiar !== n.familiar)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.familiar);
+  QUESTIONS.push({
+    key: `m_off_fam_${n.official}`,
+    type: "Official → Familiar",
+    q: n.official,
+    context: "male first name — what is the familiar form?",
+    a: n.familiar,
+    opts: shuffle([n.familiar, ...distractors]),
+    fact: null,
+  });
+});
+
+// 4. Familiar → Official (male) — 20 questions
+MALE_NAMES.forEach(n => {
+  const distractors = MALE_NAMES.filter(x => x.official !== n.official)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => x.official);
+  QUESTIONS.push({
+    key: `m_fam_off_${n.familiar}`,
+    type: "Familiar → Official",
+    q: n.familiar,
+    context: "male familiar name — what is the official form?",
+    a: n.official,
+    opts: shuffle([n.official, ...distractors]),
+    fact: null,
+  });
+});
+
+// 5. Official name → Male patronymic — 20 questions (one per father name subset)
+const PAT_NAMES_M = ALL_FATHER_NAMES.slice(0, 20);
+PAT_NAMES_M.forEach(name => {
+  const correct = malePatronymic(name);
+  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => malePatronymic(x));
+  QUESTIONS.push({
+    key: `pat_m_${name}`,
+    type: "Form the patronymic",
+    q: name,
+    context: "father's name — form the male patronymic (-ович/-евич)",
+    a: correct,
+    opts: shuffle([correct, ...distractors]),
+    fact: null,
+  });
+});
+
+// 6. Official name → Female patronymic — 20 questions
+const PAT_NAMES_F = ALL_FATHER_NAMES.slice(0, 20);
+PAT_NAMES_F.forEach(name => {
+  const correct = femalePatronymic(name);
+  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => femalePatronymic(x));
+  QUESTIONS.push({
+    key: `pat_f_${name}`,
+    type: "Form the patronymic",
+    q: name,
+    context: "father's name — form the female patronymic (-овна/-евна)",
+    a: correct,
+    opts: shuffle([correct, ...distractors]),
+    fact: null,
+  });
+});
+
+// 7. Male patronymic → Father's name — 15 questions
+const PAT_NAMES_DECODE = ALL_FATHER_NAMES.slice(0, 15);
+PAT_NAMES_DECODE.forEach(name => {
+  const pat = malePatronymic(name);
+  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
+    .sort(() => Math.random() - 0.5).slice(0, 3);
+  QUESTIONS.push({
+    key: `pat_decode_m_${name}`,
+    type: "Patronymic → Father's name",
+    q: pat,
+    context: "male patronymic — what is the father's official name?",
+    a: name,
+    opts: shuffle([name, ...distractors]),
+    fact: null,
+  });
+});
+
+// 8. Male → Female patronymic — 10 questions
+const CROSS_NAMES = ALL_FATHER_NAMES.slice(0, 10);
+CROSS_NAMES.forEach(name => {
+  const mPat = malePatronymic(name);
+  const fPat = femalePatronymic(name);
+  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => femalePatronymic(x));
+  QUESTIONS.push({
+    key: `pat_cross_mf_${name}`,
+    type: "Male → Female patronymic",
+    q: mPat,
+    context: "male patronymic — form the equivalent female patronymic",
+    a: fPat,
+    opts: shuffle([fPat, ...distractors]),
+    fact: null,
+  });
+});
+
+// 9. Female → Male patronymic — 10 questions
+const CROSS_NAMES_F = ALL_FATHER_NAMES.slice(5, 15);
+CROSS_NAMES_F.forEach(name => {
+  const mPat = malePatronymic(name);
+  const fPat = femalePatronymic(name);
+  const distractors = ALL_FATHER_NAMES.filter(x => x !== name)
+    .sort(() => Math.random() - 0.5).slice(0, 3).map(x => malePatronymic(x));
+  QUESTIONS.push({
+    key: `pat_cross_fm_${name}`,
+    type: "Female → Male patronymic",
+    q: fPat,
+    context: "female patronymic — form the equivalent male patronymic",
+    a: mPat,
+    opts: shuffle([mPat, ...distractors]),
+    fact: null,
+  });
+});
+
+// 10. Famous context questions — 20 questions with fun facts
+const FAMOUS = [
+  // Historical
+  {
+    key: "famous_lenin_father",
+    type: "Famous figure",
+    q: "Владимир Ильич Ленин",
+    context: "What is Lenin's father's name?",
+    a: "Илья",
+    opts: ["Илья", "Иван", "Николай", "Борис"],
+    fact: "Lenin's father was Ilya Nikolayevich Ulyanov, a school inspector. Ильич means 'son of Ilya' — one of the irregular biblical patronymics."
+  },
+  {
+    key: "famous_lenin_f_pat",
+    type: "Famous figure",
+    q: "Владимир Ильич Ленин",
+    context: "If Lenin had a sister, what would her patronymic be?",
+    a: "Ильинична",
+    opts: ["Ильинична", "Ильевна", "Ильяновна", "Ильична"],
+    fact: "Ильинична is the female patronymic of Илья — one of the irregular forms from the biblical name list. Lenin did in fact have a sister, Анна Ильинична Ульянова."
+  },
+  {
+    key: "famous_yeltsin_father",
+    type: "Famous figure",
+    q: "Борис Николаевич Ельцин",
+    context: "What is Yeltsin's father's name?",
+    a: "Николай",
+    opts: ["Николай", "Борис", "Иван", "Михаил"],
+    fact: "Yeltsin was Russia's first president after the fall of the USSR. His patronymic Николаевич means 'son of Nikolai' — a regular hard-consonant ending."
+  },
+  {
+    key: "famous_gorbachev_father",
+    type: "Famous figure",
+    q: "Михаил Сергеевич Горбачёв",
+    context: "What is Gorbachev's father's name?",
+    a: "Сергей",
+    opts: ["Сергей", "Михаил", "Александр", "Владимир"],
+    fact: "Gorbachev was the last leader of the Soviet Union. Сергеевич is the patronymic of Сергей — note the soft ending -евич because Сергей ends in й."
+  },
+  {
+    key: "famous_gorbachev_m_to_f",
+    type: "Famous figure",
+    q: "Сергеевич (Gorbachev's patronymic)",
+    context: "Form the female equivalent of this patronymic",
+    a: "Сергеевна",
+    opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
+    fact: "Gorbachev's patronymic is Сергеевич. The female form simply changes -евич to -евна: Сергеевна. Gorbachev's wife was Раиса Максимовна Горбачёва."
+  },
+  {
+    key: "famous_peter_father",
+    type: "Famous figure",
+    q: "Пётр Алексеевич (Пётр Великий)",
+    context: "What is Peter the Great's father's name?",
+    a: "Алексей",
+    opts: ["Алексей", "Пётр", "Иван", "Михаил"],
+    fact: "Peter the Great's father was Tsar Alexei I (Алексей Михайлович). The patronymic Алексеевич means 'son of Alexei' — soft ending because Алексей ends in й."
+  },
+  {
+    key: "famous_catherine_father",
+    type: "Famous figure",
+    q: "Екатерина Алексеевна (Екатерина Великая)",
+    context: "What is Catherine the Great's father's name (as recorded in Russia)?",
+    a: "Алексей",
+    opts: ["Алексей", "Пётр", "Фридрих", "Иван"],
+    fact: "Catherine the Great was born Sophie of Anhalt-Zerbst, a German princess. When she converted to Russian Orthodoxy she was given the patronymic Алексеевна in honour of Peter the Great's father."
+  },
+  {
+    key: "famous_pushkin_pat",
+    type: "Famous figure",
+    q: "Александр Сергеевич Пушкин",
+    context: "Form the female patronymic for Pushkin's father's name",
+    a: "Сергеевна",
+    opts: ["Сергеевна", "Сергеовна", "Сергевна", "Сергеична"],
+    fact: "Pushkin's father was Sergei Lvovich Pushkin. The female patronymic Сергеевна follows the same soft pattern as the male Сергеевич — just swap -евич for -евна."
+  },
+  {
+    key: "famous_tchaikovsky_father",
+    type: "Famous figure",
+    q: "Пётр Ильич Чайковский",
+    context: "What is Tchaikovsky's father's name?",
+    a: "Илья",
+    opts: ["Илья", "Иван", "Лука", "Никита"],
+    fact: "Tchaikovsky's father was Ilya Petrovich Tchaikovsky, a mining engineer. Like Lenin, Tchaikovsky's patronymic is Ильич — from the irregular biblical name Илья."
+  },
+  {
+    key: "famous_chekhov_father",
+    type: "Famous figure",
+    q: "Антон Павлович Чехов",
+    context: "What is Chekhov's father's name?",
+    a: "Павел",
+    opts: ["Павел", "Антон", "Николай", "Иван"],
+    fact: "Chekhov's father was Pavel Yegorovich Chekhov, a grocer. Павлович is a regular hard-consonant patronymic — Павел drops the л and adds -ович."
+  },
+  {
+    key: "famous_tolstoy_father",
+    type: "Famous figure",
+    q: "Лев Николаевич Толстой",
+    context: "What is Tolstoy's father's name?",
+    a: "Николай",
+    opts: ["Николай", "Лев", "Иван", "Александр"],
+    fact: "Tolstoy's father was Count Nikolai Ilyich Tolstoy. Николаевич is a regular soft-ending patronymic — Николай drops the й and adds -евич."
+  },
+  {
+    key: "famous_dostoevsky_father",
+    type: "Famous figure",
+    q: "Фёдор Михайлович Достоевский",
+    context: "What is Dostoevsky's father's name?",
+    a: "Михаил",
+    opts: ["Михаил", "Фёдор", "Иван", "Александр"],
+    fact: "Dostoevsky's father was Mikhail Andreyevich Dostoevsky, a doctor. Михайлович drops the й from Михаил and adds -евич — the regular soft pattern."
+  },
+  // Literary
+  {
+    key: "famous_raskolnikov_father",
+    type: "Literary figure",
+    q: "Родион Романович Раскольников",
+    context: "What is Raskolnikov's father's name?",
+    a: "Роман",
+    opts: ["Роман", "Родион", "Иван", "Дмитрий"],
+    fact: "Raskolnikov is the protagonist of Dostoevsky's Crime and Punishment (Преступление и наказание). Романович means 'son of Roman' — a regular hard-consonant patronymic."
+  },
+  {
+    key: "famous_raskolnikov_f_pat",
+    type: "Literary figure",
+    q: "Романович (Raskolnikov's patronymic)",
+    context: "Form the female equivalent of this patronymic",
+    a: "Романовна",
+    opts: ["Романовна", "Романевна", "Романична", "Романна"],
+    fact: "Романовна is also famously the patronymic of the Romanov dynasty — Николай II's daughters were all Николаевны. But as a patronymic, Романовна simply means 'daughter of Roman'."
+  },
+  {
+    key: "famous_karenina_father",
+    type: "Literary figure",
+    q: "Анна Аркадьевна Каренина",
+    context: "What is Anna Karenina's father's name?",
+    a: "Аркадий",
+    opts: ["Аркадий", "Алексей", "Андрей", "Антон"],
+    fact: "Anna Karenina is the heroine of Tolstoy's novel of the same name. Аркадьевна is a soft-ending female patronymic — Аркадий drops -ий, adds ь, then -евна."
+  },
+  {
+    key: "famous_bolkonsky_father",
+    type: "Literary figure",
+    q: "Андрей Николаевич Болконский",
+    context: "What is Prince Andrei's father's name?",
+    a: "Николай",
+    opts: ["Николай", "Андрей", "Пётр", "Иван"],
+    fact: "Prince Andrei is a central character in Tolstoy's War and Peace (Война и мир). His father is the strict old Prince Nikolai Bolkonsky, who also appears in the novel."
+  },
+  {
+    key: "famous_onegin_father",
+    type: "Literary figure",
+    q: "Евгений Онегин",
+    context: "Onegin has no patronymic given by Pushkin — but if his father were Владимир, what would his patronymic be?",
+    a: "Владимирович",
+    opts: ["Владимирович", "Владимирович", "Владимович", "Владиморович"],
+    fact: "Pushkin's verse novel Eugene Onegin (1833) is considered the foundation of Russian literature. Ongin's father's name is never given — but Владимирович follows the regular hard-consonant rule: Владимир + ович."
+  },
+  {
+    key: "famous_karamazov_father",
+    type: "Literary figure",
+    q: "Иван Фёдорович Карамазов",
+    context: "What is Ivan Karamazov's father's name?",
+    a: "Фёдор",
+    opts: ["Фёдор", "Иван", "Дмитрий", "Алексей"],
+    fact: "Ivan is one of the three Karamazov brothers in Dostoevsky's The Brothers Karamazov. Their father is Fyodor Pavlovich Karamazov — so all three brothers are Фёдоровичи."
+  },
+  {
+    key: "famous_natasha_father",
+    type: "Literary figure",
+    q: "Наташа Ростова — her official name is Наталья Ильинична",
+    context: "What is Natasha Rostova's father's name?",
+    a: "Илья",
+    opts: ["Илья", "Иван", "Лука", "Никита"],
+    fact: "Natasha Rostova is the heroine of War and Peace. Her father is Count Ilya Rostov — and Ильинична is the irregular female patronymic of Илья, just as Ильич is the male form."
+  },
+  {
+    key: "famous_vanya_patronymic",
+    type: "Famous figure",
+    q: "Дядя Ваня (Uncle Vanya) — his official name is Иван Петрович Войницкий",
+    context: "What is Uncle Vanya's father's name?",
+    a: "Пётр",
+    opts: ["Пётр", "Иван", "Николай", "Павел"],
+    fact: "Uncle Vanya (Дядя Ваня) is Chekhov's most celebrated play (1898). Вanya is the familiar form of Иван, and his patronymic Петрович means 'son of Pyotr'."
+  },
+];
+
+FAMOUS.forEach(q => QUESTIONS.push(q));
+
+// ── SCORING ──────────────────────────────────────────────────────────────────
+function loadScores() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveScores(s) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch(e) {}
+}
+function updateScore(key, correct) {
+  const s = loadScores();
+  const cur = key in s ? s[key] : 0;
+  s[key] = Math.max(0, Math.min(5, cur + (correct ? 1 : -1)));
+  saveScores(s);
+}
+
+// ── WEIGHTED SHUFFLE ──────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function weightedPick(n) {
+  const scores = loadScores();
+  const weighted = [];
+  QUESTIONS.forEach(q => {
+    const s = q.key in scores ? scores[q.key] : 0;
+    const w = Math.round(6 - (s / 5) * 5);
+    for (let i = 0; i < w; i++) weighted.push(q);
+  });
+  const picked = [];
+  const seen = new Set();
+  const pool = shuffle(weighted);
+  for (const q of pool) {
+    if (!seen.has(q.key)) {
+      seen.add(q.key);
+      picked.push(q);
+      if (picked.length === n) break;
+    }
+  }
+  // fallback if not enough weighted
+  if (picked.length < n) {
+    for (const q of shuffle(QUESTIONS)) {
+      if (!seen.has(q.key)) { seen.add(q.key); picked.push(q); if (picked.length === n) break; }
+    }
+  }
+  return picked;
+}
+
+// ── SESSION STATE ─────────────────────────────────────────────────────────────
+let session = [];
+let idx = 0;
+let correct = 0;
+let answered = false;
+
+function startSession() {
+  session = weightedPick(SESSION_SIZE);
+  idx = 0;
+  correct = 0;
+  document.getElementById('results-box').style.display = 'none';
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = session[idx];
+  document.getElementById('q-counter').textContent = `Question ${idx + 1} of ${SESSION_SIZE}`;
+  document.getElementById('score-display').textContent = idx > 0 ? `${correct} / ${idx} correct` : '';
+  document.getElementById('progress-fill').style.width = `${(idx / SESSION_SIZE) * 100}%`;
+  document.getElementById('q-type').textContent = q.type;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-context').textContent = q.context;
+  document.getElementById('fact-box').className = 'fact-box';
+  document.getElementById('fact-box').textContent = '';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  const optionsEl = document.getElementById('options');
+  optionsEl.innerHTML = '';
+  // Regenerate shuffled opts each load for first-name questions
+  let opts = q.opts;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => handleAnswer(opt, q);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function handleAnswer(chosen, q) {
+  if (answered) return;
+  answered = true;
+  updateScore(q.key, chosen === q.a);
+
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.a) b.classList.add(chosen === q.a ? 'correct' : 'revealed');
+    else if (b.textContent === chosen && chosen !== q.a) b.classList.add('wrong');
+  });
+
+  if (chosen === q.a) correct++;
+
+  if (q.fact) {
+    const fb = document.getElementById('fact-box');
+    fb.textContent = q.fact;
+    fb.className = 'fact-box visible';
+  }
+
+  document.getElementById('next-btn').className = 'next-btn visible';
+}
+
+function nextQuestion() {
+  idx++;
+  if (idx >= SESSION_SIZE) {
+    showResults();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('q-counter').textContent = `Session complete`;
+  document.getElementById('score-display').textContent = `${correct} / ${SESSION_SIZE} correct`;
+  document.getElementById('options').innerHTML = '';
+  document.getElementById('fact-box').className = 'fact-box';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('q-type').textContent = '';
+  document.getElementById('q-text').textContent = '';
+  document.getElementById('q-context').textContent = '';
+
+  const rb = document.getElementById('results-box');
+  document.getElementById('results-score').textContent = `${correct} / ${SESSION_SIZE}`;
+  const pct = Math.round((correct / SESSION_SIZE) * 100);
+  document.getElementById('results-label').textContent =
+    pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort!' : 'Keep practising!';
+  rb.style.display = 'block';
+}
+
+startSession();
+</script>
+</body>
+</html>
