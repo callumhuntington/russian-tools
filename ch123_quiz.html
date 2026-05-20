@@ -48,8 +48,11 @@
   .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
   .results-score { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .results-msg { font-size: 1rem; color: #666; margin-bottom: 2rem; }
-  .restart-btn { background: #3a6ea8; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.75rem; font-size: 0.95rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
-  .restart-btn:hover { background: #2d5a8a; }
+  .results-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+  .nav-btn { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.4rem; font-size: 0.9rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; text-decoration: none; display: inline-block; }
+  .nav-btn:hover { background: #333; }
+  .nav-btn.secondary { background: transparent; color: #1a1a1a; border: 1px solid #ccc; }
+  .nav-btn.secondary:hover { background: #f0ede6; }
   .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
   .back-btn:hover { color: #444; }
   input[type="text"] { font-size: 16px !important; }
@@ -83,7 +86,10 @@
     <img id="results-bear" class="results-bear" src="" alt="">
     <div class="results-score" id="final-score"></div>
     <div class="results-msg" id="final-message"></div>
-    <button class="restart-btn" onclick="restartQuiz()">New set of 20</button>
+    <div class="results-btns">
+      <a class="nav-btn secondary" href="index.html">← Home</a>
+      <button class="nav-btn" onclick="restartQuiz()">Play again</button>
+    </div>
   </div>
 </div>
 <script>
