@@ -134,6 +134,7 @@
     text-align: center;
     margin-top: 1.5rem;
   }
+  .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
   .results-score { font-size: 2rem; font-weight: bold; margin-bottom: 0.4rem; }
   .results-label { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
   .results-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -175,6 +176,7 @@
   <div id="questions-area"></div>
 
   <div class="results-box" id="results-box">
+    <img id="results-bear" class="results-bear" src="" alt="">
     <div class="results-score" id="results-score"></div>
     <div class="results-label" id="results-label"></div>
     <div class="results-btns">
@@ -807,6 +809,7 @@ function showResults() {
   const box = document.getElementById('results-box');
   document.getElementById('results-score').textContent = `${correct} / ${QUESTIONS_PER_SESSION}`;
   const pct = Math.round((correct / QUESTIONS_PER_SESSION) * 100);
+  document.getElementById('results-bear').src = pct >= 70 ? 'bear_happy.png' : pct >= 40 ? 'bear_neutral.png' : 'bear_sad.png';
   let label = pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort — review the answers above.' : 'Keep practising — the answers are highlighted above.';
   document.getElementById('results-label').textContent = label;
   box.style.display = 'block';

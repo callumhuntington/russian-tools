@@ -1,4 +1,4 @@
-const CACHE = 'russian-tools-v1.22';
+const CACHE = 'russian-tools-v1.23';
 const FILES = [
   '/russian-tools/',
   '/russian-tools/index.html',
@@ -10,7 +10,10 @@ const FILES = [
   '/russian-tools/manifest.json',
   '/russian-tools/icon.png',
   '/russian-tools/icon-512.png',
-  '/russian-tools/matryoshka.png'
+  '/russian-tools/matryoshka.png',
+  '/russian-tools/bear_happy.png',
+  '/russian-tools/bear_neutral.png',
+  '/russian-tools/bear_sad.png'
 ];
 
 self.addEventListener('install', e => {

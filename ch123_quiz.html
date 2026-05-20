@@ -45,6 +45,7 @@
   .next-btn { display: none; background: #fff; border: 1px solid #bbb; border-radius: 8px; padding: 0.5rem 1.25rem; font-size: 0.9rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
   .next-btn:hover { background: #f0ede6; }
   .results { display: none; text-align: center; padding: 3rem 0 2rem; }
+  .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
   .results-score { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .results-msg { font-size: 1rem; color: #666; margin-bottom: 2rem; }
   .restart-btn { background: #3a6ea8; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.75rem; font-size: 0.95rem; font-family: Georgia, serif; cursor: pointer; transition: background 0.15s; }
@@ -79,6 +80,7 @@
   <div class="info-box" id="info-box"></div>
   <div class="next-row"><button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button></div>
   <div class="results" id="results">
+    <img id="results-bear" class="results-bear" src="" alt="">
     <div class="results-score" id="final-score"></div>
     <div class="results-msg" id="final-message"></div>
     <button class="restart-btn" onclick="restartQuiz()">New set of 20</button>
@@ -562,6 +564,7 @@ function showResults() {
   document.getElementById('next-btn').style.display = 'none';
   const pct = Math.round((score / 20) * 100);
   document.getElementById('final-score').textContent = `${score} / 20 (${pct}%)`;
+  document.getElementById('results-bear').src = pct >= 70 ? 'bear_happy.png' : pct >= 40 ? 'bear_neutral.png' : 'bear_sad.png';
   const msgs = ['Review the vocabulary and try again — каждый день!','Keep practising — you\'re getting there!','Good work! Хорошо!','Excellent! Очень хорошо!'];
   document.getElementById('final-message').textContent = msgs[pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0];
   document.getElementById('results').style.display = 'block';

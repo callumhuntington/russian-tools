@@ -27,13 +27,17 @@
   .q-text { font-size: 1.2rem; line-height: 1.4; }
   .q-context { font-size: 0.82rem; color: #666; font-style: italic; margin-top: 0.4rem; }
 
-  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-  .opt-btn { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 16px; font-family: Georgia, serif; text-align: left; cursor: pointer; color: #1a1a1a; transition: background 0.12s, border-color 0.12s; line-height: 1.3; }
-  .opt-btn:hover:not(:disabled) { background: #f0ede6; border-color: #bbb; }
-  .opt-btn.correct { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
-  .opt-btn.wrong { background: #fdecea; border-color: #e57373; color: #5c1010; }
-  .opt-btn.revealed { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
-  .opt-btn:disabled { cursor: default; }
+  .answer-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .answer-input { flex: 1; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 16px; font-family: Georgia, serif; color: #1a1a1a; outline: none; transition: border-color 0.12s; }
+  .answer-input:focus { border-color: #999; }
+  .answer-input.correct { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
+  .answer-input.wrong { background: #fdecea; border-color: #e57373; color: #5c1010; }
+  .answer-input:disabled { cursor: default; }
+  .submit-btn { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.1rem; font-size: 0.95rem; font-family: Georgia, serif; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .submit-btn:hover:not(:disabled) { background: #333; }
+  .submit-btn:disabled { background: #999; cursor: default; }
+  .correct-answer { display: none; font-size: 0.85rem; color: #c17f00; margin-bottom: 0.75rem; }
+  .correct-answer.visible { display: block; }
 
   .fact-box { display: none; background: #f5f3ee; border-left: 3px solid #c17f00; border-radius: 0 6px 6px 0; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5; color: #444; }
   .fact-box.visible { display: block; }
@@ -45,6 +49,7 @@
   .score-row { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; text-align: right; }
 
   .results-box { display: none; background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 1.5rem; text-align: center; margin-top: 1rem; }
+  .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
   .results-score { font-size: 2rem; font-weight: bold; margin-bottom: 0.4rem; }
   .results-label { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
   .results-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -72,11 +77,16 @@
     <div class="q-context" id="q-context"></div>
   </div>
 
-  <div class="options" id="options"></div>
+  <div class="answer-row" id="answer-row">
+    <input class="answer-input" id="answer-input" type="text" placeholder="Type your answer…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">Check</button>
+  </div>
+  <div class="correct-answer" id="correct-answer"></div>
   <div class="fact-box" id="fact-box"></div>
   <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
 
   <div class="results-box" id="results-box">
+    <img id="results-bear" class="results-bear" src="" alt="">
     <div class="results-score" id="results-score"></div>
     <div class="results-label" id="results-label"></div>
     <div class="results-btns">
@@ -94,23 +104,23 @@ const SESSION_SIZE = 10;
 const FEMALE_NAMES = [
   { official: "Александра", familiar: "Саша",    fact: "Александра Фёдоровна (6 June 1872 – 17 July 1918) was the last Empress of Russia, wife of Nicholas II. Her familiar name Саша is also the familiar form of the male name Александр — making it one of the few gender-neutral familiar names in Russian." },
   { official: "Анна",       familiar: "Аня",     fact: "Anna Akhmatova (Анна Андреевна Ахматова, 23 June 1889 – 5 March 1966) was one of the most significant Russian poets of the 20th century, known for her lyric poetry and the epic Requiem." },
-  { official: "Варвара",    familiar: "Варя",    fact: "Varya (Варя) is a character in Chekhov's The Cherry Orchard (Вишнёвый сад, 1904). Her official name Варвара derives from the Greek for 'foreign' or 'strange' — the same root as 'barbarian'." },
+  { official: "Варвара",    familiar: "Варя",    fact: "Varvara Stepanova (Варвара Фёдоровна Степанова, 23 October 1894 – 20 May 1958) was a Russian Constructivist artist known for her bold geometric textile and graphic designs. The name Варвара derives from the Greek for 'foreign' or 'strange' — the same root as 'barbarian'." },
   { official: "Галина",     familiar: "Галя",    fact: "Galina Ulanova (Галина Сергеевна Уланова, 8 January 1910 – 21 March 1998) was a Soviet prima ballerina, widely considered one of the greatest ballet dancers of the 20th century." },
   { official: "Дарья",      familiar: "Даша",    fact: "Dasha Zhukova (Дарья Алексеевна Жукова, born 1981) is a Russian entrepreneur and art collector, founder of the Garage Museum of Contemporary Art in Moscow." },
   { official: "Екатерина",  familiar: "Катя",    fact: "Catherine the Great (Екатерина Алексеевна, 2 May 1729 – 17 November 1796) was Empress of Russia from 1762 to 1796, the country's longest-ruling female leader." },
-  { official: "Елена",      familiar: "Лена",    fact: "Elena Isinbayeva (Елена Гаджиевна Исинбаева, born 3 June 1982) is a Russian pole vaulter who set 28 world records and won two Olympic gold medals. Лена is the standard familiar form of Елена." },
+  { official: "Елена",      familiar: "Лена",    fact: "Elena Isinbayeva (Елена Гаджиевна Исинбаева, born 3 June 1982) is a Russian pole vaulter who set 28 world records and won two Olympic gold medals." },
   { official: "Ирина",      familiar: "Ира",     fact: "Irina Rodnina (Ирина Константиновна Роднина, born 12 September 1949) is a Soviet and Russian figure skater who won three Olympic gold medals — the most of any figure skater in history." },
-  { official: "Ксения",     familiar: "Ксюша",  fact: "Xenia of Saint Petersburg (Ксения Григорьевна Петербургская, c.1730 – c.1803) is a Russian Orthodox saint venerated for her humility and piety. Ксюша is the warm familiar form of Ксения." },
-  { official: "Людмила",    familiar: "Люда",    fact: "Lyudmila is the heroine of Pushkin's early poem Ruslan and Lyudmila (Руслан и Людмила, 1820). The name means 'dear to the people' in Slavic — люд (people) + мила (dear)." },
+  { official: "Ксения",     familiar: "Ксюша",  fact: "Xenia of Saint Petersburg (Ксения Григорьевна Петербургская, c.1730 – c.1803) is a Russian Orthodox saint venerated for her humility and piety." },
+  { official: "Людмила",    familiar: "Люда",    fact: "Lyudmila Pavlichenko (Людмила Михайловна Павличенко, 12 July 1916 – 27 October 1974) was a Soviet sniper credited with 309 confirmed kills in World War II, making her the most successful female sniper in history. The name means 'dear to the people' in Slavic — люд (people) + мила (dear)." },
   { official: "Любовь",     familiar: "Люба",    fact: "Lyubov Orlova (Любовь Петровна Орлова, 29 January 1902 – 26 January 1975) was a Soviet actress and one of the first major stars of Soviet cinema. Любовь literally means 'love'." },
-  { official: "Мария",      familiar: "Маша",    fact: "Masha (Маша) is one of the three sisters in Chekhov's Three Sisters (Три сестры, 1900). Her official name is Мария — the Russian form of Mary, ultimately from the Hebrew Miriam." },
+  { official: "Мария",      familiar: "Маша",    fact: "Maria Yermolova (Мария Николаевна Ермолова, 15 July 1853 – 12 March 1928) was a celebrated Russian actress of the Maly Theatre, regarded as the greatest tragedienne of the Russian stage." },
   { official: "Надежда",    familiar: "Надя",    fact: "Nadezhda Krupskaya (Надежда Константиновна Крупская, 26 February 1869 – 27 February 1939) was a Russian Marxist revolutionary and wife of Vladimir Lenin. Надежда means 'hope' in Russian." },
-  { official: "Наталья",    familiar: "Наташа",  fact: "Natasha Rostova is the beloved heroine of Tolstoy's War and Peace (Война и мир, 1869). Her official name is Наталья Ильинична Ростова — Наташа is the familiar form." },
-  { official: "Нина",       familiar: "Ниночка", fact: "Nina is the protagonist of Chekhov's The Seagull (Чайка, 1895). Ниночка is an especially tender diminutive, adding -очка for extra warmth — a common Russian practice of layering affectionate suffixes." },
+  { official: "Наталья",    familiar: "Наташа",  fact: "Natalya Goncharova (Наталья Николаевна Гончарова, 27 August 1812 – 26 November 1863) was the wife of Alexander Pushkin, widely regarded as one of the great beauties of her era." },
+  { official: "Нина",       familiar: "Ниночка", fact: "Nina Berberova (Нина Николаевна Берберова, 8 August 1901 – 26 September 1993) was a Russian-American writer and memoirist whose autobiography The Italics Are Mine is a landmark of Russian émigré literature. Ниночка adds -очка for extra tenderness — a characteristic Russian layering of affectionate suffixes." },
   { official: "Ольга",      familiar: "Оля",     fact: "Princess Olga of Kiev (Ольга Киевская, c.890 – 11 July 969) was the first ruler of Kievan Rus to convert to Christianity and is venerated as a saint in the Orthodox Church." },
   { official: "Светлана",   familiar: "Света",   fact: "Svetlana Alexievich (Светлана Александровна Алексиевич, born 31 May 1948) is a Belarusian investigative journalist and prose writer who won the Nobel Prize in Literature in 2015." },
   { official: "Татьяна",    familiar: "Таня",    fact: "Tatiana Larina (Татьяна Ларина) is the heroine of Pushkin's verse novel Eugene Onegin (Евгений Онегин, 1833). Her famous letter to Onegin is one of the most celebrated passages in Russian literature." },
-  { official: "Тамара",     familiar: "Тома",    fact: "Tamara is the heroine of Lermontov's poem The Demon (Демон, 1841). The name is of Hebrew origin (תָּמָר), meaning 'date palm'. Тома is the warm everyday familiar form." },
+  { official: "Тамара",     familiar: "Тома",    fact: "Tamara Karsavina (Тамара Платоновна Карсавина, 9 March 1885 – 26 May 1978) was a Russian ballerina who was a principal dancer at the Imperial Ballet and later co-founded the Royal Academy of Dance in London. The name is of Hebrew origin (תָּמָר), meaning 'date palm'." },
   { official: "Юлия",       familiar: "Юля",     fact: "Yulia Lipnitskaya (Юлия Олеговна Липницкая, born 5 June 1998) is a Russian figure skater who became the youngest individual gold medallist in Winter Olympic history at the 2014 Sochi Games." },
 ];
 
@@ -124,8 +134,8 @@ const MALE_NAMES = [
   { official: "Владимир",   familiar: "Володя",  fact: "Vladimir Lenin (Владимир Ильич Ленин, 22 April 1870 – 21 January 1924) was a Russian revolutionary and politician who led the Bolshevik Revolution of 1917." },
   { official: "Григорий",   familiar: "Гриша",   fact: "Grigori Rasputin (Григорий Ефимович Распутин, c.1869 – 30 December 1916) was a Russian mystic who wielded considerable influence over the Romanov royal family." },
   { official: "Дмитрий",    familiar: "Дима",    fact: "Dmitri Mendeleev (Дмитрий Иванович Менделеев, 8 February 1834 – 2 February 1907) was a Russian chemist who formulated the Periodic Law and created the periodic table." },
-  { official: "Евгений",    familiar: "Женя",    fact: "Eugene Onegin (Евгений Онегин) is the titular hero of Pushkin's verse novel (1833). Женя is the gender-neutral familiar form used for both Евгений and Евгения." },
-  { official: "Иван",       familiar: "Ваня",    fact: "Ivan the Terrible (Иван Васильевич, 25 August 1530 – 28 March 1584) was the first Tsar of Russia. Ваня is also the name of the uncle in Chekhov's play Дядя Ваня (1898)." },
+  { official: "Евгений",    familiar: "Женя",    fact: "Yevgeny Yevtushenko (Евгений Александрович Евтушенко, 18 July 1932 – 1 April 2017) was a Soviet poet best known for Babi Yar (1961), a poem denouncing Soviet antisemitism." },
+  { official: "Иван",       familiar: "Ваня",    fact: "Ivan the Terrible (Иван Васильевич, 25 August 1530 – 28 March 1584) was the first Tsar of Russia, who centralised power and expanded the Russian state dramatically." },
   { official: "Константин", familiar: "Костя",   fact: "Konstantin Stanislavski (Константин Сергеевич Станиславский, 17 January 1863 – 7 August 1938) was a Russian theatre director who developed the Stanislavski method of acting." },
   { official: "Михаил",     familiar: "Миша",    fact: "Mikhail Gorbachev (Михаил Сергеевич Горбачёв, 2 March 1931 – 30 August 2022) was the last leader of the Soviet Union, initiating the policies of glasnost and perestroika." },
   { official: "Николай",    familiar: "Коля",    fact: "Nikolai Gogol (Николай Васильевич Гоголь, 1 April 1809 – 4 March 1852) was a Ukrainian-born Russian writer whose works include Dead Souls (Мёртвые души) and The Government Inspector (Ревизор)." },
@@ -700,6 +710,8 @@ function startSession() {
   session = weightedPick(SESSION_SIZE);
   idx = 0; correct = 0;
   document.getElementById('results-box').style.display = 'none';
+  document.querySelector('.question-card').style.display = 'block';
+  document.getElementById('answer-row').style.display = 'flex';
   loadQuestion();
 }
 
@@ -714,28 +726,38 @@ function loadQuestion() {
   document.getElementById('q-context').textContent = q.context;
   document.getElementById('fact-box').className = 'fact-box';
   document.getElementById('next-btn').className = 'next-btn';
-  const optEl = document.getElementById('options');
-  optEl.innerHTML = '';
-  shuffle(q.opts).forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'opt-btn';
-    btn.textContent = opt;
-    btn.onclick = () => handleAnswer(opt, q);
-    optEl.appendChild(btn);
-  });
+  document.getElementById('correct-answer').className = 'correct-answer';
+  const input = document.getElementById('answer-input');
+  const btn = document.getElementById('submit-btn');
+  input.value = '';
+  input.className = 'answer-input';
+  input.disabled = false;
+  btn.disabled = false;
+  // Allow Enter key to submit
+  input.onkeydown = (e) => { if (e.key === 'Enter') submitAnswer(); };
+  setTimeout(() => input.focus(), 50);
 }
 
-function handleAnswer(chosen, q) {
+function submitAnswer() {
   if (answered) return;
+  const q = session[idx];
+  const input = document.getElementById('answer-input');
+  const btn = document.getElementById('submit-btn');
+  const typed = input.value.trim();
+  if (!typed) return;
   answered = true;
-  updateScore(q.key, chosen === q.a);
-  const btns = document.querySelectorAll('.opt-btn');
-  btns.forEach(b => {
-    b.disabled = true;
-    if (b.textContent === q.a) b.classList.add(chosen === q.a ? 'correct' : 'revealed');
-    else if (b.textContent === chosen && chosen !== q.a) b.classList.add('wrong');
-  });
-  if (chosen === q.a) correct++;
+  input.disabled = true;
+  btn.disabled = true;
+  const normalise = s => s.toLowerCase().replace(/ё/g, 'е');
+  const isCorrect = normalise(typed) === normalise(q.a);
+  updateScore(q.key, isCorrect);
+  input.className = 'answer-input ' + (isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    const ca = document.getElementById('correct-answer');
+    ca.textContent = `Correct answer: ${q.a}`;
+    ca.className = 'correct-answer visible';
+  }
+  if (isCorrect) correct++;
   if (q.fact) {
     const fb = document.getElementById('fact-box');
     fb.textContent = q.fact;
@@ -754,15 +776,16 @@ function showResults() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('q-counter').textContent = 'Session complete';
   document.getElementById('score-display').textContent = `${correct} / ${SESSION_SIZE} correct`;
-  document.getElementById('options').innerHTML = '';
+  document.getElementById('answer-row').style.display = 'none';
+  document.getElementById('correct-answer').className = 'correct-answer';
   document.getElementById('fact-box').className = 'fact-box';
   document.getElementById('next-btn').className = 'next-btn';
-  document.getElementById('q-type').textContent = '';
-  document.getElementById('q-text').textContent = '';
-  document.getElementById('q-context').textContent = '';
+  document.querySelector('.question-card').style.display = 'none';
   const rb = document.getElementById('results-box');
   document.getElementById('results-score').textContent = `${correct} / ${SESSION_SIZE}`;
   const pct = Math.round((correct / SESSION_SIZE) * 100);
+  const bear = pct >= 70 ? 'bear_happy.png' : pct >= 40 ? 'bear_neutral.png' : 'bear_sad.png';
+  document.getElementById('results-bear').src = bear;
   document.getElementById('results-label').textContent =
     pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort!' : 'Keep practising!';
   rb.style.display = 'block';

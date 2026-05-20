@@ -127,6 +127,7 @@
     text-align: center;
     padding: 3rem 0 2rem;
   }
+  .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
   .results-score { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .results-msg { font-size: 1rem; color: #666; margin-bottom: 2rem; }
   .results-btn {
@@ -184,6 +185,7 @@
   </div>
 
   <div class="results" id="results">
+    <img id="results-bear" class="results-bear" src="" alt="">
     <div class="results-score" id="final-score"></div>
     <div class="results-msg" id="final-msg"></div>
     <button class="results-btn" onclick="startSession()">New session</button>
@@ -414,6 +416,7 @@ function showResults() {
   document.getElementById('results').style.display = 'block';
   const pct = Math.round((correct / 18) * 100);
   document.getElementById('final-score').textContent = correct + ' / 18 (' + pct + '%)';
+  document.getElementById('results-bear').src = pct >= 70 ? 'bear_happy.png' : pct >= 40 ? 'bear_neutral.png' : 'bear_sad.png';
   const msgs = [
     'Keep at it — review and try again. Каждый день!',
     'Getting there — keep practising!',
