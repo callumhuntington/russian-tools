@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Русский — Темы</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Русский">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script src="js/icons.js"></script>
+<script src="js/common.js"></script>
+<script src="data/bank.js"></script>
+<script>
+// Темы: one row per topic (sheet), with progress.
+$('#app').innerHTML = header('Темы', '') + `<section class="box">${sectionHead(0, 'По темам', 'Выберите тему.', 'one topic per sheet')}
+  <div class="list">${TOPICS.map((tp, n) => {
+    const items = BANK.filter(i => i.topic === tp.id);
+    return `<a class="item" href="topic.html#t-${tp.id}">
+      <span class="n">${n + 1}.</span>
+      <div class="t"><div class="nm"><span class="ru">${esc(tp.title)}</span> <span class="dim">${esc(tp.en)}</span></div>
+      ${bar(progress(NS, items.map(i => i.id)))}</div>${icon('next', 'ic go')}</a>`;
+  }).join('')}</div></section>`;
+</script>
+</body>
+</html>

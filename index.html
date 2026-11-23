@@ -1,75 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Русский</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Русский">
-<meta name="theme-color" content="#f5f3ee">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Georgia, serif;
-    background: #f5f3ee;
-    color: #1a1a1a;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-  }
-  .container { width: 100%; max-width: 400px; text-align: center; }
-  h1 { font-size: 2rem; font-weight: bold; margin-bottom: 2.5rem; }
-  .app-icon { width: 90px; height: 90px; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; object-fit: contain; }
-  .tool-link {
-    display: block;
-    background: #fff;
-    border: 1px solid #e0ddd6;
-    border-radius: 10px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-    text-decoration: none;
-    color: #1a1a1a;
-    text-align: left;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .tool-link:hover { background: #f0ede6; border-color: #bbb; }
-  .tool-title { font-size: 1.1rem; margin-bottom: 0.2rem; }
-  .tool-desc { font-size: 0.8rem; color: #888; }
-</style>
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div class="container">
-  <img src="matryoshka.png" alt="Русский" class="app-icon">
-  <h1>Русский</h1>
-  <a class="tool-link" href="ch123_quiz.html">
-    <div class="tool-title">Vocabulary Quiz</div>
-    <div class="tool-desc">20 random questions from a bank of 300</div>
-  </a>
-  <a class="tool-link" href="russian_verb_conjugator.html">
-    <div class="tool-title">Verb Conjugator</div>
-    <div class="tool-desc">3 random verbs — 18 forms per session</div>
-  </a>
-  <a class="tool-link" href="reading.html">
-    <div class="tool-title">Reading Exercises</div>
-    <div class="tool-desc">Read a passage and answer comprehension questions</div>
-  </a>
-  <a class="tool-link" href="names.html">
-    <div class="tool-title">Russian Names</div>
-    <div class="tool-desc">First names, patronymics, and famous figures</div>
-  </a>
-  <a class="tool-link" href="stats.html">
-    <div class="tool-title">Stats</div>
-    <div class="tool-desc">Track your progress across all exercises</div>
-  </a>
-</div>
+<div class="wrap" id="app"></div>
+<script src="js/icons.js"></script>
+<script src="js/common.js"></script>
+<script src="data/bank.js"></script>
+<script src="data/names.js"></script>
+<script src="js/names-bank.js"></script>
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/russian-tools/sw.js');
-  }
+// Home: the three ways in.
+const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+const today = new Date();
+const main = BANK.filter(i => i.topic !== 'penguin');
+
+$('#app').innerHTML = header('Русский', `${today.getDate()} ${MONTHS[today.getMonth()]}`, '') +
+  card('quiz.html#review', 'review', 'Повторить', 'A mix of 20 from every topic, leaning on what you got wrong.', bar(progress(NS, main.map(i => i.id)))) +
+  card('topics.html', 'topics', 'Темы', `${TOPICS.length - 1} topics, one per sheet: everything from a sheet in one place.`) +
+  card('exercises.html', 'types', 'Упражнения', `${TYPES.length} kinds of exercise, plus reading, verbs and names.`);
 </script>
 </body>
 </html>

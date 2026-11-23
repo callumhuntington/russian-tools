@@ -1,843 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Русский — Reading</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Русский — Чтение</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Русский">
-<meta name="theme-color" content="#f5f3ee">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, serif; background: #f5f3ee; color: #1a1a1a; min-height: 100vh; padding: 1.5rem 1rem 3rem; }
-  .container { width: 100%; max-width: 620px; margin: 0 auto; }
-
-  .back-btn { display: inline-block; font-size: 0.8rem; color: #888; text-decoration: none; margin-bottom: 1.25rem; }
-  .back-btn:hover { color: #444; }
-
-  h1 { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.25rem; }
-  .passage-label { font-size: 0.78rem; color: #888; margin-bottom: 1.75rem; }
-
-  /* Passage box */
-  .passage-box {
-    background: #fff;
-    border: 1px solid #e0ddd6;
-    border-radius: 10px;
-    padding: 1.25rem 1.4rem;
-    margin-bottom: 1.75rem;
-    line-height: 1.75;
-  }
-  .passage-title {
-    font-size: 1rem;
-    font-weight: bold;
-    margin-bottom: 0.9rem;
-    color: #1a1a1a;
-  }
-  .passage-intro {
-    font-size: 0.82rem;
-    color: #666;
-    margin-bottom: 0.9rem;
-    font-style: italic;
-  }
-  .dialogue-line { display: flex; gap: 0.6rem; margin-bottom: 0.35rem; align-items: baseline; }
-  .speaker { font-weight: bold; min-width: 1.4rem; font-size: 0.95rem; }
-  .line-text { font-size: 0.95rem; flex: 1; line-height: 1.75; }
-
-  /* Tappable words */
-  .rus-word {
-    cursor: pointer;
-    border-bottom: 1px dotted #bbb;
-    position: relative;
-    display: inline;
-  }
-  .rus-word:hover { border-bottom-color: #888; }
-  .rus-word.active { background: #f0ede6; border-radius: 3px; border-bottom-color: transparent; }
-  .word-tooltip {
-    display: none;
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 0.8rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 6px;
-    pointer-events: none;
-    z-index: 999;
-    white-space: nowrap;
-    font-family: Georgia, serif;
-    font-style: normal;
-    font-weight: normal;
-  }
-  .rus-word.active .word-tooltip { display: block; }
-
-  /* Key words section */
-  .key-words-box {
-    display: none;
-    background: #fff;
-    border: 1px solid #e0ddd6;
-    border-radius: 10px;
-    padding: 1.25rem 1.4rem;
-    margin-top: 1.5rem;
-  }
-  .key-words-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
-  .key-words-grid { display: flex; flex-direction: column; gap: 6px; }
-  .key-word-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.88rem; padding: 0.3rem 0; border-bottom: 1px solid #f0ede6; }
-  .key-word-row:last-child { border-bottom: none; }
-  .key-word-rus { font-weight: bold; }
-  .key-word-eng { color: #666; font-style: italic; }
-
-  /* Questions */
-  .questions-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 1rem; }
-  .question-block { margin-bottom: 1.5rem; }
-  .question-text { font-size: 0.95rem; margin-bottom: 0.65rem; line-height: 1.4; }
-  .options { display: flex; flex-direction: column; gap: 8px; }
-  .opt-btn {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.9rem;
-    font-family: Georgia, serif;
-    text-align: left;
-    cursor: pointer;
-    color: #1a1a1a;
-    transition: background 0.12s, border-color 0.12s;
-    line-height: 1.3;
-  }
-  .opt-btn:hover:not(:disabled) { background: #f0ede6; border-color: #bbb; }
-  .opt-btn.correct { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
-  .opt-btn.wrong { background: #fdecea; border-color: #e57373; color: #5c1010; }
-  .opt-btn.revealed { background: #e6f4ea; border-color: #4caf50; color: #1a4a1e; }
-  .opt-btn:disabled { cursor: default; }
-
-  /* Score / results */
-  .score-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    font-size: 0.85rem;
-    color: #888;
-  }
-  .score-display { font-size: 0.95rem; color: #1a1a1a; }
-
-  .results-box { display: none; text-align: center; padding: 2rem 0 1rem; }
-  .results-bear { width: 144px; height: 144px; margin: 0 auto 0.75rem; display: block; }
-  .results-score { font-size: 2rem; font-weight: bold; margin-bottom: 0.4rem; }
-  .results-label { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
-  .results-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nav-btn {
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.65rem 1.4rem;
-    font-size: 0.9rem;
-    font-family: Georgia, serif;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.15s;
-  }
-  .nav-btn:hover { background: #333; }
-  .nav-btn.secondary {
-    background: transparent;
-    color: #1a1a1a;
-    border: 1px solid #ccc;
-  }
-  .nav-btn.secondary:hover { background: #f0ede6; }
-</style>
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div class="container">
-  <a class="back-btn" href="index.html">← Home</a>
-  <h1>Reading Exercises</h1>
-  <p class="passage-label" id="passage-label"></p>
-
-  <div class="passage-box" id="passage-box"></div>
-
-  <div class="score-bar">
-    <span class="questions-title">Questions</span>
-    <span class="score-display" id="score-display"></span>
-  </div>
-
-  <div id="questions-area"></div>
-
-  <div class="results-box" id="results-box">
-    <img id="results-bear" class="results-bear" src="" alt="">
-    <div class="results-score" id="results-score"></div>
-    <div class="results-label" id="results-label"></div>
-    <div class="results-btns">
-      <button class="nav-btn secondary" onclick="goHome()">← Home</button>
-      <button class="nav-btn" onclick="nextPassage()">Play again</button>
-    </div>
-  </div>
-
-  <div class="key-words-box" id="key-words-box">
-    <div class="key-words-title">Key words</div>
-    <div class="key-words-grid" id="key-words-grid"></div>
-  </div>
-</div>
-
+<div class="wrap" id="app"></div>
+<script src="js/icons.js"></script>
+<script src="js/common.js"></script>
+<script src="data/reading.js"></script>
 <script>
-const PASSAGES = [
-  {
-    id: "metro_conversation",
-    title: "Разговор в метро",
-    difficulty: "easy",
-    intro: "А bumps into his fellow student Б, who has a companion В.",
-    dialogue: [
-      { speaker: "А", text: "Здравствуй, Ваня. Куда ты едешь?" },
-      { speaker: "Б", text: "Домой, на улицу Волгина. А ты едешь в университет?" },
-      { speaker: "А", text: "Нет, я тоже еду домой. Я теперь живу на улице Вавилова." },
-      { speaker: "Б", text: "Познакомьтесь. Это моя подруга Мари, она англичанка." },
-      { speaker: "В", text: "Здравствуйте, Миша." },
-      { speaker: "А", text: "Простите, вас зовут Мэри?" },
-      { speaker: "В", text: "Нет, Мари. Это французское имя. Но я не говорю по-французски." },
-    ],
-    vocab: {
-      "здравствуй": "hello (informal)",
-      "куда": "where to?",
-      "едешь": "you are going",
-      "домой": "home",
-      "улицу": "street (acc.)",
-      "университет": "university",
-      "тоже": "also / too",
-      "еду": "I am going",
-      "теперь": "now",
-      "живу": "I live",
-      "улице": "street (prep.)",
-      "познакомьтесь": "let me introduce you",
-      "моя": "my",
-      "подруга": "female friend",
-      "англичанка": "Englishwoman",
-      "простите": "excuse me",
-      "зовут": "they call (name)",
-      "французское": "French",
-      "имя": "name",
-      "говорю": "I speak",
-      "по-французски": "in French",
-    },
-    keywords: [
-      { rus: "куда", eng: "where to?" },
-      { rus: "домой", eng: "home (direction)" },
-      { rus: "улица", eng: "street" },
-      { rus: "подруга", eng: "female friend" },
-      { rus: "англичанка", eng: "Englishwoman" },
-      { rus: "имя", eng: "name" },
-      { rus: "по-французски", eng: "in French" },
-    ],
-    questions: [
-      { q: "What is the name of А?", opts: ["Ваня", "Миша", "Мари", "Борис"], a: 1 },
-      { q: "Where does А now live?", opts: ["улица Волгина", "улица Вавилова", "улица Пушкина", "улица Ленина"], a: 1 },
-      { q: "Where is Б going?", opts: ["To university", "To the shops", "Home", "To the metro"], a: 2 },
-      { q: "What nationality is В?", opts: ["French", "Russian", "American", "English"], a: 3 },
-      { q: "Which language does В say she does not speak?", opts: ["Russian", "English", "French", "German"], a: 2 },
-      { q: "What is the name of Б?", opts: ["Миша", "Ваня", "Мари", "Наташа"], a: 1 },
-      { q: "Where is Б going home to?", opts: ["улица Вавилова", "улица Пушкина", "улица Волгина", "улица Ленина"], a: 2 },
-      { q: "What does В say about her name?", opts: ["It is a Russian name", "It is a French name", "It is an English name", "It is a German name"], a: 1 },
-      { q: "Was А going to university?", opts: ["Yes", "No", "He doesn't say", "He was already there"], a: 1 },
-      { q: "How does А greet Б at the start?", opts: ["Добрый день", "Здравствуйте", "Привет", "Здравствуй"], a: 3 },
-    ]
-  },
-  {
-    id: "restaurant",
-    title: "В ресторане",
-    difficulty: "easy",
-    intro: "Джон (Д), an Englishman visiting Moscow, sits down at a restaurant. Официантка (О) comes to take his order.",
-    dialogue: [
-      { speaker: "О", text: "Здравствуйте. Добрый день." },
-      { speaker: "Д", text: "Здравствуйте. Простите, вы говорите по-английски?" },
-      { speaker: "О", text: "Нет, я не говорю по-английски. Вы говорите по-русски?" },
-      { speaker: "Д", text: "Да, немного. Где меню, пожалуйста?" },
-      { speaker: "О", text: "Вот меню." },
-      { speaker: "Д", text: "Спасибо. Это борщ?" },
-      { speaker: "О", text: "Да, это борщ. Со сметаной." },
-      { speaker: "Д", text: "Хорошо. Борщ, пожалуйста. И вино. Белое вино есть?" },
-      { speaker: "О", text: "Да, есть. Пожалуйста." },
-      { speaker: "Д", text: "Спасибо!" },
-    ],
-    vocab: {
-      "добрый": "good",
-      "день": "day",
-      "говорите": "you speak",
-      "по-английски": "in English",
-      "по-русски": "in Russian",
-      "немного": "a little",
-      "меню": "menu",
-      "борщ": "beetroot soup",
-      "со": "with",
-      "сметаной": "sour cream (instr.)",
-      "хорошо": "good / fine",
-      "белое": "white",
-      "вино": "wine",
-      "есть": "there is / is available",
-    },
-    keywords: [
-      { rus: "немного", eng: "a little" },
-      { rus: "меню", eng: "menu" },
-      { rus: "борщ", eng: "beetroot soup" },
-      { rus: "сметана", eng: "sour cream" },
-      { rus: "белое вино", eng: "white wine" },
-      { rus: "есть", eng: "there is / is available" },
-    ],
-    questions: [
-      { q: "What nationality is Джон?", opts: ["American", "French", "English", "Australian"], a: 2 },
-      { q: "Does the waitress speak English?", opts: ["Yes, a little", "Yes, very well", "No", "She doesn't say"], a: 2 },
-      { q: "What food does Джон order?", opts: ["Салат", "Борщ", "Шоколад", "Сметана"], a: 1 },
-      { q: "What does Джон ask about the dish before ordering?", opts: ["Whether it is fresh", "Whether it is expensive", "Whether it is borsch", "Whether it comes with bread"], a: 2 },
-      { q: "What does Джон drink with his meal?", opts: ["Чай", "Водка", "Пиво", "Вино"], a: 3 },
-      { q: "Does the борщ come with something?", opts: ["Хлеб", "Сахар", "Сметана", "Шоколад"], a: 2 },
-      { q: "How does Джон describe his Russian?", opts: ["Very good", "A little", "Not at all", "Only reading"], a: 1 },
-      { q: "What colour wine does Джон ask for?", opts: ["Red", "White", "Rosé", "He doesn't specify"], a: 1 },
-      { q: "What does Джон ask for before ordering food?", opts: ["Water", "The bill", "The menu", "A table"], a: 2 },
-      { q: "How does the waitress greet Джон?", opts: ["Привет", "Здравствуй", "Добрый день", "До свидания"], a: 2 },
-    ]
-  },
-  {
-    id: "hotel",
-    title: "В гостинице",
-    difficulty: "easy",
-    intro: "Лука (Л), a Neapolitan visiting Moscow, arrives at his hotel. Администратор (А) is at the desk.",
-    dialogue: [
-      { speaker: "Л", text: "Здравствуйте. Меня зовут Лука. Я живу в Неаполе." },
-      { speaker: "А", text: "Здравствуйте. Вы говорите по-русски?" },
-      { speaker: "Л", text: "Да, немного. Я изучаю русский язык." },
-      { speaker: "А", text: "Хорошо! Вы говорите по-русски очень хорошо." },
-      { speaker: "Л", text: "Спасибо! Простите, где метро?" },
-      { speaker: "А", text: "Метро? Вот. Прямо и направо." },
-      { speaker: "Л", text: "А автобус тоже там?" },
-      { speaker: "А", text: "Да, автобус и троллейбус." },
-      { speaker: "Л", text: "Отлично. Спасибо!" },
-      { speaker: "А", text: "Пожалуйста. До свидания!" },
-    ],
-    vocab: {
-      "меня": "me (acc.)",
-      "зовут": "they call (name)",
-      "живу": "I live",
-      "говорите": "you speak",
-      "по-русски": "in Russian",
-      "немного": "a little",
-      "изучаю": "I am studying",
-      "русский": "Russian",
-      "язык": "language",
-      "очень": "very",
-      "метро": "metro",
-      "прямо": "straight on",
-      "направо": "to the right",
-      "автобус": "bus",
-      "тоже": "also",
-      "там": "there",
-      "троллейбус": "trolleybus",
-      "отлично": "excellent",
-    },
-    keywords: [
-      { rus: "изучаю", eng: "I am studying" },
-      { rus: "язык", eng: "language" },
-      { rus: "прямо", eng: "straight on" },
-      { rus: "направо", eng: "to the right" },
-      { rus: "троллейбус", eng: "trolleybus" },
-      { rus: "отлично", eng: "excellent" },
-    ],
-    questions: [
-      { q: "Where is Лука from?", opts: ["Rome", "Milan", "Naples", "Turin"], a: 2 },
-      { q: "Why does Лука speak some Russian?", opts: ["He has a Russian wife", "He is studying Russian", "He lived in Moscow", "He doesn't say"], a: 1 },
-      { q: "What does the administrator say about Лука's Russian?", opts: ["It needs improvement", "It is very good", "It is a little strange", "It is bad"], a: 1 },
-      { q: "What does Лука ask the administrator to help him find?", opts: ["A restaurant", "A taxi", "The metro", "The post office"], a: 2 },
-      { q: "How does the administrator direct Лука?", opts: ["Left and then straight on", "Straight on and turn right", "Right and then left", "Straight on and turn left"], a: 1 },
-      { q: "Is there a bus stop near the metro?", opts: ["No", "Yes, bus and trolleybus", "Yes, bus only", "He doesn't ask"], a: 1 },
-      { q: "Where does Лука normally live?", opts: ["In Moscow", "In Rome", "In Naples", "In Milan"], a: 2 },
-      { q: "How does Лука describe his Russian at first?", opts: ["Very good", "A little", "Not at all", "Only reading"], a: 1 },
-      { q: "What does the administrator say when Лука thanks him at the end?", opts: ["Спасибо", "Привет", "Пожалуйста", "Хорошо"], a: 2 },
-      { q: "Where is Лука speaking from at the start of the conversation?", opts: ["A restaurant", "A metro station", "A hotel", "A bus stop"], a: 2 },
-    ]
-  },
-  {
-    id: "belgrade",
-    title: "Юлия в Белграде",
-    difficulty: "easy",
-    intro: "Юлия (Ю), a Russian student, now lives in Belgrade. She speaks to her friend Анна (А) on the phone.",
-    dialogue: [
-      { speaker: "А", text: "Привет, Юля! Где ты теперь живёшь?" },
-      { speaker: "Ю", text: "Привет, Аня! Я теперь живу в Белграде." },
-      { speaker: "А", text: "В Белграде? Это в Сербии?" },
-      { speaker: "Ю", text: "Да, в Сербии. Белград — красивый город." },
-      { speaker: "А", text: "Ты говоришь по-сербски?" },
-      { speaker: "Ю", text: "Немного. Но я понимаю, потому что я говорю по-русски." },
-      { speaker: "А", text: "Ты едешь домой в Москву?" },
-      { speaker: "Ю", text: "Нет, я не еду. Я изучаю язык здесь." },
-      { speaker: "А", text: "Понятно. До свидания, Юля!" },
-      { speaker: "Ю", text: "До свидания, Аня!" },
-    ],
-    vocab: {
-      "теперь": "now",
-      "живёшь": "you live",
-      "живу": "I live",
-      "Белград": "Belgrade",
-      "Сербии": "Serbia (prep.)",
-      "красивый": "beautiful",
-      "город": "city / town",
-      "говоришь": "you speak",
-      "по-сербски": "in Serbian",
-      "немного": "a little",
-      "понимаю": "I understand",
-      "потому что": "because",
-      "по-русски": "in Russian",
-      "едешь": "you are going",
-      "домой": "home",
-      "изучаю": "I am studying",
-      "язык": "language",
-      "здесь": "here",
-      "понятно": "I see / understood",
-    },
-    keywords: [
-      { rus: "красивый", eng: "beautiful" },
-      { rus: "город", eng: "city / town" },
-      { rus: "по-сербски", eng: "in Serbian" },
-      { rus: "потому что", eng: "because" },
-      { rus: "понятно", eng: "I see / understood" },
-      { rus: "здесь", eng: "here" },
-    ],
-    questions: [
-      { q: "Where does Юлия now live?", opts: ["Moscow", "Warsaw", "Belgrade", "Sofia"], a: 2 },
-      { q: "In which country is Belgrade?", opts: ["Russia", "Serbia", "Poland", "Bulgaria"], a: 1 },
-      { q: "Does Юлия speak Serbian?", opts: ["Yes, very well", "A little", "Not at all", "She doesn't say"], a: 1 },
-      { q: "Why does Юлия understand Serbian?", opts: ["She studied it at university", "Because she speaks Russian", "She lived in Serbia before", "She doesn't say"], a: 1 },
-      { q: "Is Юлия going back to Moscow?", opts: ["Yes, soon", "No", "She doesn't know", "Yes, next week"], a: 1 },
-      { q: "What is Юлия doing in Belgrade?", opts: ["Working", "Studying the language", "Visiting friends", "She doesn't say"], a: 1 },
-      { q: "What does Юлия say about Belgrade?", opts: ["It is very big", "It is a beautiful city", "It is cold", "It is expensive"], a: 1 },
-      { q: "What is the name of Юлия's friend?", opts: ["Наташа", "Мари", "Анна", "Мэри"], a: 2 },
-      { q: "How are the two friends speaking?", opts: ["In person in Moscow", "On the phone", "By letter", "In Belgrade"], a: 1 },
-      { q: "How does Юлия address her friend informally?", opts: ["Анна", "Аня", "Анечка", "Аннушка"], a: 1 },
-    ]
-  },
-  {
-    id: "spartak",
-    title: "На стадионе",
-    difficulty: "easy",
-    intro: "Вадим (В) and his friend Борис (Б) are going to watch Spartak Moscow play. They talk on the metro.",
-    dialogue: [
-      { speaker: "В", text: "Борис! Привет! Ты едешь на стадион?" },
-      { speaker: "Б", text: "Да! Спартак играет сегодня. Это матч!" },
-      { speaker: "В", text: "Я знаю. Спартак — мой любимый клуб." },
-      { speaker: "Б", text: "И мой тоже! Ты живёшь далеко от стадиона?" },
-      { speaker: "В", text: "Нет, я живу на улице Волгина. Это близко." },
-      { speaker: "Б", text: "Хорошо. Я еду на автобусе обычно, но сегодня на метро." },
-      { speaker: "В", text: "Метро быстрее. Где твой билет?" },
-      { speaker: "Б", text: "Вот он. А твой?" },
-      { speaker: "В", text: "Вот мой билет. Отлично!" },
-      { speaker: "Б", text: "Спартак — чемпион!" },
-    ],
-    vocab: {
-      "стадион": "stadium",
-      "играет": "is playing",
-      "сегодня": "today",
-      "матч": "match",
-      "знаю": "I know",
-      "мой": "my",
-      "любимый": "favourite",
-      "клуб": "club",
-      "тоже": "also / too",
-      "живёшь": "you live",
-      "далеко": "far",
-      "от": "from",
-      "близко": "close / nearby",
-      "обычно": "usually",
-      "быстрее": "faster",
-      "твой": "your (informal)",
-      "билет": "ticket",
-      "отлично": "excellent",
-      "чемпион": "champion",
-    },
-    keywords: [
-      { rus: "стадион", eng: "stadium" },
-      { rus: "играет", eng: "is playing" },
-      { rus: "сегодня", eng: "today" },
-      { rus: "любимый", eng: "favourite" },
-      { rus: "далеко", eng: "far" },
-      { rus: "близко", eng: "close / nearby" },
-      { rus: "обычно", eng: "usually" },
-      { rus: "билет", eng: "ticket" },
-    ],
-    questions: [
-      { q: "Where are Вадим and Борис going?", opts: ["To the cinema", "To the restaurant", "To the stadium", "To the hotel"], a: 2 },
-      { q: "Which football club is playing today?", opts: ["Динамо", "Спартак", "ЦСКА", "Локомотив"], a: 1 },
-      { q: "Whose favourite club is Спартак?", opts: ["Only Вадим's", "Only Борис's", "Both of theirs", "Neither of theirs"], a: 2 },
-      { q: "Does Вадим live far from the stadium?", opts: ["Yes, very far", "No, it is close", "He doesn't say", "He lives in another city"], a: 1 },
-      { q: "How does Борис usually travel to the stadium?", opts: ["By metro", "By trolleybus", "By bus", "By taxi"], a: 2 },
-      { q: "How is Борис travelling today?", opts: ["By bus", "By trolleybus", "By metro", "On foot"], a: 2 },
-      { q: "What does Вадим say about the metro?", opts: ["It is expensive", "It is faster", "It is far", "It is slow"], a: 1 },
-      { q: "What does Борис show Вадим?", opts: ["His passport", "His ticket", "His phone", "His metro card"], a: 1 },
-      { q: "What street does Вадим live on?", opts: ["улица Вавилова", "улица Ленина", "улица Волгина", "улица Пушкина"], a: 2 },
-      { q: "What does Борис shout at the end?", opts: ["Спартак играет!", "Спартак — чемпион!", "Спартак — клуб!", "Спартак — матч!"], a: 1 },
-    ]
-  },
-  {
-    id: "vokzal",
-    title: "На вокзале",
-    difficulty: "easy",
-    intro: "Анна (А) is at Moscow's Leningradsky station and asks a passerby (Б) for help.",
-    dialogue: [
-      { speaker: "А", text: "Простите, пожалуйста. Где здесь касса?" },
-      { speaker: "Б", text: "Касса? Прямо и налево." },
-      { speaker: "А", text: "Спасибо. А туалет где?" },
-      { speaker: "Б", text: "Туалет — направо." },
-      { speaker: "А", text: "Понятно. А где ресторан? Я не знаю этот вокзал." },
-      { speaker: "Б", text: "Ресторан? Вон там, налево." },
-      { speaker: "А", text: "Отлично! Когда работает ресторан?" },
-      { speaker: "Б", text: "Не знаю. Я думаю, что он работает сейчас." },
-      { speaker: "А", text: "Спасибо большое!" },
-      { speaker: "Б", text: "Пожалуйста. До свидания!" },
-    ],
-    vocab: {
-      "простите": "excuse me",
-      "пожалуйста": "please / you're welcome",
-      "касса": "ticket desk",
-      "прямо": "straight on",
-      "налево": "to the left",
-      "спасибо": "thank you",
-      "туалет": "toilet",
-      "направо": "to the right",
-      "понятно": "I see / understood",
-      "ресторан": "restaurant",
-      "знаю": "I know",
-      "вокзал": "station",
-      "отлично": "excellent",
-      "когда": "when",
-      "работает": "is open / works",
-      "думаю": "I think",
-      "что": "that (conjunction)",
-      "сейчас": "now / right now",
-      "большое": "big / (thank you very much)",
-    },
-    keywords: [
-      { rus: "касса", eng: "ticket desk" },
-      { rus: "вокзал", eng: "station" },
-      { rus: "прямо", eng: "straight on" },
-      { rus: "налево", eng: "to the left" },
-      { rus: "направо", eng: "to the right" },
-      { rus: "когда работает", eng: "when is it open" },
-      { rus: "сейчас", eng: "now / right now" },
-    ],
-    questions: [
-      { q: "Where is Анна?", opts: ["At the airport", "At the hotel", "At the station", "At the post office"], a: 2 },
-      { q: "Where is the ticket desk?", opts: ["Straight on and right", "Straight on and left", "To the right", "Over there on the left"], a: 1 },
-      { q: "Where is the toilet?", opts: ["To the left", "Straight on", "To the right", "Over there"], a: 2 },
-      { q: "Where is the restaurant?", opts: ["Straight on and left", "To the right", "Over there on the left", "Straight on"], a: 2 },
-      { q: "Does Анна know the station well?", opts: ["Yes, she knows it well", "No, she doesn't know it", "She's been here before", "She doesn't say"], a: 1 },
-      { q: "What does Анна ask about the restaurant?", opts: ["What it serves", "How much it costs", "When it is open", "Where exactly it is"], a: 2 },
-      { q: "Does the passerby know when the restaurant opens?", opts: ["Yes, it opens at noon", "No, but he thinks it is open now", "Yes, it is closed", "He doesn't say"], a: 1 },
-      { q: "How does Анна thank the passerby at the end?", opts: ["Спасибо", "Пожалуйста", "Спасибо большое", "Очень приятно"], a: 2 },
-      { q: "How does the passerby direct Анна to the toilet?", opts: ["Прямо и налево", "Прямо и направо", "Налево", "Направо"], a: 3 },
-      { q: "How does the passerby say goodbye?", opts: ["Привет!", "До свидания!", "Пока!", "Спасибо!"], a: 1 },
-    ]
-  },
-  {
-    id: "o_rossii",
-    title: "О России",
-    difficulty: "easy",
-    intro: "Two students, Карлос (К) and Ольга (О), talk about Russia before class.",
-    dialogue: [
-      { speaker: "К", text: "Ольга, ты знаешь, где Иркутск?" },
-      { speaker: "О", text: "Да, конечно. Иркутск в Сибири." },
-      { speaker: "К", text: "А где Сибирь?" },
-      { speaker: "О", text: "Сибирь — в России. Это очень большой регион." },
-      { speaker: "К", text: "Когда работает музей в Иркутске?" },
-      { speaker: "О", text: "Не знаю. Почему ты спрашиваешь?" },
-      { speaker: "К", text: "Я еду в Иркутск в августе." },
-      { speaker: "О", text: "Отлично! Ты едешь на поезде?" },
-      { speaker: "К", text: "Да, на поезде. По Транссибирской магистрали!" },
-      { speaker: "О", text: "Замечательно! Это красивый маршрут." },
-    ],
-    vocab: {
-      "знаешь": "you know",
-      "конечно": "of course",
-      "сибири": "Siberia (prep.)",
-      "сибирь": "Siberia",
-      "большой": "big / large",
-      "регион": "region",
-      "когда": "when",
-      "работает": "is open / works",
-      "музей": "museum",
-      "почему": "why",
-      "спрашиваешь": "you are asking",
-      "еду": "I am going",
-      "августе": "August (prep.)",
-      "отлично": "excellent",
-      "едешь": "you are going",
-      "поезде": "train (prep.)",
-      "замечательно": "wonderful",
-      "красивый": "beautiful",
-      "маршрут": "route",
-    },
-    keywords: [
-      { rus: "конечно", eng: "of course" },
-      { rus: "большой", eng: "big / large" },
-      { rus: "музей", eng: "museum" },
-      { rus: "поезд", eng: "train" },
-      { rus: "маршрут", eng: "route" },
-      { rus: "замечательно", eng: "wonderful" },
-    ],
-    questions: [
-      { q: "Where is Irkutsk?", opts: ["In Moscow", "In Siberia", "In Ukraine", "In the Crimea"], a: 1 },
-      { q: "What does Ольга say about Siberia?", opts: ["It is cold", "It is very big", "It is beautiful", "It is in Ukraine"], a: 1 },
-      { q: "What does Карлос ask about the museum?", opts: ["Where it is", "How much it costs", "When it is open", "What is inside"], a: 2 },
-      { q: "Does Ольга know when the museum is open?", opts: ["Yes, it opens at 10", "No, she doesn't know", "Yes, it is closed", "She doesn't say"], a: 1 },
-      { q: "When is Карлос going to Irkutsk?", opts: ["In July", "In September", "In August", "In June"], a: 2 },
-      { q: "How is Карлос travelling to Irkutsk?", opts: ["By plane", "By bus", "By train", "By car"], a: 2 },
-      { q: "What is the Trans-Siberian called in Russian?", opts: ["Транссибирская магистраль", "Транссибирский поезд", "Сибирский маршрут", "Сибирская дорога"], a: 0 },
-      { q: "What does Ольга say about the Trans-Siberian route?", opts: ["It is long", "It is beautiful", "It is expensive", "It is famous"], a: 1 },
-      { q: "Why is Карлос asking about the museum?", opts: ["He works there", "He is going to Irkutsk", "He is studying museums", "He doesn't say"], a: 1 },
-      { q: "Where is the conversation taking place?", opts: ["On the train", "In Siberia", "Before class", "In a museum"], a: 2 },
-    ]
-  },
-  {
-    id: "mary_manchester",
-    title: "Мэри в Манчестере",
-    difficulty: "easy",
-    intro: "Мэри Робинсон (М) is back in England. Her friend Наташа (Н) calls her from Moscow.",
-    dialogue: [
-      { speaker: "Н", text: "Мэри! Привет! Где ты сейчас?" },
-      { speaker: "М", text: "Привет, Наташа! Я в Манчестере. В Англии." },
-      { speaker: "Н", text: "Ты живёшь в центре города?" },
-      { speaker: "М", text: "Нет, я живу не в центре. Я живу в институте." },
-      { speaker: "Н", text: "В институте? Ты изучаешь русский язык там?" },
-      { speaker: "М", text: "Да! Я изучаю русский язык в институте в Манчестере." },
-      { speaker: "Н", text: "И ты говоришь по-русски очень хорошо!" },
-      { speaker: "М", text: "Спасибо. Я говорю по-русски, но я не говорю по-итальянски." },
-      { speaker: "Н", text: "А где живёт твой брат?" },
-      { speaker: "М", text: "Он живёт в Лондоне, в центре." },
-    ],
-    vocab: {
-      "сейчас": "now / right now",
-      "манчестере": "Manchester (prep.)",
-      "англии": "England (prep.)",
-      "живёшь": "you live",
-      "центре": "centre (prep.)",
-      "города": "city (gen.)",
-      "институте": "institute (prep.)",
-      "изучаешь": "you are studying",
-      "язык": "language",
-      "говоришь": "you speak",
-      "по-русски": "in Russian",
-      "хорошо": "well / good",
-      "по-итальянски": "in Italian",
-      "твой": "your (informal)",
-      "брат": "brother",
-      "лондоне": "London (prep.)",
-    },
-    keywords: [
-      { rus: "сейчас", eng: "now / right now" },
-      { rus: "центр", eng: "centre" },
-      { rus: "институт", eng: "institute" },
-      { rus: "изучаю", eng: "I am studying" },
-      { rus: "по-итальянски", eng: "in Italian" },
-      { rus: "твой", eng: "your (informal)" },
-    ],
-    questions: [
-      { q: "Where is Мэри when Наташа calls?", opts: ["In Moscow", "In London", "In Manchester", "In Brighton"], a: 2 },
-      { q: "Does Мэри live in the city centre?", opts: ["Yes, in the centre", "No, she lives at the institute", "No, she lives in the suburbs", "She doesn't say"], a: 1 },
-      { q: "What is Мэри studying in Manchester?", opts: ["English", "Italian", "Russian", "French"], a: 2 },
-      { q: "What does Наташа say about Мэри's Russian?", opts: ["It needs work", "It is very good", "It is a little strange", "It is getting better"], a: 1 },
-      { q: "Which language does Мэри say she does NOT speak?", opts: ["Russian", "English", "French", "Italian"], a: 3 },
-      { q: "Where does Мэри's brother live?", opts: ["In Manchester", "In Brighton", "In Oxford", "In London"], a: 3 },
-      { q: "Where exactly in London does her brother live?", opts: ["In the suburbs", "In the centre", "Near the station", "She doesn't say"], a: 1 },
-      { q: "Where is Наташа calling from?", opts: ["Manchester", "London", "Moscow", "Brighton"], a: 2 },
-      { q: "Where is Мэри's institute?", opts: ["In London", "In Manchester", "In Moscow", "In Brighton"], a: 1 },
-      { q: "How does Мэри address Наташа at the start?", opts: ["Здравствуйте", "Привет", "Добрый день", "Простите"], a: 1 },
-    ]
-  }
-];
+// Reading: one dialogue, tap dotted words for their meaning, then answer 4 questions from its bank.
+const PER_ROUND = 4;
+let queue = [], p = null, qs = [], done = 0, right = 0;
+// #p-<id> opens one text; #t-<topic> keeps to one topic's texts; otherwise texts come in random order.
+const want = (location.hash.match(/p-([a-z_]+)/) || [])[1];
+const tWant = (location.hash.match(/t-([a-z]+)/) || [])[1] || (PASSAGES.find(x => x.id === want) || {}).topic;
+window.onhashchange = () => location.reload();
+const back = want || tWant ? [`topic.html#t-${tWant}`, 'Тема'] : ['exercises.html', 'Упражнения'];
+const POOL = tWant ? PASSAGES.filter(x => x.topic === tWant) : PASSAGES.filter(x => x.topic !== 'penguin').concat(PASSAGES.filter(x => x.topic === 'penguin'));
 
-const QUESTIONS_PER_SESSION = 4;
-
-// Shuffles an array in place (Fisher-Yates)
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+function nextPassage(first) {
+  if (first && want && PASSAGES.find(x => x.id === want)) p = PASSAGES.find(x => x.id === want);
+  else {
+    if (!queue.length) queue = shuffle(POOL.map((_, i) => i)).filter(i => POOL[i] !== p);
+    p = POOL[queue.shift()];
   }
-  return arr;
+  // Shuffle each question's options (true/false stays in order) and keep track of the right one.
+  qs = shuffle(p.questions).slice(0, PER_ROUND).map(q => {
+    if (q.opts[0] === 'Правда') return q;
+    const order = shuffle(q.opts.map((_, i) => i));
+    return { q: q.q, opts: order.map(i => q.opts[i]), a: order.indexOf(q.a) };
+  });
+  done = 0; right = 0;
+  show();
 }
 
-// Passage order: shuffled queue, refills when empty
-let passageQueue = [];
-let currentPassageIdx = 0;
-let sessionQuestions = []; // the 4 picked questions for this round
-let answered = [];
-let correct = 0;
-
-function getNextPassageIdx() {
-  if (passageQueue.length === 0) {
-    passageQueue = shuffle([...Array(PASSAGES.length).keys()]);
-  }
-  return passageQueue.shift();
+// Wrap words that have a gloss; keep punctuation outside the dotted underline.
+function lineHtml(text) {
+  return text.split(/(\s+)/).map(tok => {
+    if (/^\s+$/.test(tok)) return tok;
+    const m = tok.match(/^([«"(—]*)([а-яёА-ЯЁa-zA-Z-]+)(.*)$/);
+    if (!m) return esc(tok);
+    const word = m[2].replace(/^-+|-+$/g, '');
+    const g = p.vocab && p.vocab[word.toLowerCase()];
+    return g ? `${esc(m[1])}<span class="gw" data-w="${esc(m[2])}" data-g="${esc(g)}">${esc(m[2])}</span>${esc(m[3])}` : esc(tok);
+  }).join('');
 }
 
-function loadPassage() {
-  const p = PASSAGES[currentPassageIdx];
-
-  // Pick 4 random questions from the full bank
-  const allQ = p.questions.map((q, i) => i);
-  shuffle(allQ);
-  sessionQuestions = allQ.slice(0, QUESTIONS_PER_SESSION);
-
-  answered = new Array(QUESTIONS_PER_SESSION).fill(false);
-  correct = 0;
-
-  // Label
-  document.getElementById('passage-label').textContent =
-    `${p.title} — ${p.difficulty}`;
-
-  // Passage box
-  const box = document.getElementById('passage-box');
-  let html = `<div class="passage-title">${p.title}</div>`;
-  if (p.intro) html += `<div class="passage-intro">${p.intro}</div>`;
-  for (const line of p.dialogue) {
-    const wordHtml = line.text.split(/(\s+)/).map(token => {
-      if (/^\s+$/.test(token)) return token;
-      const clean = token.replace(/[.,!?—:;«»""()\-]/g, '').toLowerCase();
-      if (p.vocab && p.vocab[clean]) {
-        return `<span class="rus-word" data-tr="${p.vocab[clean]}">${token}<span class="word-tooltip">${p.vocab[clean]}</span></span>`;
-      }
-      return token;
-    }).join('');
-    html += `<div class="dialogue-line">
-      <span class="speaker">${line.speaker}:</span>
-      <span class="line-text">${wordHtml}</span>
-    </div>`;
-  }
-  box.innerHTML = html;
-
-  // Attach tooltip listeners
-  let activeWord = null;
-  box.querySelectorAll('.rus-word').forEach(el => {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      if (activeWord && activeWord !== el) activeWord.classList.remove('active');
-      if (activeWord === el) {
-        el.classList.remove('active');
-        activeWord = null;
-        return;
-      }
-      activeWord = el;
-      el.classList.add('active');
+function show() {
+  $('#app').innerHTML = header('Чтение', '', back[0], back[1]) + `
+    <section class="box passage">
+      ${sectionHead(1, 'Текст', 'Прочитайте диалог.', 'tap a dotted word for its meaning')}
+      <div class="title ru">${esc(p.title)}</div>
+      <div class="intro">${esc(p.intro || '')}</div>
+      ${p.dialogue.map(l => `<div class="dl"><span class="sp">${esc(l.speaker)}</span><span class="ru">${lineHtml(l.text)}</span></div>`).join('')}
+      <div class="gloss" id="gloss">Tap a dotted word to see what it means.</div>
+    </section>
+    <section class="box">
+      ${sectionHead(2, 'Вопросы', 'Выберите ответ.', 'choose the answer')}
+      ${qs.map((q, qi) => `
+        <div class="qn"><span class="n">${qi + 1}.</span><span>${t(q.q)}</span></div>
+        <div class="opts${q.opts.some(o => o.length > 16) ? ' one' : ''}" data-q="${qi}">
+          ${q.opts.map((o, oi) => `<button class="opt" data-o="${oi}"><span class="l">${'abcd'[oi]})</span>${t(o)}</button>`).join('')}
+        </div>`).join('')}
+    </section>
+    <div id="end"></div>`;
+  $$('.gw').forEach(w => w.onclick = () => {
+    $$('.gw.on').forEach(x => x.classList.remove('on'));
+    w.classList.add('on');
+    $('#gloss').innerHTML = `<span class="ru">${esc(w.dataset.w)}</span><span class="en">${esc(w.dataset.g)}</span>`;
+  });
+  $$('.opts').forEach(box => {
+    const q = qs[+box.dataset.q];
+    $$('.opt', box).forEach(b => b.onclick = () => {
+      const oi = +b.dataset.o, ok = oi === q.a;
+      box.classList.add('done');
+      $$('.opt', box).forEach((x, i) => { x.disabled = true; if (i === q.a) x.classList.add('right'); else if (i === oi) x.classList.add('wrong'); });
+      done++; if (ok) right++;
+      setMeta(`${right} / ${done}`);
+      if (done === qs.length) setTimeout(finish, 500);
     });
   });
-  document.addEventListener('click', () => {
-    if (activeWord) { activeWord.classList.remove('active'); activeWord = null; }
-  }, { once: false });
-
-  updateScore();
-
-  // Render the 4 selected questions
-  const area = document.getElementById('questions-area');
-  area.innerHTML = '';
-  sessionQuestions.forEach((qi, displayIdx) => {
-    const q = p.questions[qi];
-    const block = document.createElement('div');
-    block.className = 'question-block';
-    block.id = `q${displayIdx}`;
-
-    const qtext = document.createElement('div');
-    qtext.className = 'question-text';
-    qtext.textContent = `${displayIdx + 1}. ${q.q}`;
-    block.appendChild(qtext);
-
-    const opts = document.createElement('div');
-    opts.className = 'options';
-    q.opts.forEach((opt, oi) => {
-      const btn = document.createElement('button');
-      btn.className = 'opt-btn';
-      btn.textContent = opt;
-      btn.onclick = () => handleAnswer(displayIdx, oi);
-      opts.appendChild(btn);
-    });
-    block.appendChild(opts);
-    area.appendChild(block);
-  });
-
-  document.getElementById('results-box').style.display = 'none';
 }
 
-function handleAnswer(displayIdx, oi) {
-  if (answered[displayIdx]) return;
-  answered[displayIdx] = true;
-
-  const p = PASSAGES[currentPassageIdx];
-  const qi = sessionQuestions[displayIdx];
-  const q = p.questions[qi];
-  const block = document.getElementById(`q${displayIdx}`);
-  const btns = block.querySelectorAll('.opt-btn');
-
-  btns.forEach(b => b.disabled = true);
-
-  if (oi === q.a) {
-    btns[oi].classList.add('correct');
-    correct++;
-  } else {
-    btns[oi].classList.add('wrong');
-    btns[q.a].classList.add('revealed');
-  }
-
-  updateScore();
-
-  if (answered.every(Boolean)) {
-    setTimeout(showResults, 600);
-  }
+function finish() {
+  const keys = (p.keywords || []).map(k => `<span class="kw"><span class="ru">${esc(k.rus)}</span> <span class="dim">${esc(k.eng)}</span></span>`).join('<span class="sep">·</span>');
+  $('#end').innerHTML = (keys ? `<section class="box">${sectionHead(3, 'Слова', 'Ключевые слова.', 'key words from the text')}<div class="keys">${keys}</div></section>` : '')
+    + resultsBox(right, qs.length, back[0], back[1]);
+  $('#again').innerHTML = `${icon('next')}Новый текст`;
+  $('#again').onclick = () => { nextPassage(); window.scrollTo(0, 0); };
+  $('#end').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function updateScore() {
-  const done = answered.filter(Boolean).length;
-  document.getElementById('score-display').textContent =
-    done > 0 ? `${correct} / ${done} correct` : '';
-}
-
-function showResults() {
-  const box = document.getElementById('results-box');
-  document.getElementById('results-score').textContent = `${correct} / ${QUESTIONS_PER_SESSION}`;
-  const pct = Math.round((correct / QUESTIONS_PER_SESSION) * 100);
-  document.getElementById('results-bear').src = pct >= 70 ? 'bear_happy.png' : pct >= 40 ? 'bear_neutral.png' : 'bear_sad.png';
-  let label = pct === 100 ? 'Perfect! 🎉' : pct >= 60 ? 'Good effort — review the answers above.' : 'Keep practising — the answers are highlighted above.';
-  document.getElementById('results-label').textContent = label;
-  box.style.display = 'block';
-
-  // Show key words
-  const p = PASSAGES[currentPassageIdx];
-  if (p.keywords && p.keywords.length > 0) {
-    const kwBox = document.getElementById('key-words-box');
-    const kwGrid = document.getElementById('key-words-grid');
-    kwGrid.innerHTML = '';
-    p.keywords.forEach(kw => {
-      const row = document.createElement('div');
-      row.className = 'key-word-row';
-      row.innerHTML = `<span class="key-word-rus">${kw.rus}</span><span class="key-word-eng">${kw.eng}</span>`;
-      kwGrid.appendChild(row);
-    });
-    kwBox.style.display = 'block';
-  }
-
-  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function nextPassage() {
-  document.getElementById('key-words-box').style.display = 'none';
-  currentPassageIdx = getNextPassageIdx();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  loadPassage();
-}
-
-function goHome() {
-  window.location.href = 'index.html';
-}
-
-// Start with a random passage
-currentPassageIdx = getNextPassageIdx();
-loadPassage();
+nextPassage(true);
 </script>
 </body>
 </html>
