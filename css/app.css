@@ -30,11 +30,11 @@ a { color: inherit; text-decoration: none; }
   padding: calc(36px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left)); }
 
 /* Header: red context left, title centre, grey italic right, over a thin rule. */
-.top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; column-gap: 10px;
+.top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; column-gap: 10px;
   padding: 6px 2px 10px; border-bottom: 1px solid var(--rule); margin-bottom: 14px; }
 .top .left { justify-self: start; color: var(--accent); font-size: 14px; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 3px; }
 .top .left .ic { width: 16px; height: 16px; }
-.top h1 { font-size: 34px; text-align: center; white-space: nowrap; }
+.top h1 { font-size: 34px; text-align: center; white-space: nowrap; min-width: 0; }
 .top .right { justify-self: end; color: var(--dim); font-size: 14px; font-style: italic; white-space: nowrap; }
 
 .track { height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; margin: -6px 0 16px; }
@@ -210,3 +210,16 @@ a { color: inherit; text-decoration: none; }
 .prompt .flag { display: flex; width: 132px; height: 88px; margin: 2px auto 0; border: 1.5px solid var(--rule); border-radius: 4px; overflow: hidden; }
 .prompt .flag.h { flex-direction: column; }
 .prompt .flag i { flex: 1; }
+
+.site { display: block; text-align: center; color: var(--dim); font-size: 13px; margin-top: 22px; }
+.site span { color: var(--accent); }
+
+/* Typed adjective endings */
+.end-in { font: inherit; width: 2.3em; border: none; border-bottom: 2px solid var(--accent); border-radius: 0; background: var(--soft);
+  text-align: center; padding: 0 2px; margin: 0 1px; outline: none; color: var(--ink); font-size: max(1em, 16px); vertical-align: baseline; }
+.end-in:focus { background: #fbeae8; }
+.end { border-bottom: 2px solid var(--ink); padding: 0 2px; margin: 0 1px; }
+.end.no { border-bottom-color: var(--accent); }
+.end s { color: var(--accent); text-decoration-thickness: 2px; margin-right: 4px; }
+.typed-hint { text-align: center; color: var(--dim); font-size: 14px; font-style: italic; margin: -4px 0 4px; }
+.btn:focus { outline: none; }

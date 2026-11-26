@@ -34,7 +34,7 @@ $('#app').innerHTML = header('Упражнения', '') +
         <div class="t"><div class="nm"><span class="ru">${esc(ty.title)}</span> <span class="dim">${esc(ty.en)} · ${its.length}</span></div>
         ${bar(progress(NS, its.map(i => i.id)))}</div>${icon('next', 'ic go')}</a>`;
     }).join('')}</div></section>` +
-  card('reading.html', 'reading', 'Чтение', `${PASSAGES.length} texts and dialogues: read, tap words, answer questions.`) +
+  card('reading.html', 'reading', 'Чтение', `${PASSAGES.length} texts: pick one or get a random one, then answer questions.`) +
   card('russian_verb_conjugator.html', 'verbs', 'Глаголы', `Type the present tense: 3 verbs from ${VERBS.length}.`) +
   card('names.html', 'names', 'Имена', 'Short forms of names and patronymics: 10 typed questions.',
     bar(progress(NAMES_NS, buildNameQuestions().map(q => q.key))));

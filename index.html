@@ -29,7 +29,8 @@ const main = BANK.filter(i => i.topic !== 'penguin');
 $('#app').innerHTML = header('Русский', `${today.getDate()} ${MONTHS[today.getMonth()]}`, '') +
   card('quiz.html#review', 'review', 'Повторить', 'A mix of 20 from every topic, leaning on what you got wrong.', bar(progress(NS, main.map(i => i.id)))) +
   card('topics.html', 'topics', 'Темы', `${TOPICS.length - 1} topics, one per sheet: everything from a sheet in one place.`) +
-  card('exercises.html', 'types', 'Упражнения', `${TYPES.length} kinds of exercise, plus reading, verbs and names.`);
+  card('exercises.html', 'types', 'Упражнения', `${TYPES.length} kinds of exercise, plus reading, verbs and names.`) +
+  '<a class="site" href="https://callumhuntington.github.io/">Made by Callum · <span>callumhuntington.github.io</span></a>';
 </script>
 </body>
 </html>

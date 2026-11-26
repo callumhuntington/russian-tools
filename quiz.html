@@ -64,6 +64,8 @@ function promptHtml(it) {
     `<div class="dl"><span class="sp">${stress(sp)}</span><span class="ru">${gap(tx)}</span></div>`).join('')}</div>`;
   else if (p.hw) body += `<span class="hw">${esc(p.hw)}</span>`;
   else if (p.big) body += `<span class="big">${esc(p.big)}</span>`;
+  else if (p.gap) { const [x, y] = p.gap.split('{}');
+    body += `<span class="ru gapline${plain(p.gap).length > 18 ? ' long' : ''}">${stress(x)}<input class="end-in" id="end" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" lang="ru" enterkeyhint="done" aria-label="ending">${stress(y)}</span>`; }
   else if (p.ru) body += `<span class="ru${plain(p.ru).length > 22 ? ' long' : ''}">${gap(p.ru)}</span>`;
   else if (p.en) body += `<span class="en${p.en.length > 40 ? ' long' : ''}">${esc(p.en)}</span>`;
   if (p.sub) body += `<span class="ctx">${t(p.sub)}</span>`;
@@ -78,37 +80,67 @@ function show() {
     <section class="box">
       ${sectionHead(idx + 1, ty.title, ty.ru, ty.instr)}
       <div class="prompt">${promptHtml(it)}</div>
+      ${it.typed ? `<div class="typed-hint" id="hint">Type the ending, then press Проверить.</div>
+      <div class="btns centre" id="checkrow"><button class="btn" id="check">${icon('tick')}Проверить</button></div>` : `
       <div class="opts${one ? ' one' : ''}">
         ${order.map((oi, k) => `<button class="opt" data-i="${oi}"><span class="l">${'abcd'[k]})</span>${t(it.o[oi])}</button>`).join('')}
-      </div>
+      </div>`}
       <div id="after"></div>
     </section>
-    ${review || !topic ? `<p class="foot">${esc(TO[it.topic].title)}</p>` : ''}`;
+    ${review || !topic ? `<p class="foot">Тема: ${esc(TO[it.topic].title)}</p>` : ''}`;
   setTrack((idx + 1) / round.length);
   $$('.opt').forEach(b => b.onclick = () => answer(+b.dataset.i));
+  if (it.typed) {
+    const inp = $('#end');
+    inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); checkTyped(); } };
+    $('#check').onclick = checkTyped;
+    try { inp.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+  }
+}
+
+// Typed endings: accept the ending on its own or the whole adjective; ё counts as е.
+const norm = s => s.trim().toLowerCase().replace(/ё/g, 'е').replace(/^[-–—_\s]+/, '');
+function checkTyped() {
+  const it = round[idx], inp = $('#end');
+  if (!inp || inp.disabled) return;
+  const v = norm(inp.value);
+  if (!v) { inp.focus(); return; }
+  if (/[a-z]/i.test(v)) { $('#hint').innerHTML = '<span class="red">That looks like English letters: switch to the Russian keyboard.</span>'; inp.focus(); return; }
+  const want = norm(it.o[0]);
+  const stemWord = norm(plain(it.p.gap.split('{}')[0]).split(/\s+/).pop());
+  const ok = v === want || v === stemWord + want;
+  inp.disabled = true; inp.blur();
+  const shown = document.createElement('span');
+  shown.className = 'end ' + (ok ? 'ok' : 'no');
+  shown.innerHTML = ok ? esc(it.o[0]) : `<s>${esc(inp.value.trim())}</s>${esc(it.o[0])}`;
+  inp.replaceWith(shown);
+  $('#hint').remove(); $('#checkrow').remove();
+  answer(ok ? 0 : -1);
 }
 
 function answer(choice) {
   const it = round[idx], ok = choice === it.a;
   if (ok) score++;
   bump(NS, it.id, ok);
-  $('.opts').classList.add('done');
+  if ($('.opts')) $('.opts').classList.add('done');
   $$('.opt').forEach(b => {
     b.disabled = true;
     const i = +b.dataset.i;
     if (i === it.a) b.classList.add('right'); else if (i === choice) b.classList.add('wrong');
   });
   const rows = [];
+  if (it.full) rows.push([ok ? 'Полностью' : 'Правильно', t(it.full)]);
   if (it.note) rows.push(['Заметка', t(it.note)]);
   if (it.tr) rows.push(['Перевод', `<span class="en">${esc(it.tr)}</span>`]);
   if (it.ex) { const [ru, en] = splitEx(it.ex); rows.push(['Пример', `${t(ru)}${en ? ` <span class="en">— ${esc(en)}</span>` : ''}`]); }
   if (it.p.lines) rows.push(['Диалог', it.p.lines.map(([sp, tx]) => `<span class="red">${stress(sp)}</span> ${t(tx.replace('___', it.o[it.a]))}`).join('<br>')]);
   const last = idx === round.length - 1;
   $('#after').innerHTML = `
-    <div class="fb ${ok ? 'ok' : 'no'}">${icon(ok ? 'tick' : 'cross')}<span>${ok ? 'Правильно!' : `The answer is ${t(it.o[it.a])}`}</span></div>
+    <div class="fb ${ok ? 'ok' : 'no'}">${icon(ok ? 'tick' : 'cross')}<span>${ok ? 'Правильно!' : it.typed ? `The ending is ${t('-' + it.o[0])}` : `The answer is ${t(it.o[it.a])}`}</span></div>
     ${rows.length ? `<div class="info">${rows.map(([l, v]) => `<div><div class="lab">${l}</div><div class="val">${v}</div></div>`).join('')}</div>` : ''}
     <div class="btns"><button class="btn" id="next">${last ? 'Итог' : 'Дальше'}${icon('next')}</button></div>`;
   $('#next').onclick = next;
+  if (it.typed) $('#next').focus({ preventScroll: true });
   $('#next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 

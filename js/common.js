@@ -119,6 +119,22 @@ function speak(text) {
   speechSynthesis.speak(u);
 }
 
+// Header: shrink the title until it fits between the left and right labels.
+function fitTop() {
+  document.querySelectorAll('.top h1').forEach(h => {
+    h.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(h).fontSize);
+    while (h.scrollWidth > h.clientWidth + 1 && fs > 14) { fs -= 1; h.style.fontSize = fs + 'px'; }
+  });
+}
+let fitQueued = false;
+function queueFit() { if (fitQueued) return; fitQueued = true; requestAnimationFrame(() => { fitQueued = false; fitTop(); }); }
+try {
+  new MutationObserver(queueFit).observe(document.documentElement, { childList: true, subtree: true });
+  window.addEventListener('resize', queueFit);
+  if (document.fonts) document.fonts.ready.then(queueFit);
+} catch (e) { /* older browsers: title just stays full size */ }
+
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) { /* not available here */ }
 }

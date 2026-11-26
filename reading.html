@@ -22,12 +22,28 @@
 // Reading: one dialogue, tap dotted words for their meaning, then answer 4 questions from its bank.
 const PER_ROUND = 4;
 let queue = [], p = null, qs = [], done = 0, right = 0;
-// #p-<id> opens one text; #t-<topic> keeps to one topic's texts; otherwise texts come in random order.
-const want = (location.hash.match(/p-([a-z_]+)/) || [])[1];
-const tWant = (location.hash.match(/t-([a-z]+)/) || [])[1] || (PASSAGES.find(x => x.id === want) || {}).topic;
+// No hash: the list of texts. #random: random texts. #i-<id>: one text opened from the list.
+// #p-<id>: one text opened from its topic. #t-<topic>: that topic's texts.
+const H = location.hash;
+const fromList = /^#(i-|random)/.test(H);
+const want = (H.match(/[pi]-([a-z_]+)/) || [])[1];
+const tWant = (H.match(/t-([a-z]+)/) || [])[1] || (!fromList && (PASSAGES.find(x => x.id === want) || {}).topic);
 window.onhashchange = () => location.reload();
-const back = want || tWant ? [`topic.html#t-${tWant}`, 'Тема'] : ['exercises.html', 'Упражнения'];
-const POOL = tWant ? PASSAGES.filter(x => x.topic === tWant) : PASSAGES.filter(x => x.topic !== 'penguin').concat(PASSAGES.filter(x => x.topic === 'penguin'));
+const back = fromList ? ['reading.html', 'Тексты'] : want || tWant ? [`topic.html#t-${tWant}`, 'Тема'] : ['exercises.html', 'Упражнения'];
+const MAIN = PASSAGES.filter(x => x.topic !== 'penguin');
+const POOL = tWant ? PASSAGES.filter(x => x.topic === tWant) : MAIN;
+
+function showList() {
+  const row = (x, n) => `<a class="item" href="reading.html#i-${x.id}"><span class="n">${n + 1}.</span>
+    <div class="t"><div class="nm"><span class="ru">${esc(x.title)}</span> <span class="dim">${esc(x.difficulty || '')}</span></div></div>${icon('next', 'ic go')}</a>`;
+  const pen = PASSAGES.filter(x => x.topic === 'penguin');
+  $('#app').innerHTML = header('Чтение', `${PASSAGES.length} texts`, 'exercises.html', 'Упражнения') + `
+    <section class="box">${sectionHead(0, 'Тексты', 'Выберите текст.', 'or let the app pick one')}
+      <div class="btns centre" style="margin:0 0 12px"><a class="btn" href="reading.html#random">${icon('review')}Случайный текст</a></div>
+      <div class="list">${MAIN.map(row).join('')}</div></section>
+    <section class="box">${sectionHead(0, 'Penguin', '', 'texts from the Penguin course')}
+      <div class="list">${pen.map(row).join('')}</div></section>`;
+}
 
 function nextPassage(first) {
   if (first && want && PASSAGES.find(x => x.id === want)) p = PASSAGES.find(x => x.id === want);
@@ -102,7 +118,7 @@ function finish() {
   $('#end').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-nextPassage(true);
+if (!H || H === '#') showList(); else nextPassage(true);
 </script>
 </body>
 </html>
