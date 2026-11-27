@@ -119,12 +119,21 @@ function speak(text) {
   speechSynthesis.speak(u);
 }
 
-// Header: shrink the title until it fits between the left and right labels.
+// Header: the title stays centred on the page. If it doesn't fit between the side labels it shrinks a little;
+// if it still doesn't fit, it moves onto its own line under them.
 function fitTop() {
-  document.querySelectorAll('.top h1').forEach(h => {
-    h.style.fontSize = '';
+  document.querySelectorAll('.top').forEach(top => {
+    const h = top.querySelector('h1'), l = top.querySelector('.left'), r = top.querySelector('.right');
+    if (!h) return;
+    h.style.fontSize = ''; top.classList.remove('stack');
+    const side = Math.max(l ? l.scrollWidth : 0, r ? r.scrollWidth : 0);
+    const room = top.clientWidth - 4 - 2 * side - 20;
     let fs = parseFloat(getComputedStyle(h).fontSize);
-    while (h.scrollWidth > h.clientWidth + 1 && fs > 14) { fs -= 1; h.style.fontSize = fs + 'px'; }
+    while (h.scrollWidth > room && fs > 24) { fs -= 1; h.style.fontSize = fs + 'px'; }
+    if (h.scrollWidth <= room) return;
+    top.classList.add('stack'); h.style.fontSize = '';
+    fs = parseFloat(getComputedStyle(h).fontSize);
+    while (h.scrollWidth > top.clientWidth - 4 && fs > 14) { fs -= 1; h.style.fontSize = fs + 'px'; }
   });
 }
 let fitQueued = false;

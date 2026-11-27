@@ -1,6 +1,6 @@
 // Offline support. Pages and data are fetched fresh when online (so updates show up without reinstalling),
 // and served from the cache when offline.
-const CACHE = 'russian-tools-v3.5';
+const CACHE = 'russian-tools-v3.6';
 const FILES = [
   './',
   'bear_happy.png',
