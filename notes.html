@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Русский — Заметки</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Русский">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="css/fonts.css?v=3.5">
+<link rel="stylesheet" href="css/app.css?v=3.5">
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script src="js/icons.js?v=3.5"></script>
+<script src="js/common.js?v=3.5"></script>
+<script src="data/notes.js?v=3.5"></script>
+<script src="js/notes-view.js?v=3.5"></script>
+<script>
+// Заметки: the notes for one topic, then links to practise it.
+const tid = (location.hash.match(/t-([a-z]+)/) || [, 'prilag'])[1];
+window.onhashchange = () => location.reload();
+const extra = tid === 'prilag' ? `<a class="btn ghost" href="quiz.html#x-okonch">${icon('types')}Окончания</a>` : '';
+$('#app').innerHTML = header('Заметки', '', `topic.html#t-${tid}`, 'Тема') + renderNotes(tid) +
+  `<div class="btns centre">${extra}<a class="btn" href="quiz.html#t-${tid}">${icon('all')}Practise this topic</a></div>`;
+</script>
+</body>
+</html>

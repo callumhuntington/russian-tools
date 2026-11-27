@@ -10,14 +10,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Русский">
 <meta name="theme-color" content="#ffffff">
-<link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/fonts.css?v=3.5">
+<link rel="stylesheet" href="css/app.css?v=3.5">
 </head>
 <body>
 <div class="wrap" id="app"></div>
-<script src="js/icons.js"></script>
-<script src="js/common.js"></script>
-<script src="data/bank.js"></script>
+<script src="js/icons.js?v=3.5"></script>
+<script src="js/common.js?v=3.5"></script>
+<script src="data/bank.js?v=3.5"></script>
+<script src="data/notes.js?v=3.5"></script>
+<script src="js/notes-view.js?v=3.5"></script>
 <script>
 // Question runner. #review = daily mix · #t-<topic> = one topic · #x-<type> = one exercise type · #t-<topic>-x-<type> = both.
 const TY = Object.fromEntries(TYPES.map(x => [x.id, x]));
@@ -63,7 +65,7 @@ function promptHtml(it) {
   else if (p.lines) body += `<div class="lines">${p.lines.map(([sp, tx]) =>
     `<div class="dl"><span class="sp">${stress(sp)}</span><span class="ru">${gap(tx)}</span></div>`).join('')}</div>`;
   else if (p.hw) body += `<span class="hw">${esc(p.hw)}</span>`;
-  else if (p.big) body += `<span class="big">${esc(p.big)}</span>`;
+  else if (p.big) body += `<span class="big${p.big.length > 9 ? ' long' : ''}">${esc(p.big)}</span>`;
   else if (p.gap) { const [x, y] = p.gap.split('{}');
     body += `<span class="ru gapline${plain(p.gap).length > 18 ? ' long' : ''}">${stress(x)}<input class="end-in" id="end" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" lang="ru" enterkeyhint="done" aria-label="ending">${stress(y)}</span>`; }
   else if (p.ru) body += `<span class="ru${plain(p.ru).length > 22 ? ' long' : ''}">${gap(p.ru)}</span>`;
@@ -72,10 +74,13 @@ function promptHtml(it) {
   return body;
 }
 
+// Adjective endings use the adjectives notes; everything else uses its topic's notes.
+const notesFor = it => it.type === 'okonch' ? 'prilag' : it.topic;
+
 function show() {
   const it = round[idx], ty = TY[it.type];
   const order = it.fixed ? it.o.map((_, i) => i) : shuffle(it.o.map((_, i) => i));
-  const one = it.o.some(o => plain(o).length > 14);
+  const one = it.o.some(o => plain(o).length > 11);
   $('#app').innerHTML = header(title, `${idx + 1} / ${round.length}`, back[0], back[1]) + '<div class="track"><i></i></div>' + `
     <section class="box">
       ${sectionHead(idx + 1, ty.title, ty.ru, ty.instr)}
@@ -87,9 +92,11 @@ function show() {
       </div>`}
       <div id="after"></div>
     </section>
-    ${review || !topic ? `<p class="foot">Тема: ${esc(TO[it.topic].title)}</p>` : ''}`;
+    <div class="qfoot">${review || !topic ? `<span>Тема: ${esc(TO[it.topic].title)}</span>` : ''}
+      ${NOTES[notesFor(it)] ? `<button class="pill" id="notesbtn" type="button">${icon('vocab')}Заметки</button>` : ''}</div>`;
   setTrack((idx + 1) / round.length);
   $$('.opt').forEach(b => b.onclick = () => answer(+b.dataset.i));
+  if ($('#notesbtn')) $('#notesbtn').onclick = () => openNotes(notesFor(it));
   if (it.typed) {
     const inp = $('#end');
     inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); checkTyped(); } };

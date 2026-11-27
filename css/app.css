@@ -62,7 +62,7 @@ a { color: inherit; text-decoration: none; }
 .prompt .ctx { display: block; margin-top: 8px; font-size: 14px; color: var(--dim); font-style: italic; font-family: 'DM Sans', sans-serif; }
 
 /* Multiple choice: a) b) c) d) */
-.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .opts.one { grid-template-columns: 1fr; }
 .opt { text-align: left; border: 1px solid var(--rule); border-radius: 10px; padding: 11px 12px; font-size: 17px; line-height: 1.3;
   display: flex; gap: 8px; align-items: baseline; transition: background 0.12s, border-color 0.12s, opacity 0.2s; background: var(--paper); }
@@ -142,10 +142,11 @@ a { color: inherit; text-decoration: none; }
 .qn { display: flex; gap: 8px; margin: 14px 0 8px; font-size: 16px; }
 .qn:first-of-type { margin-top: 0; }
 .qn .n { color: var(--dim); width: 20px; text-align: right; flex: none; font-size: 14px; padding-top: 1px; }
-.keys { font-size: 15px; line-height: 1.8; text-align: center; }
+.keys { font-size: 15px; display: grid; }
+.keys .kw { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 12px; padding: 7px 2px; border-bottom: 1px dashed var(--rule); }
+.keys .kw:last-child { border-bottom: none; }
 .keys .ru { font-size: 17px; }
-.keys .kw { white-space: nowrap; }
-.keys .sep { color: var(--rule); margin: 0 6px; }
+.keys .dim { font-style: italic; text-align: right; margin-left: auto; }
 
 /* Verbs */
 .verb { text-align: center; margin-bottom: 14px; }
@@ -183,6 +184,7 @@ a { color: inherit; text-decoration: none; }
 .prompt .pic { display: block; width: 92px; height: 92px; margin: 2px auto 0; color: var(--ink); }
 .prompt .pic svg { width: 100%; height: 100%; }
 .prompt .big { font-family: 'Onest', sans-serif; font-size: 44px; letter-spacing: 0.04em; display: block; line-height: 1.2; }
+.prompt .big.long { font-size: 26px; letter-spacing: 0.02em; overflow-wrap: anywhere; }
 .prompt .lines { text-align: left; display: inline-block; max-width: 100%; }
 .prompt .lines .dl { font-size: 19px; }
 .prompt .lines .sp { width: auto; min-width: 22px; margin-right: 4px; }
@@ -223,3 +225,45 @@ a { color: inherit; text-decoration: none; }
 .end s { color: var(--accent); text-decoration-thickness: 2px; margin-right: 4px; }
 .typed-hint { text-align: center; color: var(--dim); font-size: 14px; font-style: italic; margin: -4px 0 4px; }
 .btn:focus { outline: none; }
+
+/* Notes (Заметки) */
+.ntitle { text-align: center; margin: 2px 0 16px; }
+.ntitle .ru { display: block; font-size: 24px; }
+.ntitle .en { display: block; color: var(--dim); font-style: italic; font-size: 14px; margin-top: 4px; }
+.np { font-size: 15px; line-height: 1.5; margin: 8px 0; }
+.ntw { overflow-x: auto; margin: 8px 0; }
+.nt { width: 100%; border-collapse: collapse; font-size: 15px; }
+.nt.wide { font-size: 14px; }
+.nt th { font-weight: 500; color: var(--accent); text-align: left; font-size: 13px; padding: 4px 6px; border-bottom: 1px solid var(--rule); }
+.nt td { padding: 5px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.nt tr:last-child td { border-bottom: none; }
+.nt.lab td:first-child { color: var(--dim); font-size: 13px; }
+.nex { margin: 8px 0; }
+.nex .r { display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px dashed var(--rule); }
+.nex .r:last-child { border-bottom: none; }
+.nex .ru { font-size: 17px; }
+.nex .en { color: var(--dim); font-style: italic; font-size: 14px; }
+.nl { padding-left: 20px; font-size: 15px; line-height: 1.5; margin: 6px 0; }
+.nl li { margin: 4px 0; }
+.traps .nl li::marker { color: var(--accent); }
+.box.notes .sh { margin-bottom: 8px; }
+
+/* Notes button in exercises, and the notes panel */
+.qfoot { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; color: var(--dim); font-size: 13px; margin-top: 14px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 6px 14px;
+  font-size: 14px; font-weight: 500; background: var(--paper); }
+.pill .ic { width: 17px; height: 17px; }
+.overlay { position: fixed; inset: 0; background: var(--paper); z-index: 50; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.overlay .top .right { display: inline-flex; align-items: center; gap: 3px; font-style: normal; color: var(--accent); font-size: 14px; }
+.overlay .top .right .ic { width: 16px; height: 16px; }
+.overlay .top .left { color: var(--accent); }
+body.noscroll { overflow: hidden; }
+
+.end-r, .end-r .ru { color: var(--accent); }
+.nt tr.grp td { color: var(--dim); font-size: 13px; font-style: italic; padding-top: 9px; padding-bottom: 1px; border-bottom: none; }
+.nt.four { font-size: 14px; }
+.nt.four td, .nt.four th { padding-left: 3px; padding-right: 3px; }
+
+/* Safety net: long words wrap rather than push the page wider */
+.opt, .prompt, .info .val, .np, .nl li, .nex .r, .fact, .qn, .dl { overflow-wrap: anywhere; min-width: 0; }
+.opts.one { grid-template-columns: minmax(0, 1fr); }

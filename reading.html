@@ -10,14 +10,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Русский">
 <meta name="theme-color" content="#ffffff">
-<link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/fonts.css?v=3.5">
+<link rel="stylesheet" href="css/app.css?v=3.5">
 </head>
 <body>
 <div class="wrap" id="app"></div>
-<script src="js/icons.js"></script>
-<script src="js/common.js"></script>
-<script src="data/reading.js"></script>
+<script src="js/icons.js?v=3.5"></script>
+<script src="js/common.js?v=3.5"></script>
+<script src="data/reading.js?v=3.5"></script>
 <script>
 // Reading: one dialogue, tap dotted words for their meaning, then answer 4 questions from its bank.
 const PER_ROUND = 4;
@@ -86,7 +86,7 @@ function show() {
       ${sectionHead(2, 'Вопросы', 'Выберите ответ.', 'choose the answer')}
       ${qs.map((q, qi) => `
         <div class="qn"><span class="n">${qi + 1}.</span><span>${t(q.q)}</span></div>
-        <div class="opts${q.opts.some(o => o.length > 16) ? ' one' : ''}" data-q="${qi}">
+        <div class="opts${q.opts.some(o => o.length > 12) ? ' one' : ''}" data-q="${qi}">
           ${q.opts.map((o, oi) => `<button class="opt" data-o="${oi}"><span class="l">${'abcd'[oi]})</span>${t(o)}</button>`).join('')}
         </div>`).join('')}
     </section>
@@ -110,7 +110,7 @@ function show() {
 }
 
 function finish() {
-  const keys = (p.keywords || []).map(k => `<span class="kw"><span class="ru">${esc(k.rus)}</span> <span class="dim">${esc(k.eng)}</span></span>`).join('<span class="sep">·</span>');
+  const keys = (p.keywords || []).map(k => `<div class="kw"><span class="ru">${esc(k.rus)}</span><span class="dim">${esc(k.eng)}</span></div>`).join('');
   $('#end').innerHTML = (keys ? `<section class="box">${sectionHead(3, 'Слова', 'Ключевые слова.', 'key words from the text')}<div class="keys">${keys}</div></section>` : '')
     + resultsBox(right, qs.length, back[0], back[1]);
   $('#again').innerHTML = `${icon('next')}Новый текст`;

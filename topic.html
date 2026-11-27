@@ -10,15 +10,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Русский">
 <meta name="theme-color" content="#ffffff">
-<link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/fonts.css?v=3.5">
+<link rel="stylesheet" href="css/app.css?v=3.5">
 </head>
 <body>
 <div class="wrap" id="app"></div>
-<script src="js/icons.js"></script>
-<script src="js/common.js"></script>
-<script src="data/bank.js"></script>
-<script src="data/reading.js"></script>
+<script src="js/icons.js?v=3.5"></script>
+<script src="js/common.js?v=3.5"></script>
+<script src="data/bank.js?v=3.5"></script>
+<script src="data/reading.js?v=3.5"></script>
+<script src="data/notes.js?v=3.5"></script>
 <script>
 // One topic: all of it mixed, each exercise type on its own, and its reading texts.
 const tid = (location.hash.match(/t-([a-z]+)/) || [, 'privet'])[1];
@@ -29,6 +30,7 @@ const texts = PASSAGES.filter(p => p.topic === tp.id);
 const types = TYPES.filter(ty => items.some(i => i.type === ty.id));
 
 $('#app').innerHTML = header(tp.title, '', 'topics.html', 'Темы') +
+  (NOTES[tp.id] ? card(`notes.html#t-${tp.id}`, 'vocab', 'Заметки', 'Short notes: the patterns, examples and traps.') : '') +
   card(`quiz.html#t-${tp.id}`, 'all', 'Всё', `20 questions mixed from the whole topic (${items.length} in all).`, bar(progress(NS, items.map(i => i.id)))) +
   `<section class="box">${sectionHead(0, 'Упражнения', 'Выберите упражнение.', 'one kind at a time')}
     <div class="list">${types.map((ty, n) => {

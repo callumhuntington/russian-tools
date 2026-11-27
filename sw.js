@@ -1,6 +1,6 @@
 // Offline support. Pages and data are fetched fresh when online (so updates show up without reinstalling),
 // and served from the cache when offline.
-const CACHE = 'russian-tools-v3.3';
+const CACHE = 'russian-tools-v3.5';
 const FILES = [
   './',
   'bear_happy.png',
@@ -10,6 +10,7 @@ const FILES = [
   'css/fonts.css',
   'data/bank.js',
   'data/names.js',
+  'data/notes.js',
   'data/reading.js',
   'data/verbs.js',
   'exercises.html',
@@ -41,8 +42,10 @@ const FILES = [
   'js/common.js',
   'js/icons.js',
   'js/names-bank.js',
+  'js/notes-view.js',
   'manifest.json',
   'names.html',
+  'notes.html',
   'quiz.html',
   'reading.html',
   'russian_verb_conjugator.html',
@@ -67,7 +70,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, { cache: 'no-cache' }).then(res => {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(e.request, copy));
       return res;
